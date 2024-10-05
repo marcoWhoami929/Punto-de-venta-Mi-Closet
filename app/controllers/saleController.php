@@ -30,7 +30,7 @@ class saleController extends mainModel
 		}
 
 		/*== Seleccionando productos en la DB ==*/
-		$datos_productos = $this->ejecutarConsulta("SELECT * FROM producto WHERE (producto_nombre LIKE '%$producto%' OR producto_marca LIKE '%$producto%' OR producto_modelo LIKE '%$producto%') ORDER BY producto_nombre ASC");
+		$datos_productos = $this->ejecutarConsulta("SELECT * FROM producto WHERE (nombre LIKE '%$producto%' OR marca LIKE '%$producto%' OR modelo LIKE '%$producto%') ORDER BY nombre ASC");
 
 		if ($datos_productos->rowCount() >= 1) {
 
@@ -41,9 +41,9 @@ class saleController extends mainModel
 			foreach ($datos_productos as $rows) {
 				$tabla .= '
 					<tr class="has-text-left" >
-                        <td><i class="fas fa-box fa-fw"></i> &nbsp; ' . $rows['producto_nombre'] . '</td>
+                        <td><i class="fas fa-box fa-fw"></i> &nbsp; ' . $rows['nombre'] . '</td>
                         <td class="has-text-centered">
-                            <button type="button" class="button is-link is-rounded is-small" onclick="agregar_codigo(\'' . $rows['producto_codigo'] . '\')"><i class="fas fa-plus-circle"></i></button>
+                            <button type="button" class="button is-link is-rounded is-small" onclick="agregar_codigo(\'' . $rows['codigo'] . '\')"><i class="fas fa-plus-circle"></i></button>
                         </td>
                     </tr>
                     ';
@@ -72,7 +72,7 @@ class saleController extends mainModel
 	{
 
 		/*== Recuperando codigo del producto ==*/
-		$codigo = $this->limpiarCadena($_POST['producto_codigo']);
+		$codigo = $this->limpiarCadena($_POST['codigo']);
 
 		if ($codigo == "") {
 			$alerta = [
@@ -98,7 +98,7 @@ class saleController extends mainModel
 		}
 
 		/*== Comprobando producto en la DB ==*/
-		$check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE producto_codigo='$codigo'");
+		$check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE codigo='$codigo'");
 		if ($check_producto->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -113,13 +113,13 @@ class saleController extends mainModel
 		}
 
 		/*== Codigo de producto ==*/
-		$codigo = $campos['producto_codigo'];
+		$codigo = $campos['codigo'];
 
 		if (empty($_SESSION['datos_producto_venta'][$codigo])) {
 
 			$detalle_cantidad = 1;
 
-			$stock_total = $campos['producto_stock_total'] - $detalle_cantidad;
+			$stock_total = $campos['stock_total'] - $detalle_cantidad;
 
 			if ($stock_total < 0) {
 				$alerta = [
@@ -132,26 +132,26 @@ class saleController extends mainModel
 				exit();
 			}
 
-			$detalle_total = $detalle_cantidad * $campos['producto_precio_venta'];
+			$detalle_total = $detalle_cantidad * $campos['precio_venta'];
 			$detalle_total = number_format($detalle_total, MONEDA_DECIMALES, '.', '');
 
 			$_SESSION['datos_producto_venta'][$codigo] = [
-				"producto_id" => $campos['producto_id'],
-				"producto_codigo" => $campos['producto_codigo'],
-				"producto_stock_total" => $stock_total,
-				"producto_stock_total_old" => $campos['producto_stock_total'],
-				"venta_detalle_precio_compra" => $campos['producto_precio_compra'],
-				"venta_detalle_precio_venta" => $campos['producto_precio_venta'],
+				"id_producto" => $campos['id_producto'],
+				"codigo" => $campos['codigo'],
+				"stock_total" => $stock_total,
+				"stock_total_old" => $campos['stock_total'],
+				"venta_detalle_precio_compra" => $campos['precio_compra'],
+				"venta_detalle_precio_venta" => $campos['precio_venta'],
 				"venta_detalle_cantidad" => 1,
 				"venta_detalle_total" => $detalle_total,
-				"venta_detalle_descripcion" => $campos['producto_nombre']
+				"venta_detalle_descripcion" => $campos['nombre']
 			];
 
-			$_SESSION['alerta_producto_agregado'] = "Se agrego <strong>" . $campos['producto_nombre'] . "</strong> a la venta";
+			$_SESSION['alerta_producto_agregado'] = "Se agrego <strong>" . $campos['nombre'] . "</strong> a la venta";
 		} else {
 			$detalle_cantidad = ($_SESSION['datos_producto_venta'][$codigo]['venta_detalle_cantidad']) + 1;
 
-			$stock_total = $campos['producto_stock_total'] - $detalle_cantidad;
+			$stock_total = $campos['stock_total'] - $detalle_cantidad;
 
 			if ($stock_total < 0) {
 				$alerta = [
@@ -164,22 +164,22 @@ class saleController extends mainModel
 				exit();
 			}
 
-			$detalle_total = $detalle_cantidad * $campos['producto_precio_venta'];
+			$detalle_total = $detalle_cantidad * $campos['precio_venta'];
 			$detalle_total = number_format($detalle_total, MONEDA_DECIMALES, '.', '');
 
 			$_SESSION['datos_producto_venta'][$codigo] = [
-				"producto_id" => $campos['producto_id'],
-				"producto_codigo" => $campos['producto_codigo'],
-				"producto_stock_total" => $stock_total,
-				"producto_stock_total_old" => $campos['producto_stock_total'],
-				"venta_detalle_precio_compra" => $campos['producto_precio_compra'],
-				"venta_detalle_precio_venta" => $campos['producto_precio_venta'],
+				"id_producto" => $campos['id_producto'],
+				"codigo" => $campos['codigo'],
+				"stock_total" => $stock_total,
+				"stock_total_old" => $campos['stock_total'],
+				"venta_detalle_precio_compra" => $campos['precio_compra'],
+				"venta_detalle_precio_venta" => $campos['precio_venta'],
 				"venta_detalle_cantidad" => $detalle_cantidad,
 				"venta_detalle_total" => $detalle_total,
-				"venta_detalle_descripcion" => $campos['producto_nombre']
+				"venta_detalle_descripcion" => $campos['nombre']
 			];
 
-			$_SESSION['alerta_producto_agregado'] = "Se agrego +1 <strong>" . $campos['producto_nombre'] . "</strong> a la venta. Total en carrito: <strong>$detalle_cantidad</strong>";
+			$_SESSION['alerta_producto_agregado'] = "Se agrego +1 <strong>" . $campos['nombre'] . "</strong> a la venta. Total en carrito: <strong>$detalle_cantidad</strong>";
 		}
 
 		$alerta = [
@@ -196,7 +196,7 @@ class saleController extends mainModel
 	{
 
 		/*== Recuperando codigo del producto ==*/
-		$codigo = $this->limpiarCadena($_POST['producto_codigo']);
+		$codigo = $this->limpiarCadena($_POST['codigo']);
 
 		unset($_SESSION['datos_producto_venta'][$codigo]);
 
@@ -224,7 +224,7 @@ class saleController extends mainModel
 	{
 
 		/*== Recuperando codigo & cantidad del producto ==*/
-		$codigo = $this->limpiarCadena($_POST['producto_codigo']);
+		$codigo = $this->limpiarCadena($_POST['codigo']);
 		$cantidad = $this->limpiarCadena($_POST['producto_cantidad']);
 
 		/*== comprobando campos vacios ==*/
@@ -252,7 +252,7 @@ class saleController extends mainModel
 		}
 
 		/*== Comprobando producto en la DB ==*/
-		$check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE producto_codigo='$codigo'");
+		$check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE codigo='$codigo'");
 		if ($check_producto->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -289,7 +289,7 @@ class saleController extends mainModel
 
 			$detalle_cantidad = $cantidad;
 
-			$stock_total = $campos['producto_stock_total'] - $detalle_cantidad;
+			$stock_total = $campos['stock_total'] - $detalle_cantidad;
 
 			if ($stock_total < 0) {
 				$alerta = [
@@ -302,22 +302,22 @@ class saleController extends mainModel
 				exit();
 			}
 
-			$detalle_total = $detalle_cantidad * $campos['producto_precio_venta'];
+			$detalle_total = $detalle_cantidad * $campos['precio_venta'];
 			$detalle_total = number_format($detalle_total, MONEDA_DECIMALES, '.', '');
 
 			$_SESSION['datos_producto_venta'][$codigo] = [
-				"producto_id" => $campos['producto_id'],
-				"producto_codigo" => $campos['producto_codigo'],
-				"producto_stock_total" => $stock_total,
-				"producto_stock_total_old" => $campos['producto_stock_total'],
-				"venta_detalle_precio_compra" => $campos['producto_precio_compra'],
-				"venta_detalle_precio_venta" => $campos['producto_precio_venta'],
+				"id_producto" => $campos['id_producto'],
+				"codigo" => $campos['codigo'],
+				"stock_total" => $stock_total,
+				"stock_total_old" => $campos['stock_total'],
+				"venta_detalle_precio_compra" => $campos['precio_compra'],
+				"venta_detalle_precio_venta" => $campos['precio_venta'],
 				"venta_detalle_cantidad" => $detalle_cantidad,
 				"venta_detalle_total" => $detalle_total,
-				"venta_detalle_descripcion" => $campos['producto_nombre']
+				"venta_detalle_descripcion" => $campos['nombre']
 			];
 
-			$_SESSION['alerta_producto_agregado'] = "Se $diferencia_productos <strong>" . $campos['producto_nombre'] . "</strong> a la venta. Total en carrito <strong>$detalle_cantidad</strong>";
+			$_SESSION['alerta_producto_agregado'] = "Se $diferencia_productos <strong>" . $campos['nombre'] . "</strong> a la venta. Total en carrito <strong>$detalle_cantidad</strong>";
 
 			$alerta = [
 				"tipo" => "redireccionar",
@@ -360,7 +360,7 @@ class saleController extends mainModel
 		}
 
 		/*== Seleccionando clientes en la DB ==*/
-		$datos_cliente = $this->ejecutarConsulta("SELECT * FROM cliente WHERE (cliente_id!='1') AND (cliente_numero_documento LIKE '%$cliente%' OR cliente_nombre LIKE '%$cliente%' OR cliente_apellido LIKE '%$cliente%' OR cliente_telefono LIKE '%$cliente%') ORDER BY cliente_nombre ASC");
+		$datos_cliente = $this->ejecutarConsulta("SELECT * FROM cliente WHERE (id_cliente!='1') AND (cliente_numero_documento LIKE '%$cliente%' OR nombre LIKE '%$cliente%' OR cliente_apellido LIKE '%$cliente%' OR telefono LIKE '%$cliente%') ORDER BY nombre ASC");
 
 		if ($datos_cliente->rowCount() >= 1) {
 
@@ -371,9 +371,9 @@ class saleController extends mainModel
 			foreach ($datos_cliente as $rows) {
 				$tabla .= '
 					<tr>
-                        <td class="has-text-left" ><i class="fas fa-male fa-fw"></i> &nbsp; ' . $rows['cliente_nombre'] . ' ' . $rows['cliente_apellido'] . ' (' . $rows['cliente_tipo_documento'] . ': ' . $rows['cliente_numero_documento'] . ')</td>
+                        <td class="has-text-left" ><i class="fas fa-male fa-fw"></i> &nbsp; ' . $rows['nombre'] . ' ' . $rows['cliente_apellido'] . ' (' . $rows['cliente_tipo_documento'] . ': ' . $rows['cliente_numero_documento'] . ')</td>
                         <td class="has-text-centered" >
-                            <button type="button" class="button is-link is-rounded is-small" onclick="agregar_cliente(' . $rows['cliente_id'] . ')"><i class="fas fa-user-plus"></i></button>
+                            <button type="button" class="button is-link is-rounded is-small" onclick="agregar_cliente(' . $rows['id_cliente'] . ')"><i class="fas fa-user-plus"></i></button>
                         </td>
                     </tr>
                     ';
@@ -402,10 +402,10 @@ class saleController extends mainModel
 	{
 
 		/*== Recuperando id del cliente ==*/
-		$id = $this->limpiarCadena($_POST['cliente_id']);
+		$id = $this->limpiarCadena($_POST['id_cliente']);
 
 		/*== Comprobando cliente en la DB ==*/
-		$check_cliente = $this->ejecutarConsulta("SELECT * FROM cliente WHERE cliente_id='$id'");
+		$check_cliente = $this->ejecutarConsulta("SELECT * FROM cliente WHERE id_cliente='$id'");
 		if ($check_cliente->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -419,12 +419,12 @@ class saleController extends mainModel
 			$campos = $check_cliente->fetch();
 		}
 
-		if ($_SESSION['datos_cliente_venta']['cliente_id'] == 1) {
+		if ($_SESSION['datos_cliente_venta']['id_cliente'] == 1) {
 			$_SESSION['datos_cliente_venta'] = [
-				"cliente_id" => $campos['cliente_id'],
+				"id_cliente" => $campos['id_cliente'],
 				"cliente_tipo_documento" => $campos['cliente_tipo_documento'],
 				"cliente_numero_documento" => $campos['cliente_numero_documento'],
-				"cliente_nombre" => $campos['cliente_nombre'],
+				"nombre" => $campos['nombre'],
 				"cliente_apellido" => $campos['cliente_apellido']
 			];
 
@@ -476,10 +476,10 @@ class saleController extends mainModel
 	{
 
 		$caja = $this->limpiarCadena($_POST['venta_caja']);
-		$venta_pagado = $this->limpiarCadena($_POST['venta_abono']);
+		$pagado = $this->limpiarCadena($_POST['venta_abono']);
 
 		/*== Comprobando integridad de los datos ==*/
-		if ($this->verificarDatos("[0-9.]{1,25}", $venta_pagado)) {
+		if ($this->verificarDatos("[0-9.]{1,25}", $pagado)) {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -490,7 +490,7 @@ class saleController extends mainModel
 			exit();
 		}
 
-		if ($_SESSION['venta_total'] <= 0 || (!isset($_SESSION['datos_producto_venta']) && count($_SESSION['datos_producto_venta']) <= 0)) {
+		if ($_SESSION['total'] <= 0 || (!isset($_SESSION['datos_producto_venta']) && count($_SESSION['datos_producto_venta']) <= 0)) {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -514,7 +514,7 @@ class saleController extends mainModel
 
 
 		/*== Comprobando cliente en la DB ==*/
-		$check_cliente = $this->ejecutarConsulta("SELECT cliente_id FROM cliente WHERE cliente_id='" . $_SESSION['datos_cliente_venta']['cliente_id'] . "'");
+		$check_cliente = $this->ejecutarConsulta("SELECT id_cliente FROM cliente WHERE id_cliente='" . $_SESSION['datos_cliente_venta']['id_cliente'] . "'");
 		if ($check_cliente->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -528,7 +528,7 @@ class saleController extends mainModel
 
 
 		/*== Comprobando caja en la DB ==*/
-		$check_caja = $this->ejecutarConsulta("SELECT * FROM caja WHERE caja_id='$caja'");
+		$check_caja = $this->ejecutarConsulta("SELECT * FROM caja WHERE id_caja='$caja'");
 		if ($check_caja->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -544,18 +544,18 @@ class saleController extends mainModel
 
 
 		/*== Formateando variables ==*/
-		$venta_pagado = number_format($venta_pagado, MONEDA_DECIMALES, '.', '');
-		$venta_total = number_format($_SESSION['venta_total'], MONEDA_DECIMALES, '.', '');
+		$pagado = number_format($pagado, MONEDA_DECIMALES, '.', '');
+		$total = number_format($_SESSION['total'], MONEDA_DECIMALES, '.', '');
 
-		$venta_fecha = date("Y-m-d");
-		$venta_hora = date("h:i a");
+		$fecha_venta = date("Y-m-d");
+		$hora_venta = date("h:i a");
 
-		$venta_total_final = $venta_total;
-		$venta_total_final = number_format($venta_total_final, MONEDA_DECIMALES, '.', '');
+		$total_final = $total;
+		$total_final = number_format($total_final, MONEDA_DECIMALES, '.', '');
 
 
 		/*== Calculando el cambio ==*/
-		if ($venta_pagado < $venta_total_final) {
+		if ($pagado < $total_final) {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -566,15 +566,15 @@ class saleController extends mainModel
 			exit();
 		}
 
-		$venta_cambio = $venta_pagado - $venta_total_final;
-		$venta_cambio = number_format($venta_cambio, MONEDA_DECIMALES, '.', '');
+		$cambio = $pagado - $total_final;
+		$cambio = number_format($cambio, MONEDA_DECIMALES, '.', '');
 
 
 		/*== Calculando total en caja ==*/
-		$movimiento_cantidad = $venta_pagado - $venta_cambio;
+		$movimiento_cantidad = $pagado - $cambio;
 		$movimiento_cantidad = number_format($movimiento_cantidad, MONEDA_DECIMALES, '.', '');
 
-		$total_caja = $datos_caja['caja_efectivo'] + $movimiento_cantidad;
+		$total_caja = $datos_caja['efectivo'] + $movimiento_cantidad;
 		$total_caja = number_format($total_caja, MONEDA_DECIMALES, '.', '');
 
 
@@ -583,7 +583,7 @@ class saleController extends mainModel
 		foreach ($_SESSION['datos_producto_venta'] as $productos) {
 
 			/*== Obteniendo datos del producto ==*/
-			$check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE producto_id='" . $productos['producto_id'] . "' AND producto_codigo='" . $productos['producto_codigo'] . "'");
+			$check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE id_producto='" . $productos['id_producto'] . "' AND codigo='" . $productos['codigo'] . "'");
 			if ($check_producto->rowCount() < 1) {
 				$errores_productos = 1;
 				break;
@@ -592,23 +592,23 @@ class saleController extends mainModel
 			}
 
 			/*== Respaldando datos de BD para poder restaurar en caso de errores ==*/
-			$_SESSION['datos_producto_venta'][$productos['producto_codigo']]['producto_stock_total'] = $datos_producto['producto_stock_total'] - $_SESSION['datos_producto_venta'][$productos['producto_codigo']]['venta_detalle_cantidad'];
+			$_SESSION['datos_producto_venta'][$productos['codigo']]['stock_total'] = $datos_producto['stock_total'] - $_SESSION['datos_producto_venta'][$productos['codigo']]['venta_detalle_cantidad'];
 
-			$_SESSION['datos_producto_venta'][$productos['producto_codigo']]['producto_stock_total_old'] = $datos_producto['producto_stock_total'];
+			$_SESSION['datos_producto_venta'][$productos['codigo']]['stock_total_old'] = $datos_producto['stock_total'];
 
 			/*== Preparando datos para enviarlos al modelo ==*/
 			$datos_producto_up = [
 				[
-					"campo_nombre" => "producto_stock_total",
+					"campo_nombre" => "stock_total",
 					"campo_marcador" => ":Stock",
-					"campo_valor" => $_SESSION['datos_producto_venta'][$productos['producto_codigo']]['producto_stock_total']
+					"campo_valor" => $_SESSION['datos_producto_venta'][$productos['codigo']]['stock_total']
 				]
 			];
 
 			$condicion = [
-				"condicion_campo" => "producto_id",
+				"condicion_campo" => "id_producto",
 				"condicion_marcador" => ":ID",
-				"condicion_valor" => $productos['producto_id']
+				"condicion_valor" => $productos['id_producto']
 			];
 
 			/*== Actualizando producto ==*/
@@ -625,16 +625,16 @@ class saleController extends mainModel
 
 				$datos_producto_rs = [
 					[
-						"campo_nombre" => "producto_stock_total",
+						"campo_nombre" => "stock_total",
 						"campo_marcador" => ":Stock",
-						"campo_valor" => $producto['producto_stock_total_old']
+						"campo_valor" => $producto['stock_total_old']
 					]
 				];
 
 				$condicion = [
-					"condicion_campo" => "producto_id",
+					"condicion_campo" => "id_producto",
 					"condicion_marcador" => ":ID",
-					"condicion_valor" => $producto['producto_id']
+					"condicion_valor" => $producto['id_producto']
 				];
 
 				$this->actualizarDatos("producto", $datos_producto_rs, $condicion);
@@ -651,54 +651,54 @@ class saleController extends mainModel
 		}
 
 		/*== generando codigo de venta ==*/
-		$correlativo = $this->ejecutarConsulta("SELECT venta_id FROM venta");
+		$correlativo = $this->ejecutarConsulta("SELECT id_venta FROM venta");
 		$correlativo = ($correlativo->rowCount()) + 1;
 		$codigo_venta = $this->generarCodigoAleatorio(10, $correlativo);
 
 		/*== Preparando datos para enviarlos al modelo ==*/
 		$datos_venta_reg = [
 			[
-				"campo_nombre" => "venta_codigo",
+				"campo_nombre" => "codigo",
 				"campo_marcador" => ":Codigo",
 				"campo_valor" => $codigo_venta
 			],
 			[
-				"campo_nombre" => "venta_fecha",
+				"campo_nombre" => "fecha_venta",
 				"campo_marcador" => ":Fecha",
-				"campo_valor" => $venta_fecha
+				"campo_valor" => $fecha_venta
 			],
 			[
-				"campo_nombre" => "venta_hora",
+				"campo_nombre" => "hora_venta",
 				"campo_marcador" => ":Hora",
-				"campo_valor" => $venta_hora
+				"campo_valor" => $hora_venta
 			],
 			[
-				"campo_nombre" => "venta_total",
+				"campo_nombre" => "total",
 				"campo_marcador" => ":Total",
-				"campo_valor" => $venta_total_final
+				"campo_valor" => $total_final
 			],
 			[
-				"campo_nombre" => "venta_pagado",
+				"campo_nombre" => "pagado",
 				"campo_marcador" => ":Pagado",
-				"campo_valor" => $venta_pagado
+				"campo_valor" => $pagado
 			],
 			[
-				"campo_nombre" => "venta_cambio",
+				"campo_nombre" => "cambio",
 				"campo_marcador" => ":Cambio",
-				"campo_valor" => $venta_cambio
+				"campo_valor" => $cambio
 			],
 			[
-				"campo_nombre" => "usuario_id",
+				"campo_nombre" => "id_usuario",
 				"campo_marcador" => ":Usuario",
 				"campo_valor" => $_SESSION['id']
 			],
 			[
-				"campo_nombre" => "cliente_id",
+				"campo_nombre" => "id_cliente",
 				"campo_marcador" => ":Cliente",
-				"campo_valor" => $_SESSION['datos_cliente_venta']['cliente_id']
+				"campo_valor" => $_SESSION['datos_cliente_venta']['id_cliente']
 			],
 			[
-				"campo_nombre" => "caja_id",
+				"campo_nombre" => "id_caja",
 				"campo_marcador" => ":Caja",
 				"campo_valor" => $caja
 			]
@@ -712,16 +712,16 @@ class saleController extends mainModel
 
 				$datos_producto_rs = [
 					[
-						"campo_nombre" => "producto_stock_total",
+						"campo_nombre" => "stock_total",
 						"campo_marcador" => ":Stock",
-						"campo_valor" => $producto['producto_stock_total_old']
+						"campo_valor" => $producto['stock_total_old']
 					]
 				];
 
 				$condicion = [
-					"condicion_campo" => "producto_id",
+					"condicion_campo" => "id_producto",
 					"condicion_marcador" => ":ID",
-					"condicion_valor" => $producto['producto_id']
+					"condicion_valor" => $producto['id_producto']
 				];
 
 				$this->actualizarDatos("producto", $datos_producto_rs, $condicion);
@@ -769,14 +769,14 @@ class saleController extends mainModel
 					"campo_valor" => $venta_detalle['venta_detalle_descripcion']
 				],
 				[
-					"campo_nombre" => "venta_codigo",
+					"campo_nombre" => "codigo",
 					"campo_marcador" => ":VentaCodigo",
 					"campo_valor" => $codigo_venta
 				],
 				[
-					"campo_nombre" => "producto_id",
+					"campo_nombre" => "id_producto",
 					"campo_marcador" => ":Producto",
-					"campo_valor" => $venta_detalle['producto_id']
+					"campo_valor" => $venta_detalle['id_producto']
 				]
 			];
 
@@ -791,23 +791,23 @@ class saleController extends mainModel
 		/*== Reestableciendo DB debido a errores ==*/
 		if ($errores_venta_detalle == 1) {
 
-			$this->eliminarRegistro("venta_detalle", "venta_codigo", $codigo_venta);
-			$this->eliminarRegistro("venta", "venta_codigo", $codigo_venta);
+			$this->eliminarRegistro("venta_detalle", "codigo", $codigo_venta);
+			$this->eliminarRegistro("venta", "codigo", $codigo_venta);
 
 			foreach ($_SESSION['datos_producto_venta'] as $producto) {
 
 				$datos_producto_rs = [
 					[
-						"campo_nombre" => "producto_stock_total",
+						"campo_nombre" => "stock_total",
 						"campo_marcador" => ":Stock",
-						"campo_valor" => $producto['producto_stock_total_old']
+						"campo_valor" => $producto['stock_total_old']
 					]
 				];
 
 				$condicion = [
-					"condicion_campo" => "producto_id",
+					"condicion_campo" => "id_producto",
 					"condicion_marcador" => ":ID",
-					"condicion_valor" => $producto['producto_id']
+					"condicion_valor" => $producto['id_producto']
 				];
 
 				$this->actualizarDatos("producto", $datos_producto_rs, $condicion);
@@ -826,37 +826,37 @@ class saleController extends mainModel
 		/*== Actualizando efectivo en caja ==*/
 		$datos_caja_up = [
 			[
-				"campo_nombre" => "caja_efectivo",
+				"campo_nombre" => "efectivo",
 				"campo_marcador" => ":Efectivo",
 				"campo_valor" => $total_caja
 			]
 		];
 
 		$condicion_caja = [
-			"condicion_campo" => "caja_id",
+			"condicion_campo" => "id_caja",
 			"condicion_marcador" => ":ID",
 			"condicion_valor" => $caja
 		];
 
 		if (!$this->actualizarDatos("caja", $datos_caja_up, $condicion_caja)) {
 
-			$this->eliminarRegistro("venta_detalle", "venta_codigo", $codigo_venta);
-			$this->eliminarRegistro("venta", "venta_codigo", $codigo_venta);
+			$this->eliminarRegistro("venta_detalle", "codigo", $codigo_venta);
+			$this->eliminarRegistro("venta", "codigo", $codigo_venta);
 
 			foreach ($_SESSION['datos_producto_venta'] as $producto) {
 
 				$datos_producto_rs = [
 					[
-						"campo_nombre" => "producto_stock_total",
+						"campo_nombre" => "stock_total",
 						"campo_marcador" => ":Stock",
-						"campo_valor" => $producto['producto_stock_total_old']
+						"campo_valor" => $producto['stock_total_old']
 					]
 				];
 
 				$condicion = [
-					"condicion_campo" => "producto_id",
+					"condicion_campo" => "id_producto",
 					"condicion_marcador" => ":ID",
-					"condicion_valor" => $producto['producto_id']
+					"condicion_valor" => $producto['id_producto']
 				];
 
 				$this->actualizarDatos("producto", $datos_producto_rs, $condicion);
@@ -873,11 +873,11 @@ class saleController extends mainModel
 		}
 
 		/*== Vaciando variables de sesion ==*/
-		unset($_SESSION['venta_total']);
+		unset($_SESSION['total']);
 		unset($_SESSION['datos_cliente_venta']);
 		unset($_SESSION['datos_producto_venta']);
 
-		$_SESSION['venta_codigo_factura'] = $codigo_venta;
+		$_SESSION['codigo_factura'] = $codigo_venta;
 
 		$alerta = [
 			"tipo" => "recargar",
@@ -906,18 +906,18 @@ class saleController extends mainModel
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
 		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
 
-		$campos_tablas = "venta.venta_id,venta.venta_codigo,venta.venta_fecha,venta.venta_hora,venta.venta_total,venta.usuario_id,venta.cliente_id,venta.caja_id,usuario.usuario_id,usuario.usuario_nombre,usuario.usuario_apellido,cliente.cliente_id,cliente.cliente_nombre,cliente.cliente_apellido";
+		$campos_tablas = "venta.id_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre,usuario.usuario_apellido,cliente.id_cliente,cliente.nombre,cliente.cliente_apellido";
 
 		if (isset($busqueda) && $busqueda != "") {
 
-			$consulta_datos = "SELECT $campos_tablas FROM venta INNER JOIN cliente ON venta.cliente_id=cliente.cliente_id INNER JOIN usuario ON venta.usuario_id=usuario.usuario_id WHERE (venta.venta_codigo='$busqueda') ORDER BY venta.venta_id DESC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $campos_tablas FROM venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario WHERE (venta.codigo='$busqueda') ORDER BY venta.id_venta DESC LIMIT $inicio,$registros";
 
-			$consulta_total = "SELECT COUNT(venta_id) FROM venta WHERE (venta.venta_codigo='$busqueda')";
+			$consulta_total = "SELECT COUNT(id_venta) FROM venta WHERE (venta.codigo='$busqueda')";
 		} else {
 
-			$consulta_datos = "SELECT $campos_tablas FROM venta INNER JOIN cliente ON venta.cliente_id=cliente.cliente_id INNER JOIN usuario ON venta.usuario_id=usuario.usuario_id ORDER BY venta.venta_id DESC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $campos_tablas FROM venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario ORDER BY venta.id_venta DESC LIMIT $inicio,$registros";
 
-			$consulta_total = "SELECT COUNT(venta_id) FROM venta";
+			$consulta_total = "SELECT COUNT(id_venta) FROM venta";
 		}
 
 		$datos = $this->ejecutarConsulta($consulta_datos);
@@ -951,32 +951,32 @@ class saleController extends mainModel
 			foreach ($datos as $rows) {
 				$tabla .= '
 						<tr class="has-text-centered" >
-							<td>' . $rows['venta_id'] . '</td>
-							<td>' . $rows['venta_codigo'] . '</td>
-							<td>' . date("d-m-Y", strtotime($rows['venta_fecha'])) . ' ' . $rows['venta_hora'] . '</td>
-							<td>' . $this->limitarCadena($rows['cliente_nombre'] . ' ' . $rows['cliente_apellido'], 30, "...") . '</td>
-							<td>' . $this->limitarCadena($rows['usuario_nombre'] . ' ' . $rows['usuario_apellido'], 30, "...") . '</td>
-							<td>' . MONEDA_SIMBOLO . number_format($rows['venta_total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
+							<td>' . $rows['id_venta'] . '</td>
+							<td>' . $rows['codigo'] . '</td>
+							<td>' . date("d-m-Y", strtotime($rows['fecha_venta'])) . ' ' . $rows['hora_venta'] . '</td>
+							<td>' . $this->limitarCadena($rows['nombre'] . ' ' . $rows['cliente_apellido'], 30, "...") . '</td>
+							<td>' . $this->limitarCadena($rows['nombre'] . ' ' . $rows['usuario_apellido'], 30, "...") . '</td>
+							<td>' . MONEDA_SIMBOLO . number_format($rows['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
 			                <td>
 
-			                	<button type="button" class="button is-link is-outlined is-rounded is-small btn-sale-options" onclick="print_invoice(\'' . APP_URL . 'app/pdf/invoice.php?code=' . $rows['venta_codigo'] . '\')" title="Imprimir factura Nro. ' . $rows['venta_id'] . '" >
+			                	<button type="button" class="button is-link is-outlined is-rounded is-small btn-sale-options" onclick="print_invoice(\'' . APP_URL . 'app/pdf/invoice.php?code=' . $rows['codigo'] . '\')" title="Imprimir factura Nro. ' . $rows['id_venta'] . '" >
 	                                <i class="fas fa-file-invoice-dollar fa-fw"></i>
 	                            </button>
 
-                                <button type="button" class="button is-link is-outlined is-rounded is-small btn-sale-options" onclick="print_ticket(\'' . APP_URL . 'app/pdf/ticket.php?code=' . $rows['venta_codigo'] . '\')" title="Imprimir ticket Nro. ' . $rows['venta_id'] . '" >
+                                <button type="button" class="button is-link is-outlined is-rounded is-small btn-sale-options" onclick="print_ticket(\'' . APP_URL . 'app/pdf/ticket.php?code=' . $rows['codigo'] . '\')" title="Imprimir ticket Nro. ' . $rows['id_venta'] . '" >
                                     <i class="fas fa-receipt fa-fw"></i>
                                 </button>
 
-			                    <a href="' . APP_URL . 'saleDetail/' . $rows['venta_codigo'] . '/" class="button is-link is-rounded is-small" title="Informacion de venta Nro. ' . $rows['venta_id'] . '" >
+			                    <a href="' . APP_URL . 'saleDetail/' . $rows['codigo'] . '/" class="button is-link is-rounded is-small" title="Informacion de venta Nro. ' . $rows['id_venta'] . '" >
 			                    	<i class="fas fa-shopping-bag fa-fw"></i>
 			                    </a>
 
 			                	<form class="FormularioAjax is-inline-block" action="' . APP_URL . 'app/ajax/ventaAjax.php" method="POST" autocomplete="off" >
 
 			                		<input type="hidden" name="modulo_venta" value="eliminar_venta">
-			                		<input type="hidden" name="venta_id" value="' . $rows['venta_id'] . '">
+			                		<input type="hidden" name="id_venta" value="' . $rows['id_venta'] . '">
 
-			                    	<button type="submit" class="button is-danger is-rounded is-small" title="Eliminar venta Nro. ' . $rows['venta_id'] . '" >
+			                    	<button type="submit" class="button is-danger is-rounded is-small" title="Eliminar venta Nro. ' . $rows['id_venta'] . '" >
 			                    		<i class="far fa-trash-alt fa-fw"></i>
 			                    	</button>
 			                    </form>
@@ -1026,10 +1026,10 @@ class saleController extends mainModel
 	public function eliminarVentaControlador()
 	{
 
-		$id = $this->limpiarCadena($_POST['venta_id']);
+		$id = $this->limpiarCadena($_POST['id_venta']);
 
 		# Verificando venta #
-		$datos = $this->ejecutarConsulta("SELECT * FROM venta WHERE venta_id='$id'");
+		$datos = $this->ejecutarConsulta("SELECT * FROM venta WHERE id_venta='$id'");
 		if ($datos->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -1044,12 +1044,12 @@ class saleController extends mainModel
 		}
 
 		# Verificando detalles de venta #
-		$check_detalle_venta = $this->ejecutarConsulta("SELECT venta_detalle_id FROM venta_detalle WHERE venta_codigo='" . $datos['venta_codigo'] . "'");
+		$check_detalle_venta = $this->ejecutarConsulta("SELECT venta_detalle_id FROM venta_detalle WHERE codigo='" . $datos['codigo'] . "'");
 		$check_detalle_venta = $check_detalle_venta->rowCount();
 
 		if ($check_detalle_venta > 0) {
 
-			$eliminarVentaDetalle = $this->eliminarRegistro("venta_detalle", "venta_codigo", $datos['venta_codigo']);
+			$eliminarVentaDetalle = $this->eliminarRegistro("venta_detalle", "codigo", $datos['codigo']);
 
 			if ($eliminarVentaDetalle->rowCount() != $check_detalle_venta) {
 				$alerta = [
@@ -1064,7 +1064,7 @@ class saleController extends mainModel
 		}
 
 
-		$eliminarVenta = $this->eliminarRegistro("venta", "venta_id", $id);
+		$eliminarVenta = $this->eliminarRegistro("venta", "id_venta", $id);
 
 		if ($eliminarVenta->rowCount() == 1) {
 

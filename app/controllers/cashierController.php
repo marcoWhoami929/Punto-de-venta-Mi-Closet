@@ -12,12 +12,12 @@ class cashierController extends mainModel
 	{
 
 		# Almacenando datos#
-		$numero = $this->limpiarCadena($_POST['caja_numero']);
-		$nombre = $this->limpiarCadena($_POST['caja_nombre']);
-		$efectivo = $this->limpiarCadena($_POST['caja_efectivo']);
+		$numero = $this->limpiarCadena($_POST['numero']);
+		$nombre = $this->limpiarCadena($_POST['nombre']);
+		$saldo_inicial = $this->limpiarCadena($_POST['saldo_inicial']);
 
 		# Verificando campos obligatorios #
-		if ($numero == "" || $nombre == "" || $efectivo == "") {
+		if ($numero == "" || $nombre == "" || $saldo_inicial == "") {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -51,7 +51,7 @@ class cashierController extends mainModel
 			exit();
 		}
 
-		if ($this->verificarDatos("[0-9.]{1,25}", $efectivo)) {
+		if ($this->verificarDatos("[0-9.]{1,25}", $saldo_inicial)) {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -63,7 +63,7 @@ class cashierController extends mainModel
 		}
 
 		# Comprobando numero de caja #
-		$check_numero = $this->ejecutarConsulta("SELECT caja_numero FROM caja WHERE caja_numero='$numero'");
+		$check_numero = $this->ejecutarConsulta("SELECT numero FROM caja WHERE numero='$numero'");
 		if ($check_numero->rowCount() > 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -76,7 +76,7 @@ class cashierController extends mainModel
 		}
 
 		# Comprobando nombre de caja #
-		$check_nombre = $this->ejecutarConsulta("SELECT caja_nombre FROM caja WHERE caja_nombre='$nombre'");
+		$check_nombre = $this->ejecutarConsulta("SELECT nombre FROM caja WHERE nombre='$nombre'");
 		if ($check_nombre->rowCount() > 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -89,8 +89,8 @@ class cashierController extends mainModel
 		}
 
 		# Comprobando que el efectivo sea mayor o igual a 0 #
-		$efectivo = number_format($efectivo, 2, '.', '');
-		if ($efectivo < 0) {
+		$saldo_inicial = number_format($saldo_inicial, 2, '.', '');
+		if ($saldo_inicial < 0) {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -104,19 +104,19 @@ class cashierController extends mainModel
 
 		$caja_datos_reg = [
 			[
-				"campo_nombre" => "caja_numero",
+				"campo_nombre" => "numero",
 				"campo_marcador" => ":Numero",
 				"campo_valor" => $numero
 			],
 			[
-				"campo_nombre" => "caja_nombre",
+				"campo_nombre" => "nombre",
 				"campo_marcador" => ":Nombre",
 				"campo_valor" => $nombre
 			],
 			[
-				"campo_nombre" => "caja_efectivo",
-				"campo_marcador" => ":Efectivo",
-				"campo_valor" => $efectivo
+				"campo_nombre" => "saldo_inicial",
+				"campo_marcador" => ":Saldo_inicial",
+				"campo_valor" => $saldo_inicial
 			]
 		];
 
@@ -160,14 +160,14 @@ class cashierController extends mainModel
 
 		if (isset($busqueda) && $busqueda != "") {
 
-			$consulta_datos = "SELECT * FROM caja WHERE caja_numero LIKE '%$busqueda%' OR caja_nombre LIKE '%$busqueda%' ORDER BY caja_numero ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT * FROM caja WHERE numero LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' ORDER BY numero ASC LIMIT $inicio,$registros";
 
-			$consulta_total = "SELECT COUNT(caja_id) FROM caja WHERE caja_numero LIKE '%$busqueda%' OR caja_nombre LIKE '%$busqueda%'";
+			$consulta_total = "SELECT COUNT(id_caja) FROM caja WHERE numero LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%'";
 		} else {
 
-			$consulta_datos = "SELECT * FROM caja ORDER BY caja_numero ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT * FROM caja ORDER BY numero ASC LIMIT $inicio,$registros";
 
-			$consulta_total = "SELECT COUNT(caja_id) FROM caja";
+			$consulta_total = "SELECT COUNT(id_caja) FROM caja";
 		}
 
 		$datos = $this->ejecutarConsulta($consulta_datos);
@@ -185,7 +185,7 @@ class cashierController extends mainModel
 		                <tr>
 		                    <th class="has-text-centered is-primary">Numero</th>
 		                    <th class="has-text-centered is-primary">Nombre</th>
-		                    <th class="has-text-centered is-primary">Efectivo</th>
+		                    <th class="has-text-centered is-primary">Saldo Inicial</th>
 		                    <th class="has-text-centered is-primary">Actualizar</th>
 		                    <th class="has-text-centered is-primary">Eliminar</th>
 		                </tr>
@@ -199,11 +199,11 @@ class cashierController extends mainModel
 			foreach ($datos as $rows) {
 				$tabla .= '
 						<tr class="has-text-centered" >
-							<td>' . $rows['caja_numero'] . '</td>
-							<td>' . $rows['caja_nombre'] . '</td>
-							<td>' . $rows['caja_efectivo'] . '</td>
+							<td>' . $rows['numero'] . '</td>
+							<td>' . $rows['nombre'] . '</td>
+							<td>' . $rows['saldo_inicial'] . '</td>
 			                <td>
-			                    <a href="' . APP_URL . 'cashierUpdate/' . $rows['caja_id'] . '/" class="button is-success is-rounded is-small">
+			                    <a href="' . APP_URL . 'cashierUpdate/' . $rows['id_caja'] . '/" class="button is-success is-rounded is-small">
 			                    	<i class="fas fa-sync fa-fw"></i>
 			                    </a>
 			                </td>
@@ -211,7 +211,7 @@ class cashierController extends mainModel
 			                	<form class="FormularioAjax" action="' . APP_URL . 'app/ajax/cajaAjax.php" method="POST" autocomplete="off" >
 
 			                		<input type="hidden" name="modulo_caja" value="eliminar">
-			                		<input type="hidden" name="caja_id" value="' . $rows['caja_id'] . '">
+			                		<input type="hidden" name="id_caja" value="' . $rows['id_caja'] . '">
 
 			                    	<button type="submit" class="button is-danger is-rounded is-small">
 			                    		<i class="far fa-trash-alt fa-fw"></i>
@@ -262,7 +262,7 @@ class cashierController extends mainModel
 	public function eliminarCajaControlador()
 	{
 
-		$id = $this->limpiarCadena($_POST['caja_id']);
+		$id = $this->limpiarCadena($_POST['id_caja']);
 
 		if ($id == 1) {
 			$alerta = [
@@ -276,7 +276,7 @@ class cashierController extends mainModel
 		}
 
 		# Verificando caja #
-		$datos = $this->ejecutarConsulta("SELECT * FROM caja WHERE caja_id='$id'");
+		$datos = $this->ejecutarConsulta("SELECT * FROM caja WHERE id_caja='$id'");
 		if ($datos->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -291,7 +291,7 @@ class cashierController extends mainModel
 		}
 
 		# Verificando ventas #
-		$check_ventas = $this->ejecutarConsulta("SELECT caja_id FROM venta WHERE caja_id='$id' LIMIT 1");
+		$check_ventas = $this->ejecutarConsulta("SELECT id_caja FROM venta WHERE id_caja='$id' LIMIT 1");
 		if ($check_ventas->rowCount() > 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -304,7 +304,7 @@ class cashierController extends mainModel
 		}
 
 		# Verificando usuarios #
-		$check_usuarios = $this->ejecutarConsulta("SELECT caja_id FROM usuario WHERE caja_id='$id' LIMIT 1");
+		$check_usuarios = $this->ejecutarConsulta("SELECT id_caja FROM usuario WHERE id_caja='$id' LIMIT 1");
 		if ($check_usuarios->rowCount() > 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -316,20 +316,20 @@ class cashierController extends mainModel
 			exit();
 		}
 
-		$eliminarCaja = $this->eliminarRegistro("caja", "caja_id", $id);
+		$eliminarCaja = $this->eliminarRegistro("caja", "id_caja", $id);
 
 		if ($eliminarCaja->rowCount() == 1) {
 			$alerta = [
 				"tipo" => "recargar",
 				"titulo" => "Caja eliminada",
-				"texto" => "La caja " . $datos['caja_nombre'] . " #" . $datos['caja_numero'] . " ha sido eliminada del sistema correctamente",
+				"texto" => "La caja " . $datos['nombre'] . " #" . $datos['numero'] . " ha sido eliminada del sistema correctamente",
 				"icono" => "success"
 			];
 		} else {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos podido eliminar la caja " . $datos['caja_nombre'] . " #" . $datos['caja_numero'] . " del sistema, por favor intente nuevamente",
+				"texto" => "No hemos podido eliminar la caja " . $datos['nombre'] . " #" . $datos['numero'] . " del sistema, por favor intente nuevamente",
 				"icono" => "error"
 			];
 		}
@@ -342,10 +342,10 @@ class cashierController extends mainModel
 	public function actualizarCajaControlador()
 	{
 
-		$id = $this->limpiarCadena($_POST['caja_id']);
+		$id = $this->limpiarCadena($_POST['id_caja']);
 
 		# Verificando caja #
-		$datos = $this->ejecutarConsulta("SELECT * FROM caja WHERE caja_id='$id'");
+		$datos = $this->ejecutarConsulta("SELECT * FROM caja WHERE id_caja='$id'");
 		if ($datos->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -360,12 +360,12 @@ class cashierController extends mainModel
 		}
 
 		# Almacenando datos#
-		$numero = $this->limpiarCadena($_POST['caja_numero']);
-		$nombre = $this->limpiarCadena($_POST['caja_nombre']);
-		$efectivo = $this->limpiarCadena($_POST['caja_efectivo']);
+		$numero = $this->limpiarCadena($_POST['numero']);
+		$nombre = $this->limpiarCadena($_POST['nombre']);
+		$saldo_inicial = $this->limpiarCadena($_POST['saldo_inicial']);
 
 		# Verificando campos obligatorios #
-		if ($numero == "" || $nombre == "" || $efectivo == "") {
+		if ($numero == "" || $nombre == "" || $saldo_inicial == "") {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -399,7 +399,7 @@ class cashierController extends mainModel
 			exit();
 		}
 
-		if ($this->verificarDatos("[0-9.]{1,25}", $efectivo)) {
+		if ($this->verificarDatos("[0-9.]{1,25}", $saldo_inicial)) {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -411,8 +411,8 @@ class cashierController extends mainModel
 		}
 
 		# Comprobando numero de caja #
-		if ($datos['caja_numero'] != $numero) {
-			$check_numero = $this->ejecutarConsulta("SELECT caja_numero FROM caja WHERE caja_numero='$numero'");
+		if ($datos['numero'] != $numero) {
+			$check_numero = $this->ejecutarConsulta("SELECT numero FROM caja WHERE numero='$numero'");
 			if ($check_numero->rowCount() > 0) {
 				$alerta = [
 					"tipo" => "simple",
@@ -426,8 +426,8 @@ class cashierController extends mainModel
 		}
 
 		# Comprobando nombre de caja #
-		if ($datos['caja_nombre'] != $nombre) {
-			$check_nombre = $this->ejecutarConsulta("SELECT caja_nombre FROM caja WHERE caja_nombre='$nombre'");
+		if ($datos['nombre'] != $nombre) {
+			$check_nombre = $this->ejecutarConsulta("SELECT nombre FROM caja WHERE nombre='$nombre'");
 			if ($check_nombre->rowCount() > 0) {
 				$alerta = [
 					"tipo" => "simple",
@@ -441,8 +441,8 @@ class cashierController extends mainModel
 		}
 
 		# Comprobando que el efectivo sea mayor o igual a 0 #
-		$efectivo = number_format($efectivo, 2, '.', '');
-		if ($efectivo < 0) {
+		$saldo_inicial = number_format($saldo_inicial, 2, '.', '');
+		if ($saldo_inicial < 0) {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -455,24 +455,24 @@ class cashierController extends mainModel
 
 		$caja_datos_up = [
 			[
-				"campo_nombre" => "caja_numero",
+				"campo_nombre" => "numero",
 				"campo_marcador" => ":Numero",
 				"campo_valor" => $numero
 			],
 			[
-				"campo_nombre" => "caja_nombre",
+				"campo_nombre" => "nombre",
 				"campo_marcador" => ":Nombre",
 				"campo_valor" => $nombre
 			],
 			[
-				"campo_nombre" => "caja_efectivo",
-				"campo_marcador" => ":Efectivo",
-				"campo_valor" => $efectivo
+				"campo_nombre" => "saldo_inicial",
+				"campo_marcador" => ":Saldo_inicial",
+				"campo_valor" => $saldo_inicial
 			]
 		];
 
 		$condicion = [
-			"condicion_campo" => "caja_id",
+			"condicion_campo" => "id_caja",
 			"condicion_marcador" => ":ID",
 			"condicion_valor" => $id
 		];
@@ -481,14 +481,14 @@ class cashierController extends mainModel
 			$alerta = [
 				"tipo" => "recargar",
 				"titulo" => "Caja actualizada",
-				"texto" => "Los datos de la caja " . $datos['caja_nombre'] . " #" . $datos['caja_numero'] . " se actualizaron correctamente",
+				"texto" => "Los datos de la caja " . $datos['nombre'] . " #" . $datos['numero'] . " se actualizaron correctamente",
 				"icono" => "success"
 			];
 		} else {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos podido actualizar los datos de la caja " . $datos['caja_nombre'] . " #" . $datos['caja_numero'] . ", por favor intente nuevamente",
+				"texto" => "No hemos podido actualizar los datos de la caja " . $datos['nombre'] . " #" . $datos['numero'] . ", por favor intente nuevamente",
 				"icono" => "error"
 			];
 		}

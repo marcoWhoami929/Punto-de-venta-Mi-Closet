@@ -5,7 +5,7 @@ const APP_NAME = "Ventas Mi Closet";
 const APP_SESSION_NAME = "POS";
 
 /*----------  Tipos de documentos  ----------*/
-const DOCUMENTOS_USUARIOS = ["INE", "FACEBOOK"];
+const TIPO_USUARIOS = ["Facebook", "General"];
 
 
 /*----------  Tipos de unidades de productos  ----------*/

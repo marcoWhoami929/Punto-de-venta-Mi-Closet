@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 05-10-2024 a las 02:10:16
+-- Tiempo de generación: 05-10-2024 a las 21:14:42
 -- Versión del servidor: 10.4.27-MariaDB
 -- Versión de PHP: 7.4.33
 
@@ -31,11 +31,13 @@ CREATE TABLE `caja` (
   `id_caja` int(11) NOT NULL,
   `numero` int(10) NOT NULL,
   `nombre` varchar(100) NOT NULL,
-  `efectivo` decimal(30,2) NOT NULL,
   `fecha_apertura` timestamp NOT NULL DEFAULT current_timestamp(),
-  `fecha_cierre` timestamp NOT NULL DEFAULT current_timestamp(),
   `saldo_inicial` decimal(10,2) NOT NULL,
-  `saldo_final` decimal(10,2) DEFAULT NULL,
+  `efectivo` decimal(30,2) NOT NULL,
+  `tarjeta_debito` decimal(30,2) NOT NULL,
+  `tarjeta_credito` decimal(30,2) NOT NULL,
+  `saldo_final` decimal(10,2) NOT NULL,
+  `fecha_cierre` timestamp NOT NULL DEFAULT current_timestamp(),
   `estado` enum('abierta','cerrada') DEFAULT 'abierta'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
@@ -43,8 +45,9 @@ CREATE TABLE `caja` (
 -- Volcado de datos para la tabla `caja`
 --
 
-INSERT INTO `caja` (`id_caja`, `numero`, `nombre`, `efectivo`, `fecha_apertura`, `fecha_cierre`, `saldo_inicial`, `saldo_final`, `estado`) VALUES
-(1, 1, 'Caja Principal', '0.00', '2024-10-04 20:04:59', '2024-10-04 20:04:59', '0.00', NULL, 'abierta');
+INSERT INTO `caja` (`id_caja`, `numero`, `nombre`, `fecha_apertura`, `saldo_inicial`, `efectivo`, `tarjeta_debito`, `tarjeta_credito`, `saldo_final`, `fecha_cierre`, `estado`) VALUES
+(1, 1, 'Caja Principal', '2024-10-04 20:04:59', '150.00', '0.00', '0.00', '0.00', '0.00', '2024-10-04 20:04:59', 'abierta'),
+(2, 2, 'cAJA 2', '2024-10-05 17:17:24', '120.00', '0.00', '0.00', '0.00', '0.00', '2024-10-05 17:17:24', 'abierta');
 
 -- --------------------------------------------------------
 
@@ -81,11 +84,19 @@ CREATE TABLE `categoria` (
 
 CREATE TABLE `cliente` (
   `id_cliente` int(11) NOT NULL,
-  `nombre` varchar(50) NOT NULL,
+  `tipo_cliente` text NOT NULL,
+  `nombre` text NOT NULL,
+  `usuario` text NOT NULL,
+  `apellidos` text NOT NULL,
   `email` varchar(50) NOT NULL,
-  `telefono` varchar(20) NOT NULL,
-  `direccion` varchar(70) NOT NULL,
+  `password` text NOT NULL,
+  `telefono` varchar(15) NOT NULL,
+  `celular` varchar(12) NOT NULL,
+  `direccion` text NOT NULL,
   `facebook` text NOT NULL,
+  `credito` decimal(30,3) NOT NULL,
+  `pagado` decimal(30,3) NOT NULL,
+  `pendiente` decimal(30,3) NOT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
@@ -93,8 +104,8 @@ CREATE TABLE `cliente` (
 -- Volcado de datos para la tabla `cliente`
 --
 
-INSERT INTO `cliente` (`id_cliente`, `nombre`, `email`, `telefono`, `direccion`, `facebook`, `fecha_registro`) VALUES
-(1, 'Publico', 'N/A', 'N/A', 'N/A', '', '2024-10-04 20:11:45');
+INSERT INTO `cliente` (`id_cliente`, `tipo_cliente`, `nombre`, `usuario`, `apellidos`, `email`, `password`, `telefono`, `celular`, `direccion`, `facebook`, `credito`, `pagado`, `pendiente`, `fecha_registro`) VALUES
+(1, 'Facebook', 'Publico', '', '', '', '', '', '', '', '', '0.000', '0.000', '0.000', '2024-10-04 20:11:45');
 
 -- --------------------------------------------------------
 
@@ -261,22 +272,23 @@ CREATE TABLE `proveedor` (
 --
 
 CREATE TABLE `usuario` (
-  `usuario_id` int(7) NOT NULL,
-  `usuario_nombre` varchar(50) NOT NULL,
-  `usuario_apellido` varchar(50) NOT NULL,
-  `usuario_email` varchar(50) NOT NULL,
-  `usuario_usuario` varchar(30) NOT NULL,
-  `usuario_clave` varchar(535) NOT NULL,
-  `usuario_foto` varchar(200) NOT NULL,
-  `caja_id` int(5) NOT NULL
+  `id_usuario` int(11) NOT NULL,
+  `nombre` text NOT NULL,
+  `email` text NOT NULL,
+  `usuario` text NOT NULL,
+  `password` text NOT NULL,
+  `foto` varchar(200) NOT NULL,
+  `perfil` text NOT NULL,
+  `id_caja` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
 
 --
 -- Volcado de datos para la tabla `usuario`
 --
 
-INSERT INTO `usuario` (`usuario_id`, `usuario_nombre`, `usuario_apellido`, `usuario_email`, `usuario_usuario`, `usuario_clave`, `usuario_foto`, `caja_id`) VALUES
-(1, 'Administrador', 'Principal', '', 'Administrador', '$2y$10$Jgm6xFb5Onz/BMdIkNK2Tur8yg/NYEMb/tdnhoV7kB1BwIG4R05D2', '', 1);
+INSERT INTO `usuario` (`id_usuario`, `nombre`, `email`, `usuario`, `password`, `foto`, `perfil`, `id_caja`) VALUES
+(1, 'Administrador', '', 'Administrador', '$2y$10$Jgm6xFb5Onz/BMdIkNK2Tur8yg/NYEMb/tdnhoV7kB1BwIG4R05D2', '', 'Administrador', 1),
+(2, 'Marco Antonio Lopez Perez', 'mm_marco_mar@hotmail.com', 'Marco', '$2y$10$wxXEdDCZk7B8KghwfWOoM.lj8C7N6ecUdcsNjnCN//SXytM/JY0WW', 'Marco_Antonio_Lopez_Perez_18.png', 'Administrador', 1);
 
 -- --------------------------------------------------------
 
@@ -418,8 +430,8 @@ ALTER TABLE `proveedor`
 -- Indices de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  ADD PRIMARY KEY (`usuario_id`),
-  ADD KEY `caja_id` (`caja_id`);
+  ADD PRIMARY KEY (`id_usuario`),
+  ADD KEY `id_caja` (`id_caja`);
 
 --
 -- Indices de la tabla `venta`
@@ -444,7 +456,7 @@ ALTER TABLE `venta_detalle`
 -- AUTO_INCREMENT de la tabla `caja`
 --
 ALTER TABLE `caja`
-  MODIFY `id_caja` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_caja` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `cajaempleado`
@@ -528,7 +540,7 @@ ALTER TABLE `proveedor`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `usuario_id` int(7) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `venta`
@@ -590,6 +602,12 @@ ALTER TABLE `pago`
 --
 ALTER TABLE `producto`
   ADD CONSTRAINT `product_ibfk_1` FOREIGN KEY (`id_categoria`) REFERENCES `categoria` (`id_categoria`);
+
+--
+-- Filtros para la tabla `usuario`
+--
+ALTER TABLE `usuario`
+  ADD CONSTRAINT `usuario_ibfk_1` FOREIGN KEY (`id_caja`) REFERENCES `caja` (`id_caja`);
 
 --
 -- Filtros para la tabla `venta`

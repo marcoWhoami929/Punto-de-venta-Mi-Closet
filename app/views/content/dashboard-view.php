@@ -12,21 +12,21 @@
 		</figure>
 	</div>
 	<div class="columns is-flex is-justify-content-center">
-		<h2 class="subtitle">¡Bienvenido <?php echo $_SESSION['nombre'] . " " . $_SESSION['apellido']; ?>!</h2>
+		<h2 class="subtitle">¡Bienvenido <?php echo $_SESSION['nombre'] ?>!</h2>
 	</div>
 </div>
 <?php
-$total_cajas = $insLogin->seleccionarDatos("Normal", "caja", "caja_id", 0);
+$total_cajas = $insLogin->seleccionarDatos("Normal", "caja", "id_caja", 0);
 
-$total_usuarios = $insLogin->seleccionarDatos("Normal", "usuario WHERE usuario_id!='1' AND usuario_id!='" . $_SESSION['id'] . "'", "usuario_id", 0);
+$total_usuarios = $insLogin->seleccionarDatos("Normal", "usuario WHERE id_usuario!='1' AND id_usuario!='" . $_SESSION['id'] . "'", "id_usuario", 0);
 
-$total_clientes = $insLogin->seleccionarDatos("Normal", "cliente WHERE cliente_id!='1'", "cliente_id", 0);
+$total_clientes = $insLogin->seleccionarDatos("Normal", "cliente WHERE id_cliente!='1'", "id_cliente", 0);
 
-$total_categorias = $insLogin->seleccionarDatos("Normal", "categoria", "categoria_id", 0);
+$total_categorias = $insLogin->seleccionarDatos("Normal", "categoria", "id_categoria", 0);
 
-$total_productos = $insLogin->seleccionarDatos("Normal", "producto", "producto_id", 0);
+$total_productos = $insLogin->seleccionarDatos("Normal", "producto", "id_producto", 0);
 
-$total_ventas = $insLogin->seleccionarDatos("Normal", "venta", "venta_id", 0);
+$total_ventas = $insLogin->seleccionarDatos("Normal", "venta", "id_venta", 0);
 ?>
 <div class="container container is-widescreen pb-2 pt-6">
 	<div class="columns is-multiline">

@@ -45,20 +45,19 @@ class loginController extends mainModel
 				} else {
 
 					# Verificando usuario #
-					$check_usuario = $this->ejecutarConsulta("SELECT * FROM usuario WHERE usuario_usuario='$usuario'");
+					$check_usuario = $this->ejecutarConsulta("SELECT * FROM usuario WHERE usuario='$usuario'");
 
 					if ($check_usuario->rowCount() == 1) {
 
 						$check_usuario = $check_usuario->fetch();
 
-						if ($check_usuario['usuario_usuario'] == $usuario && password_verify($clave, $check_usuario['usuario_clave'])) {
+						if ($check_usuario['usuario'] == $usuario && password_verify($clave, $check_usuario['password'])) {
 
-							$_SESSION['id'] = $check_usuario['usuario_id'];
-							$_SESSION['nombre'] = $check_usuario['usuario_nombre'];
-							$_SESSION['apellido'] = $check_usuario['usuario_apellido'];
-							$_SESSION['usuario'] = $check_usuario['usuario_usuario'];
-							$_SESSION['foto'] = $check_usuario['usuario_foto'];
-							$_SESSION['caja'] = $check_usuario['caja_id'];
+							$_SESSION['id'] = $check_usuario['id_usuario'];
+							$_SESSION['nombre'] = $check_usuario['nombre'];
+							$_SESSION['usuario'] = $check_usuario['usuario'];
+							$_SESSION['foto'] = $check_usuario['foto'];
+							$_SESSION['caja'] = $check_usuario['id_caja'];
 
 
 							if (headers_sent()) {
