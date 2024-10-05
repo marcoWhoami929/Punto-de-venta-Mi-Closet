@@ -2,7 +2,7 @@
 
 	<form class="box login" action="" method="POST" autocomplete="off">
 		<p class="has-text-centered">
-			<img src="app/views/img/logo.png" alt="">
+			<img src="./app/views/img/logo.png" alt="">
 		</p>
 		<h5 class="title is-5 has-text-centered">Inicia sesión con tu cuenta</h5>
 

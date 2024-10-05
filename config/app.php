@@ -5,11 +5,11 @@ const APP_NAME = "Ventas Mi Closet";
 const APP_SESSION_NAME = "POS";
 
 /*----------  Tipos de documentos  ----------*/
-const DOCUMENTOS_USUARIOS = ["DUI", "DNI", "Cedula", "Licencia", "Pasaporte", "Otro"];
+const DOCUMENTOS_USUARIOS = ["INE", "FACEBOOK"];
 
 
 /*----------  Tipos de unidades de productos  ----------*/
-const PRODUCTO_UNIDAD = ["Unidad", "Libra", "Kilogramo", "Caja", "Paquete", "Lata", "Galon", "Botella", "Tira", "Sobre", "Bolsa", "Saco", "Tarjeta", "Otro"];
+const PRODUCTO_UNIDAD = ["Unidad", "Kilogramo", "Caja"];
 
 /*----------  Configuración de moneda  ----------*/
 const MONEDA_SIMBOLO = "$";
