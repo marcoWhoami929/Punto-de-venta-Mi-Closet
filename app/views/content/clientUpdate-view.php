@@ -16,81 +16,95 @@
 		$datos = $datos->fetch();
 	?>
 
-		<h2 class="title has-text-centered"><?php echo $datos['nombre'] . " " . $datos['cliente_apellido'] . " (" . $datos['cliente_tipo_documento'] . ": " . $datos['cliente_numero_documento'] . ")"; ?></h2>
+		<h2 class="title has-text-centered"><?php echo $datos['nombre'] . " " . $datos['apellidos'] . ""; ?></h2>
 
 		<form class="FormularioAjax" action="<?php echo APP_URL; ?>app/ajax/clienteAjax.php" method="POST" autocomplete="off">
 
 			<input type="hidden" name="modulo_cliente" value="actualizar">
 			<input type="hidden" name="id_cliente" value="<?php echo $datos['id_cliente']; ?>">
+			<div class="columns">
+			<div class="column">
+				<div class="control">
+					<label>Tipo de Usuario <?php echo CAMPO_OBLIGATORIO; ?></label><br>
+					<div class="select">
+						<select name="tipo_cliente">
+							<option value="" selected="">Seleccione una opción</option>
+							<?php
+							echo $insLogin->generarSelect(TIPO_USUARIOS,  $datos['tipo_cliente']);
+							?>
+						</select>
+					</div>
+				</div>
+			</div>
+			<div class="column">
+				<div class="control">
+					<label>Usuario Facebook</label>
+					<input class="input" type="text" name="facebook" value="<?php echo $datos['facebook']; ?>" pattern="[a-zA-Z0-9-]{7,30}" maxlength="30">
+				</div>
+			</div>
+		</div>
+		<div class="columns">
+			<div class="column">
+				<div class="control">
+					<label>Nombre <?php echo CAMPO_OBLIGATORIO; ?></label>
+					<input class="input" type="text" name="nombre" value="<?php echo $datos['nombre']; ?>" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,40}" maxlength="80" required>
+				</div>
+			</div>
+			<div class="column">
+				<div class="control">
+					<label>Apellidos <?php echo CAMPO_OBLIGATORIO; ?></label>
+					<input class="input" type="text" name="apellidos" value="<?php echo $datos['apellidos']; ?>" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,40}" maxlength="80" required>
+				</div>
+			</div>
+			<div class="column">
+				<div class="control">
+					<label>Nombre Usuario <?php echo CAMPO_OBLIGATORIO; ?></label>
+					<input class="input" type="text" name="usuario" value="<?php echo $datos['usuario']; ?>" maxlength="120" required>
+				</div>
+			</div>
+		</div>
+		<div class="columns">
+			<div class="column">
+				<div class="control">
+					<label>Email</label>
+					<input class="input" type="email" name="email" value="<?php echo $datos['email']; ?>" maxlength="70">
+				</div>
+			</div>
+			<div class="column">
+				<div class="control">
+					<label>Teléfono</label>
+					<input class="input" type="tel" name="telefono" value="<?php echo $datos['telefono']; ?>" placeholder="1234567891" pattern="[0-9()+]{8,20}" maxlength="20">
+				</div>
+			</div>
+			<div class="column">
+				<div class="control">
+					<label>Celular <?php echo CAMPO_OBLIGATORIO; ?></label>
+					<input class="input" type="tel" name="celular" value="<?php echo $datos['celular']; ?>" placeholder="1234567891" pattern="[0-9()+]{8,20}" maxlength="20" required>
+				</div>
+			</div>
 
-			<div class="columns">
-				<div class="column">
-					<div class="control">
-						<label>Tipo de documento <?php echo CAMPO_OBLIGATORIO; ?></label><br>
-						<div class="select">
-							<select name="cliente_tipo_documento">
-								<?php
-								echo $insLogin->generarSelect(TIPO_USUARIOS, $datos['cliente_tipo_documento']);
-								?>
-							</select>
-						</div>
-					</div>
-				</div>
-				<div class="column">
-					<div class="control">
-						<label>Numero de documento <?php echo CAMPO_OBLIGATORIO; ?></label>
-						<input class="input" type="text" name="cliente_numero_documento" value="<?php echo $datos['cliente_numero_documento']; ?>" pattern="[a-zA-Z0-9-]{7,30}" maxlength="30" required>
-					</div>
+		</div>
+		<div class="columns">
+			
+			<div class="column">
+				<div class="control">
+					<label>Crédito Cliente</label>
+					<input class="input" type="text" name="credito" value="<?php echo $datos['credito']; ?>" pattern="[0-9.]{1,25}" maxlength="25" >
 				</div>
 			</div>
-			<div class="columns">
-				<div class="column">
-					<div class="control">
-						<label>Nombres <?php echo CAMPO_OBLIGATORIO; ?></label>
-						<input class="input" type="text" name="nombre" value="<?php echo $datos['nombre']; ?>" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,40}" maxlength="40" required>
-					</div>
-				</div>
-				<div class="column">
-					<div class="control">
-						<label>Apellidos <?php echo CAMPO_OBLIGATORIO; ?></label>
-						<input class="input" type="text" name="cliente_apellido" value="<?php echo $datos['cliente_apellido']; ?>" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,40}" maxlength="40" required>
-					</div>
+			<div class="column">
+				<div class="control">
+					<label>Domicilio <?php echo CAMPO_OBLIGATORIO; ?></label>
+					<input class="input" type="text" name="domicilio" value="<?php echo $datos['domicilio']; ?>" required>
 				</div>
 			</div>
-			<div class="columns">
-				<div class="column">
-					<div class="control">
-						<label>Estado, provincia o departamento <?php echo CAMPO_OBLIGATORIO; ?></label>
-						<input class="input" type="text" name="cliente_provincia" value="<?php echo $datos['cliente_provincia']; ?>" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{4,30}" maxlength="30" required>
-					</div>
-				</div>
-				<div class="column">
-					<div class="control">
-						<label>Ciudad o pueblo <?php echo CAMPO_OBLIGATORIO; ?></label>
-						<input class="input" type="text" name="cliente_ciudad" value="<?php echo $datos['cliente_ciudad']; ?>" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{4,30}" maxlength="30" required>
-					</div>
-				</div>
-				<div class="column">
-					<div class="control">
-						<label>Calle o dirección de casa <?php echo CAMPO_OBLIGATORIO; ?></label>
-						<input class="input" type="text" name="direccion" value="<?php echo $datos['direccion']; ?>" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{4,70}" maxlength="70" required>
-					</div>
-				</div>
-			</div>
-			<div class="columns">
-				<div class="column">
-					<div class="control">
-						<label>Teléfono</label>
-						<input class="input" type="text" name="telefono" value="<?php echo $datos['telefono']; ?>" pattern="[0-9()+]{8,20}" maxlength="20">
-					</div>
-				</div>
-				<div class="column">
-					<div class="control">
-						<label>Email</label>
-						<input class="input" type="email" name="email" value="<?php echo $datos['email']; ?>" maxlength="70">
-					</div>
-				</div>
-			</div>
+
+		</div>
+		<div class="columns">
+			
+		</div>
+			
+			
 			<p class="has-text-centered">
 				<button type="submit" class="button is-success is-rounded"><i class="fas fa-sync-alt"></i> &nbsp; Actualizar</button>
 			</p>

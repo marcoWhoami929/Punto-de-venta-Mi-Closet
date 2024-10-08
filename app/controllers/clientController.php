@@ -48,8 +48,8 @@ class clientController extends mainModel
 			exit();
 		}
 
-		if ($telefono != "") {
-			if ($this->verificarDatos("[0-9()+]{8,20}", $telefono)) {
+		if ($celular != "") {
+			if ($this->verificarDatos("[0-9()+]{8,20}", $celular)) {
 				$alerta = [
 					"tipo" => "simple",
 					"titulo" => "Ocurrió un error inesperado",
@@ -185,9 +185,9 @@ class clientController extends mainModel
 
 		if (isset($busqueda) && $busqueda != "") {
 
-			$consulta_datos = "SELECT * FROM cliente WHERE ((id_cliente!='1') AND (cliente_tipo_documento LIKE '%$busqueda%' OR cliente_numero_documento LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' OR cliente_apellido LIKE '%$busqueda%' OR email LIKE '%$busqueda%' OR cliente_provincia LIKE '%$busqueda%' OR cliente_ciudad LIKE '%$busqueda%')) ORDER BY nombre ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT * FROM cliente WHERE ((id_cliente!='1') OR nombre LIKE '%$busqueda%' OR apellidos LIKE '%$busqueda%' OR email LIKE '%$busqueda%')) ORDER BY nombre ASC LIMIT $inicio,$registros";
 
-			$consulta_total = "SELECT COUNT(id_cliente) FROM cliente WHERE ((id_cliente!='1') AND (cliente_tipo_documento LIKE '%$busqueda%' OR cliente_numero_documento LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' OR cliente_apellido LIKE '%$busqueda%' OR email LIKE '%$busqueda%' OR cliente_provincia LIKE '%$busqueda%' OR cliente_ciudad LIKE '%$busqueda%'))";
+			$consulta_total = "SELECT COUNT(id_cliente) FROM cliente WHERE ((id_cliente!='1') AND ( nombre LIKE '%$busqueda%' OR apellidos LIKE '%$busqueda%' OR email LIKE '%$busqueda%'))";
 		} else {
 
 			$consulta_datos = "SELECT * FROM cliente WHERE id_cliente!='1' ORDER BY nombre ASC LIMIT $inicio,$registros";
@@ -209,9 +209,13 @@ class clientController extends mainModel
 		            <thead>
 		                <tr>
 		                    <th class="has-text-centered">#</th>
-		                    <th class="has-text-centered">Documento</th>
+		                    <th class="has-text-centered">Tipo Cliente</th>
 		                    <th class="has-text-centered">Nombre</th>
 		                    <th class="has-text-centered">Email</th>
+							<th class="has-text-centered">Celular</th>
+							<th class="has-text-centered">Crédito</th>
+							<th class="has-text-centered">Pagado</th>
+							<th class="has-text-centered">Pendiente</th>
 		                    <th class="has-text-centered">Actualizar</th>
 		                    <th class="has-text-centered">Eliminar</th>
 		                </tr>
@@ -226,9 +230,13 @@ class clientController extends mainModel
 				$tabla .= '
 						<tr class="has-text-centered" >
 							<td>' . $contador . '</td>
-							<td>' . $rows['cliente_tipo_documento'] . ': ' . $rows['cliente_numero_documento'] . '</td>
-							<td>' . $rows['nombre'] . ' ' . $rows['cliente_apellido'] . '</td>
+							<td>' . $rows['tipo_cliente'] . '</td>
+							<td>' . $rows['nombre'] . ' ' . $rows['apellidos'] . '</td>
 							<td>' . $rows['email'] . '</td>
+							<td>' . $rows['celular'] . '</td>
+							<td>' . $rows['credito'] . '</td>
+							<td>' . $rows['pagado'] . '</td>
+							<td>' . $rows['pendiente'] . '</td>
 			                <td>
 			                    <a href="' . APP_URL . 'clientUpdate/' . $rows['id_cliente'] . '/" class="button is-success is-rounded is-small">
 			                    	<i class="fas fa-sync fa-fw"></i>
@@ -337,14 +345,14 @@ class clientController extends mainModel
 			$alerta = [
 				"tipo" => "recargar",
 				"titulo" => "Cliente eliminado",
-				"texto" => "El cliente " . $datos['nombre'] . " " . $datos['cliente_apellido'] . " ha sido eliminado del sistema correctamente",
+				"texto" => "El cliente " . $datos['nombre'] . " " . $datos['apellidos'] . " ha sido eliminado del sistema correctamente",
 				"icono" => "success"
 			];
 		} else {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos podido eliminar el cliente " . $datos['nombre'] . " " . $datos['cliente_apellido'] . " del sistema, por favor intente nuevamente",
+				"texto" => "No hemos podido eliminar el cliente " . $datos['nombre'] . " " . $datos['apellidos'] . " del sistema, por favor intente nuevamente",
 				"icono" => "error"
 			];
 		}
@@ -375,20 +383,19 @@ class clientController extends mainModel
 		}
 
 		# Almacenando datos#
-		$tipo_documento = $this->limpiarCadena($_POST['cliente_tipo_documento']);
-		$numero_documento = $this->limpiarCadena($_POST['cliente_numero_documento']);
+		$tipo_cliente = $this->limpiarCadena($_POST['tipo_cliente']);
+		$facebook = $this->limpiarCadena($_POST['facebook']);
 		$nombre = $this->limpiarCadena($_POST['nombre']);
-		$apellido = $this->limpiarCadena($_POST['cliente_apellido']);
-
-		$provincia = $this->limpiarCadena($_POST['cliente_provincia']);
-		$ciudad = $this->limpiarCadena($_POST['cliente_ciudad']);
-		$direccion = $this->limpiarCadena($_POST['direccion']);
-
-		$telefono = $this->limpiarCadena($_POST['telefono']);
+		$apellidos = $this->limpiarCadena($_POST['apellidos']);
+		$usuario = $this->limpiarCadena($_POST['usuario']);
 		$email = $this->limpiarCadena($_POST['email']);
+		$telefono = $this->limpiarCadena($_POST['telefono']);
+		$celular = $this->limpiarCadena($_POST['celular']);
+		$domicilio = $this->limpiarCadena($_POST['domicilio']);
+		$credito = $this->limpiarCadena($_POST['credito']);
 
 		# Verificando campos obligatorios #
-		if ($numero_documento == "" || $nombre == "" || $apellido == "" || $provincia == "" || $ciudad == "" || $direccion == "") {
+		if ($nombre == "" || $apellidos == "" || $celular == "" || $tipo_cliente == "" || $usuario == ""  || $domicilio == "") {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -399,17 +406,6 @@ class clientController extends mainModel
 			exit();
 		}
 
-		# Verificando integridad de los datos #
-		if ($this->verificarDatos("[a-zA-Z0-9-]{7,30}", $numero_documento)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El NUMERO DE DOCUMENTO no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
 
 		if ($this->verificarDatos("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,40}", $nombre)) {
 			$alerta = [
@@ -422,52 +418,10 @@ class clientController extends mainModel
 			exit();
 		}
 
-		if ($this->verificarDatos("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,40}", $apellido)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El APELLIDO no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
+		
 
-		if ($this->verificarDatos("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{4,30}", $provincia)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El ESTADO, PROVINCIA O DEPARTAMENTO no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
-
-		if ($this->verificarDatos("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{4,30}", $ciudad)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "La CIUDAD O PUEBLO no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
-
-		if ($this->verificarDatos("[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{4,70}", $direccion)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "La DIRECCION O CALLE no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
-
-		if ($telefono != "") {
-			if ($this->verificarDatos("[0-9()+]{8,20}", $telefono)) {
+		if ($celular != "") {
+			if ($this->verificarDatos("[0-9()+]{8,20}", $celular)) {
 				$alerta = [
 					"tipo" => "simple",
 					"titulo" => "Ocurrió un error inesperado",
@@ -479,17 +433,7 @@ class clientController extends mainModel
 			}
 		}
 
-		# Comprobando tipo de documento #
-		if (!in_array($tipo_documento, TIPO_USUARIOS)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El TIPO DE DOCUMENTO no es correcto",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
+		
 
 		# Verificando email #
 		if ($email != "" && $datos['email'] != $email) {
@@ -516,32 +460,11 @@ class clientController extends mainModel
 				exit();
 			}
 		}
-
-		# Comprobando documento #
-		if ($tipo_documento != $datos['cliente_tipo_documento'] || $numero_documento != $datos['cliente_numero_documento']) {
-			$check_documento = $this->ejecutarConsulta("SELECT id_cliente FROM cliente WHERE cliente_tipo_documento='$tipo_documento' AND cliente_numero_documento='$numero_documento'");
-			if ($check_documento->rowCount() > 0) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "El número y tipo de documento ingresado ya se encuentra registrado en el sistema",
-					"icono" => "error"
-				];
-				return json_encode($alerta);
-				exit();
-			}
-		}
-
 		$cliente_datos_up = [
 			[
-				"campo_nombre" => "cliente_tipo_documento",
-				"campo_marcador" => ":TipoDocumento",
-				"campo_valor" => $tipo_documento
-			],
-			[
-				"campo_nombre" => "cliente_numero_documento",
-				"campo_marcador" => ":NumeroDocumento",
-				"campo_valor" => $numero_documento
+				"campo_nombre" => "tipo_cliente",
+				"campo_marcador" => ":TipoCliente",
+				"campo_valor" => $tipo_cliente
 			],
 			[
 				"campo_nombre" => "nombre",
@@ -549,24 +472,19 @@ class clientController extends mainModel
 				"campo_valor" => $nombre
 			],
 			[
-				"campo_nombre" => "cliente_apellido",
-				"campo_marcador" => ":Apellido",
-				"campo_valor" => $apellido
+				"campo_nombre" => "apellidos",
+				"campo_marcador" => ":Apellidos",
+				"campo_valor" => $apellidos
 			],
 			[
-				"campo_nombre" => "cliente_provincia",
-				"campo_marcador" => ":Provincia",
-				"campo_valor" => $provincia
+				"campo_nombre" => "usuario",
+				"campo_marcador" => ":Usuario",
+				"campo_valor" => $usuario
 			],
 			[
-				"campo_nombre" => "cliente_ciudad",
-				"campo_marcador" => ":Ciudad",
-				"campo_valor" => $ciudad
-			],
-			[
-				"campo_nombre" => "direccion",
-				"campo_marcador" => ":Direccion",
-				"campo_valor" => $direccion
+				"campo_nombre" => "email",
+				"campo_marcador" => ":Email",
+				"campo_valor" => $email
 			],
 			[
 				"campo_nombre" => "telefono",
@@ -574,9 +492,24 @@ class clientController extends mainModel
 				"campo_valor" => $telefono
 			],
 			[
-				"campo_nombre" => "email",
-				"campo_marcador" => ":Email",
-				"campo_valor" => $email
+				"campo_nombre" => "celular",
+				"campo_marcador" => ":Celular",
+				"campo_valor" => $celular
+			],
+			[
+				"campo_nombre" => "domicilio",
+				"campo_marcador" => ":Domicilio",
+				"campo_valor" => $domicilio
+			],
+			[
+				"campo_nombre" => "facebook",
+				"campo_marcador" => ":Facebook",
+				"campo_valor" => $facebook
+			],
+			[
+				"campo_nombre" => "credito",
+				"campo_marcador" => ":credito",
+				"campo_valor" => $credito
 			]
 		];
 
@@ -590,14 +523,14 @@ class clientController extends mainModel
 			$alerta = [
 				"tipo" => "recargar",
 				"titulo" => "Cliente actualizado",
-				"texto" => "Los datos del cliente " . $datos['nombre'] . " " . $datos['cliente_apellido'] . " se actualizaron correctamente",
+				"texto" => "Los datos del cliente " . $datos['nombre'] . " " . $datos['apellidos'] . " se actualizaron correctamente",
 				"icono" => "success"
 			];
 		} else {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos podido actualizar los datos del cliente " . $datos['nombre'] . " " . $datos['cliente_apellido'] . ", por favor intente nuevamente",
+				"texto" => "No hemos podido actualizar los datos del cliente " . $datos['nombre'] . " " . $datos['apellidos'] . ", por favor intente nuevamente",
 				"icono" => "error"
 			];
 		}
