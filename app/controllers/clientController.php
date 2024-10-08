@@ -185,7 +185,7 @@ class clientController extends mainModel
 
 		if (isset($busqueda) && $busqueda != "") {
 
-			$consulta_datos = "SELECT * FROM cliente WHERE ((id_cliente!='1') OR nombre LIKE '%$busqueda%' OR apellidos LIKE '%$busqueda%' OR email LIKE '%$busqueda%')) ORDER BY nombre ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT * FROM cliente WHERE ((id_cliente!='1') and nombre LIKE '%$busqueda%' OR apellidos LIKE '%$busqueda%' OR email LIKE '%$busqueda%') ORDER BY nombre ASC LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_cliente) FROM cliente WHERE ((id_cliente!='1') AND ( nombre LIKE '%$busqueda%' OR apellidos LIKE '%$busqueda%' OR email LIKE '%$busqueda%'))";
 		} else {
@@ -197,7 +197,7 @@ class clientController extends mainModel
 
 		$datos = $this->ejecutarConsulta($consulta_datos);
 		$datos = $datos->fetchAll();
-
+	
 		$total = $this->ejecutarConsulta($consulta_total);
 		$total = (int) $total->fetchColumn();
 
