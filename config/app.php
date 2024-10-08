@@ -9,7 +9,7 @@ const TIPO_USUARIOS = ["Facebook", "General"];
 
 
 /*----------  Tipos de unidades de productos  ----------*/
-const PRODUCTO_UNIDAD = ["Unidad", "Kilogramo", "Caja"];
+const PRODUCTO_UNIDAD = ["Pieza", "Caja"];
 
 /*----------  Configuración de moneda  ----------*/
 const MONEDA_SIMBOLO = "$";

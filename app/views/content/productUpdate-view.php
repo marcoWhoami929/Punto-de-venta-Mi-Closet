@@ -65,7 +65,7 @@
 				<div class="column">
 					<div class="control">
 						<label>Stock o existencias <?php echo CAMPO_OBLIGATORIO; ?></label>
-						<input class="input" type="text" name="producto_stock" value="<?php echo $datos['stock_total']; ?>" pattern="[0-9]{1,22}" maxlength="22" required>
+						<input class="input" type="text" name="producto_stock" value="<?php echo $datos['stock_total']; ?>" maxlength="22" readonly>
 					</div>
 				</div>
 			</div>

@@ -337,7 +337,7 @@ class productController extends mainModel
 			[
 				"campo_nombre" => "estado",
 				"campo_marcador" => ":Estado",
-				"campo_valor" => "Habilitado"
+				"campo_valor" => "1"
 			],
 			[
 				"campo_nombre" => "foto",
@@ -400,21 +400,21 @@ class productController extends mainModel
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
 		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
 
-		$campos = "producto.id_producto,producto.codigo,producto.nombre,stock_total,producto.precio_venta,producto.foto,categoria.nombre";
+		$campos = "prod.id_producto,prod.codigo,prod.nombre as 'producto',prod.stock_total,prod.precio_venta,prod.foto,cat.nombre as 'categoria'";
 
 		if (isset($busqueda) && $busqueda != "") {
 
-			$consulta_datos = "SELECT $campos FROM producto INNER JOIN categoria ON producto.id_categoria=categoria.id_categoria WHERE codigo LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' OR marca LIKE '%$busqueda%' OR modelo LIKE '%$busqueda%' ORDER BY nombre ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria WHERE prod.codigo LIKE '%$busqueda%' OR prod.nombre LIKE '%$busqueda%' OR prod.marca LIKE '%$busqueda%' OR prod.modelo LIKE '%$busqueda%' ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_producto) FROM producto WHERE codigo LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' OR marca LIKE '%$busqueda%' OR modelo LIKE '%$busqueda%'";
 		} elseif ($categoria > 0) {
 
-			$consulta_datos = "SELECT $campos FROM producto INNER JOIN categoria ON producto.id_categoria=categoria.id_categoria WHERE producto.id_categoria='$categoria' ORDER BY producto.nombre ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria WHERE prod.id_categoria='$categoria' ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_producto) FROM producto WHERE id_categoria='$categoria'";
 		} else {
 
-			$consulta_datos = "SELECT $campos FROM producto INNER JOIN categoria ON producto.id_categoria=categoria.id_categoria ORDER BY nombre ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_producto) FROM producto";
 		}
@@ -445,11 +445,11 @@ class productController extends mainModel
 		                <div class="media-content">
 		                    <div class="content">
 		                        <p>
-		                            <strong>' . $contador . ' - ' . $rows['nombre'] . '</strong><br>
+		                            <strong>' . $contador . ' - ' . $rows['producto'] . '</strong><br>
 		                            <strong>CODIGO:</strong> ' . $rows['codigo'] . ', 
 		                            <strong>PRECIO:</strong> $' . $rows['precio_venta'] . ', 
 		                            <strong>STOCK:</strong> ' . $rows['stock_total'] . ', 
-		                            <strong>CATEGORIA:</strong> ' . $rows['nombre'] . '
+		                            <strong>CATEGORIA:</strong> ' . $rows['categoria'] . '
 		                        </p>
 		                    </div>
 		                    <div class="has-text-right">
@@ -662,16 +662,6 @@ class productController extends mainModel
 			exit();
 		}
 
-		if ($this->verificarDatos("[0-9]{1,22}", $stock)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El STOCK O EXISTENCIAS no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
 
 		if ($marca != "") {
 			if ($this->verificarDatos("[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{1,30}", $marca)) {

@@ -140,16 +140,16 @@ class saleController extends mainModel
 				"codigo" => $campos['codigo'],
 				"stock_total" => $stock_total,
 				"stock_total_old" => $campos['stock_total'],
-				"venta_detalle_precio_compra" => $campos['precio_compra'],
-				"venta_detalle_precio_venta" => $campos['precio_venta'],
-				"venta_detalle_cantidad" => 1,
-				"venta_detalle_total" => $detalle_total,
-				"venta_detalle_descripcion" => $campos['nombre']
+				"precio_compra" => $campos['precio_compra'],
+				"precio_venta" => $campos['precio_venta'],
+				"cantidad" => 1,
+				"total" => $detalle_total,
+				"descripcion" => $campos['nombre']
 			];
 
 			$_SESSION['alerta_producto_agregado'] = "Se agrego <strong>" . $campos['nombre'] . "</strong> a la venta";
 		} else {
-			$detalle_cantidad = ($_SESSION['datos_producto_venta'][$codigo]['venta_detalle_cantidad']) + 1;
+			$detalle_cantidad = ($_SESSION['datos_producto_venta'][$codigo]['cantidad']) + 1;
 
 			$stock_total = $campos['stock_total'] - $detalle_cantidad;
 
@@ -172,11 +172,11 @@ class saleController extends mainModel
 				"codigo" => $campos['codigo'],
 				"stock_total" => $stock_total,
 				"stock_total_old" => $campos['stock_total'],
-				"venta_detalle_precio_compra" => $campos['precio_compra'],
-				"venta_detalle_precio_venta" => $campos['precio_venta'],
-				"venta_detalle_cantidad" => $detalle_cantidad,
-				"venta_detalle_total" => $detalle_total,
-				"venta_detalle_descripcion" => $campos['nombre']
+				"precio_compra" => $campos['precio_compra'],
+				"precio_venta" => $campos['precio_venta'],
+				"cantidad" => $detalle_cantidad,
+				"total" => $detalle_total,
+				"descripcion" => $campos['nombre']
 			];
 
 			$_SESSION['alerta_producto_agregado'] = "Se agrego +1 <strong>" . $campos['nombre'] . "</strong> a la venta. Total en carrito: <strong>$detalle_cantidad</strong>";
@@ -269,7 +269,7 @@ class saleController extends mainModel
 		/*== comprobando producto en carrito ==*/
 		if (!empty($_SESSION['datos_producto_venta'][$codigo])) {
 
-			if ($_SESSION['datos_producto_venta'][$codigo]["venta_detalle_cantidad"] == $cantidad) {
+			if ($_SESSION['datos_producto_venta'][$codigo]["cantidad"] == $cantidad) {
 				$alerta = [
 					"tipo" => "simple",
 					"titulo" => "Ocurrió un error inesperado",
@@ -280,10 +280,10 @@ class saleController extends mainModel
 				exit();
 			}
 
-			if ($cantidad > $_SESSION['datos_producto_venta'][$codigo]["venta_detalle_cantidad"]) {
-				$diferencia_productos = "agrego +" . ($cantidad - $_SESSION['datos_producto_venta'][$codigo]["venta_detalle_cantidad"]);
+			if ($cantidad > $_SESSION['datos_producto_venta'][$codigo]["cantidad"]) {
+				$diferencia_productos = "agrego +" . ($cantidad - $_SESSION['datos_producto_venta'][$codigo]["cantidad"]);
 			} else {
-				$diferencia_productos = "quito -" . ($_SESSION['datos_producto_venta'][$codigo]["venta_detalle_cantidad"] - $cantidad);
+				$diferencia_productos = "quito -" . ($_SESSION['datos_producto_venta'][$codigo]["cantidad"] - $cantidad);
 			}
 
 
@@ -310,11 +310,11 @@ class saleController extends mainModel
 				"codigo" => $campos['codigo'],
 				"stock_total" => $stock_total,
 				"stock_total_old" => $campos['stock_total'],
-				"venta_detalle_precio_compra" => $campos['precio_compra'],
-				"venta_detalle_precio_venta" => $campos['precio_venta'],
-				"venta_detalle_cantidad" => $detalle_cantidad,
-				"venta_detalle_total" => $detalle_total,
-				"venta_detalle_descripcion" => $campos['nombre']
+				"precio_compra" => $campos['precio_compra'],
+				"precio_venta" => $campos['precio_venta'],
+				"cantidad" => $detalle_cantidad,
+				"total" => $detalle_total,
+				"descripcion" => $campos['nombre']
 			];
 
 			$_SESSION['alerta_producto_agregado'] = "Se $diferencia_productos <strong>" . $campos['nombre'] . "</strong> a la venta. Total en carrito <strong>$detalle_cantidad</strong>";
@@ -353,14 +353,14 @@ class saleController extends mainModel
 					 </div>
 				    <div class="message-body has-text-centered">
 				    	<i class="fas fa-exclamation-triangle fa-2x"></i><br>
-						Debes de introducir el Numero de documento, Nombre, Apellido o Teléfono del cliente
+						Debes de introducir el Nombre, Apellido o Celular del cliente
 				    </div>
 				</article>';
 			exit();
 		}
 
 		/*== Seleccionando clientes en la DB ==*/
-		$datos_cliente = $this->ejecutarConsulta("SELECT * FROM cliente WHERE (id_cliente!='1') AND (cliente_numero_documento LIKE '%$cliente%' OR nombre LIKE '%$cliente%' OR cliente_apellido LIKE '%$cliente%' OR telefono LIKE '%$cliente%') ORDER BY nombre ASC");
+		$datos_cliente = $this->ejecutarConsulta("SELECT * FROM cliente WHERE (id_cliente!='1') AND nombre LIKE '%$cliente%' OR apellidos LIKE '%$cliente%' OR celular LIKE '%$cliente%' ORDER BY nombre ASC");
 
 		if ($datos_cliente->rowCount() >= 1) {
 
@@ -371,7 +371,7 @@ class saleController extends mainModel
 			foreach ($datos_cliente as $rows) {
 				$tabla .= '
 					<tr>
-                        <td class="has-text-left" ><i class="fas fa-male fa-fw"></i> &nbsp; ' . $rows['nombre'] . ' ' . $rows['cliente_apellido'] . ' (' . $rows['cliente_tipo_documento'] . ': ' . $rows['cliente_numero_documento'] . ')</td>
+                        <td class="has-text-left" ><i class="fas fa-male fa-fw"></i> &nbsp; ' . $rows['nombre'] . ' ' . $rows['apellidos'] . '</td>
                         <td class="has-text-centered" >
                             <button type="button" class="button is-link is-rounded is-small" onclick="agregar_cliente(' . $rows['id_cliente'] . ')"><i class="fas fa-user-plus"></i></button>
                         </td>
@@ -422,10 +422,8 @@ class saleController extends mainModel
 		if ($_SESSION['datos_cliente_venta']['id_cliente'] == 1) {
 			$_SESSION['datos_cliente_venta'] = [
 				"id_cliente" => $campos['id_cliente'],
-				"cliente_tipo_documento" => $campos['cliente_tipo_documento'],
-				"cliente_numero_documento" => $campos['cliente_numero_documento'],
 				"nombre" => $campos['nombre'],
-				"cliente_apellido" => $campos['cliente_apellido']
+				"apellidos" => $campos['apellidos']
 			];
 
 			$alerta = [
@@ -592,7 +590,7 @@ class saleController extends mainModel
 			}
 
 			/*== Respaldando datos de BD para poder restaurar en caso de errores ==*/
-			$_SESSION['datos_producto_venta'][$productos['codigo']]['stock_total'] = $datos_producto['stock_total'] - $_SESSION['datos_producto_venta'][$productos['codigo']]['venta_detalle_cantidad'];
+			$_SESSION['datos_producto_venta'][$productos['codigo']]['stock_total'] = $datos_producto['stock_total'] - $_SESSION['datos_producto_venta'][$productos['codigo']]['cantidad'];
 
 			$_SESSION['datos_producto_venta'][$productos['codigo']]['stock_total_old'] = $datos_producto['stock_total'];
 
@@ -744,33 +742,33 @@ class saleController extends mainModel
 			/*== Preparando datos para enviarlos al modelo ==*/
 			$datos_venta_detalle_reg = [
 				[
-					"campo_nombre" => "venta_detalle_cantidad",
+					"campo_nombre" => "cantidad",
 					"campo_marcador" => ":Cantidad",
-					"campo_valor" => $venta_detalle['venta_detalle_cantidad']
+					"campo_valor" => $venta_detalle['cantidad']
 				],
 				[
-					"campo_nombre" => "venta_detalle_precio_compra",
+					"campo_nombre" => "precio_compra",
 					"campo_marcador" => ":PrecioCompra",
-					"campo_valor" => $venta_detalle['venta_detalle_precio_compra']
+					"campo_valor" => $venta_detalle['precio_compra']
 				],
 				[
-					"campo_nombre" => "venta_detalle_precio_venta",
+					"campo_nombre" => "precio_venta",
 					"campo_marcador" => ":PrecioVenta",
-					"campo_valor" => $venta_detalle['venta_detalle_precio_venta']
+					"campo_valor" => $venta_detalle['precio_venta']
 				],
 				[
-					"campo_nombre" => "venta_detalle_total",
+					"campo_nombre" => "total",
 					"campo_marcador" => ":Total",
-					"campo_valor" => $venta_detalle['venta_detalle_total']
+					"campo_valor" => $venta_detalle['total']
 				],
 				[
-					"campo_nombre" => "venta_detalle_descripcion",
+					"campo_nombre" => "descripcion",
 					"campo_marcador" => ":Descripcion",
-					"campo_valor" => $venta_detalle['venta_detalle_descripcion']
+					"campo_valor" => $venta_detalle['descripcion']
 				],
 				[
 					"campo_nombre" => "codigo",
-					"campo_marcador" => ":VentaCodigo",
+					"campo_marcador" => ":Codigo",
 					"campo_valor" => $codigo_venta
 				],
 				[
@@ -906,7 +904,7 @@ class saleController extends mainModel
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
 		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
 
-		$campos_tablas = "venta.id_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre,usuario.usuario_apellido,cliente.id_cliente,cliente.nombre,cliente.cliente_apellido";
+		$campos_tablas = "venta.id_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre as 'nombreVendedor',cliente.id_cliente,cliente.nombre as 'nombreCliente',cliente.apellidos";
 
 		if (isset($busqueda) && $busqueda != "") {
 
@@ -954,8 +952,8 @@ class saleController extends mainModel
 							<td>' . $rows['id_venta'] . '</td>
 							<td>' . $rows['codigo'] . '</td>
 							<td>' . date("d-m-Y", strtotime($rows['fecha_venta'])) . ' ' . $rows['hora_venta'] . '</td>
-							<td>' . $this->limitarCadena($rows['nombre'] . ' ' . $rows['cliente_apellido'], 30, "...") . '</td>
-							<td>' . $this->limitarCadena($rows['nombre'] . ' ' . $rows['usuario_apellido'], 30, "...") . '</td>
+							<td>' . $this->limitarCadena($rows['nombreCliente'] . ' ' . $rows['apellidos'], 30, "...") . '</td>
+							<td>' . $this->limitarCadena($rows['nombreVendedor'], 30, "...") . '</td>
 							<td>' . MONEDA_SIMBOLO . number_format($rows['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
 			                <td>
 
@@ -1044,7 +1042,7 @@ class saleController extends mainModel
 		}
 
 		# Verificando detalles de venta #
-		$check_detalle_venta = $this->ejecutarConsulta("SELECT venta_detalle_id FROM venta_detalle WHERE codigo='" . $datos['codigo'] . "'");
+		$check_detalle_venta = $this->ejecutarConsulta("SELECT id_detalle FROM venta_detalle WHERE codigo='" . $datos['codigo'] . "'");
 		$check_detalle_venta = $check_detalle_venta->rowCount();
 
 		if ($check_detalle_venta > 0) {

@@ -37,6 +37,7 @@
                     </div>
                 </form>
                 <?php
+
                 if (isset($_SESSION['alerta_producto_agregado']) && $_SESSION['alerta_producto_agregado'] != "") {
                     echo '
                     <div class="notification is-success is-light">
@@ -99,14 +100,14 @@
                                     <tr class="has-text-centered">
                                         <td><?php echo $cc; ?></td>
                                         <td><?php echo $productos['codigo']; ?></td>
-                                        <td><?php echo $productos['venta_detalle_descripcion']; ?></td>
+                                        <td><?php echo $productos['descripcion']; ?></td>
                                         <td>
                                             <div class="control">
-                                                <input class="input sale_input-cant has-text-centered" value="<?php echo $productos['venta_detalle_cantidad']; ?>" id="sale_input_<?php echo str_replace(" ", "_", $productos['codigo']); ?>" type="text" style="max-width: 80px;">
+                                                <input class="input sale_input-cant has-text-centered" value="<?php echo $productos['cantidad']; ?>" id="sale_input_<?php echo str_replace(" ", "_", $productos['codigo']); ?>" type="text" style="max-width: 80px;">
                                             </div>
                                         </td>
-                                        <td><?php echo MONEDA_SIMBOLO . number_format($productos['venta_detalle_precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
-                                        <td><?php echo MONEDA_SIMBOLO . number_format($productos['venta_detalle_total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
+                                        <td><?php echo MONEDA_SIMBOLO . number_format($productos['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
+                                        <td><?php echo MONEDA_SIMBOLO . number_format($productos['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
                                         <td>
                                             <button type="button" class="button is-success is-rounded is-small" onclick="actualizar_cantidad('#sale_input_<?php echo str_replace(" ", "_", $productos['codigo']); ?>','<?php echo $productos['codigo']; ?>')">
                                                 <i class="fas fa-redo-alt fa-fw"></i>
@@ -126,7 +127,7 @@
                                     </tr>
                                 <?php
                                     $cc++;
-                                    $_SESSION['total'] += $productos['venta_detalle_total'];
+                                    $_SESSION['total'] += $productos['total'];
                                 }
                                 ?>
                                 <tr class="has-text-centered">
@@ -190,11 +191,12 @@
 
                         <label>Cliente</label>
                         <?php
+
                         if (isset($_SESSION['datos_cliente_venta']) && count($_SESSION['datos_cliente_venta']) >= 1 && $_SESSION['datos_cliente_venta']['id_cliente'] != 1) {
                         ?>
                             <div class="field has-addons mb-5">
                                 <div class="control">
-                                    <input class="input" type="text" readonly id="venta_cliente" value="<?php echo $_SESSION['datos_cliente_venta']['nombre'] . " " . $_SESSION['datos_cliente_venta']['cliente_apellido']; ?>">
+                                    <input class="input" type="text" readonly id="venta_cliente" value="<?php echo $_SESSION['datos_cliente_venta']['nombre'] . " " . $_SESSION['datos_cliente_venta']['apellidos']; ?>">
                                 </div>
                                 <div class="control">
                                     <a class="button is-danger" title="Remove cliente" id="btn_remove_client" onclick="remover_cliente(<?php echo $_SESSION['datos_cliente_venta']['id_cliente']; ?>)">
@@ -210,24 +212,21 @@
 
                                 $_SESSION['datos_cliente_venta'] = [
                                     "id_cliente" => $datos_cliente['id_cliente'],
-                                    "cliente_tipo_documento" => $datos_cliente['cliente_tipo_documento'],
-                                    "cliente_numero_documento" => $datos_cliente['cliente_numero_documento'],
                                     "nombre" => $datos_cliente['nombre'],
-                                    "cliente_apellido" => $datos_cliente['cliente_apellido']
+                                    "apellidos" => $datos_cliente['apellidos']
                                 ];
                             } else {
                                 $_SESSION['datos_cliente_venta'] = [
                                     "id_cliente" => 1,
-                                    "cliente_tipo_documento" => "N/A",
-                                    "cliente_numero_documento" => "N/A",
                                     "nombre" => "Publico",
-                                    "cliente_apellido" => "General"
+                                    "apellidos" => "General"
                                 ];
                             }
+
                         ?>
                             <div class="field has-addons mb-5">
                                 <div class="control">
-                                    <input class="input" type="text" readonly id="venta_cliente" value="<?php echo $_SESSION['datos_cliente_venta']['nombre'] . " " . $_SESSION['datos_cliente_venta']['cliente_apellido']; ?>">
+                                    <input class="input" type="text" readonly id="venta_cliente" value="<?php echo $_SESSION['datos_cliente_venta']['nombre'] . " " . $_SESSION['datos_cliente_venta']['apellidos']; ?>">
                                 </div>
                                 <div class="control">
                                     <a class="button is-info js-modal-trigger" data-target="modal-js-client" title="Agregar cliente" id="btn_add_client">
@@ -305,7 +304,7 @@
         </header>
         <section class="modal-card-body">
             <div class="field mt-6 mb-6">
-                <label class="label">Documento, Nombre, Apellido, Teléfono</label>
+                <label class="label">Nombre, Apellido, Celular</label>
                 <div class="control">
                     <input class="input" type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]{1,30}" name="input_cliente" id="input_cliente" maxlength="30">
                 </div>

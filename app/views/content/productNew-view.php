@@ -12,14 +12,20 @@
 		<div class="columns">
 			<div class="column">
 				<div class="control">
-					<label>Código de barra <?php echo CAMPO_OBLIGATORIO; ?></label>
-					<input class="input" type="text" name="codigo" pattern="[a-zA-Z0-9- ]{1,77}" maxlength="77" required>
+					<label>Código de barras <?php echo CAMPO_OBLIGATORIO; ?></label>
+					<input class="input" type="text" name="codigo" pattern="[a-zA-Z0-9- ]{1,77}" maxlength="77">
 				</div>
 			</div>
 			<div class="column">
 				<div class="control">
 					<label>Nombre <?php echo CAMPO_OBLIGATORIO; ?></label>
 					<input class="input" type="text" name="nombre" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,$#\-\/ ]{1,100}" maxlength="100" required>
+				</div>
+			</div>
+			<div class="column">
+				<div class="control">
+					<label>Descripción</label>
+					<input class="input" type="text" name="descripcion">
 				</div>
 			</div>
 		</div>
@@ -38,7 +44,7 @@
 			</div>
 			<div class="column">
 				<div class="control">
-					<label>Stock o existencias <?php echo CAMPO_OBLIGATORIO; ?></label>
+					<label>Stock Inicial<?php echo CAMPO_OBLIGATORIO; ?></label>
 					<input class="input" type="text" name="producto_stock" pattern="[0-9]{1,22}" maxlength="22" required>
 				</div>
 			</div>

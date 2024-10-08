@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-10-2024 a las 02:19:40
+-- Tiempo de generación: 08-10-2024 a las 21:21:20
 -- Versión del servidor: 10.4.27-MariaDB
 -- Versión de PHP: 7.4.33
 
@@ -46,8 +46,8 @@ CREATE TABLE `caja` (
 --
 
 INSERT INTO `caja` (`id_caja`, `numero`, `nombre`, `fecha_apertura`, `saldo_inicial`, `efectivo`, `tarjeta_debito`, `tarjeta_credito`, `saldo_final`, `fecha_cierre`, `estado`) VALUES
-(1, 1, 'Caja Principal', '2024-10-04 20:04:59', '150.00', '0.00', '0.00', '0.00', '0.00', '2024-10-04 20:04:59', 'abierta'),
-(2, 2, 'cAJA 2', '2024-10-05 17:17:24', '120.00', '0.00', '0.00', '0.00', '0.00', '2024-10-05 17:17:24', 'abierta');
+(1, 1, 'Caja Principal', '2024-10-04 20:04:59', '100.00', '930.00', '0.00', '0.00', '0.00', '2024-10-04 20:04:59', 'abierta'),
+(2, 2, 'Caja Piso 1', '2024-10-05 17:17:24', '100.00', '0.00', '0.00', '0.00', '0.00', '2024-10-05 17:17:24', 'abierta');
 
 -- --------------------------------------------------------
 
@@ -75,6 +75,14 @@ CREATE TABLE `categoria` (
   `descripcion` text NOT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
+
+--
+-- Volcado de datos para la tabla `categoria`
+--
+
+INSERT INTO `categoria` (`id_categoria`, `nombre`, `ubicacion`, `descripcion`, `fecha_registro`) VALUES
+(1, 'Categoria1', 'Piso 101', '', '2024-10-08 16:43:16'),
+(2, 'Categoria 2', 'Piso 2', '', '2024-10-08 19:16:34');
 
 -- --------------------------------------------------------
 
@@ -106,8 +114,9 @@ CREATE TABLE `cliente` (
 
 INSERT INTO `cliente` (`id_cliente`, `tipo_cliente`, `nombre`, `apellidos`, `usuario`, `email`, `password`, `telefono`, `celular`, `domicilio`, `facebook`, `credito`, `pagado`, `pendiente`, `fecha_registro`) VALUES
 (1, 'Facebook', 'Publico', '', '', '', '', '', '', '', '', '0.000', '0.000', '0.000', '2024-10-04 20:11:45'),
-(2, 'Facebook', 'Marco Antonio', 'Lopez Perez', 'MarcWhoami', 'mlopez@sfd.com.mx', '', '', '2211636228', 'Dalias 6124 San Baltazar Lindavista', 'Marc Antoni Lopez Perrez', '0.000', '0.000', '0.000', '2024-10-07 21:33:32'),
-(3, 'Facebook', 'Marco', 'Lopez', 'fsdfsdfd', 'mlopezz@sfd.com.mx', 'Whoami929', '', '2211636228', 'Dalias 6124', 'sdfsdf', '0.000', '0.000', '0.000', '2024-10-07 21:44:13');
+(2, 'Facebook', 'Marco Antonio', 'Lopez Perez', 'MarcWhoami', 'mlopez@sfd.com.mx', '', '', '2211636228', 'Dalias 6124 San Baltazar Lindavista', 'Marc Antoni Lopez Perrez', '100.000', '0.000', '0.000', '2024-10-07 21:33:32'),
+(3, 'Facebook', 'Marco', 'Lopez', 'fsdfsdfd', 'mlopezz@sfd.com.mx', 'Whoami929', '', '2211636228', 'Dalias 6124', 'sdfsdf', '0.000', '0.000', '0.000', '2024-10-07 21:44:13'),
+(4, 'Facebook', 'Carlos Daniel', 'Fuentes Ugarte', 'carDani', 'carlos@gmail.com', '12345678', '', '2222222222', 'Dalias 6124 Bugambilias Puebla', '', '0.000', '0.000', '0.000', '2024-10-08 19:16:04');
 
 -- --------------------------------------------------------
 
@@ -156,6 +165,13 @@ CREATE TABLE `empresa` (
   `empresa_email` varchar(50) NOT NULL,
   `empresa_direccion` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
+
+--
+-- Volcado de datos para la tabla `empresa`
+--
+
+INSERT INTO `empresa` (`empresa_id`, `empresa_nombre`, `empresa_telefono`, `empresa_email`, `empresa_direccion`) VALUES
+(1, 'Ventas Mi Closet', '2224265678', 'atencion@ventasmicloset.com.mx', 'Av. 2 de Abril 443, Tetela, 73780 Cdad. de Libres, Pue.');
 
 -- --------------------------------------------------------
 
@@ -246,11 +262,20 @@ CREATE TABLE `producto` (
   `precio_venta` decimal(30,2) NOT NULL,
   `marca` varchar(35) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
   `modelo` varchar(35) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
-  `estado` varchar(20) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
+  `estado` int(11) NOT NULL,
   `foto` varchar(500) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
   `fecha_ceacion` timestamp NOT NULL DEFAULT current_timestamp(),
   `fecha_actualizacion` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
+
+--
+-- Volcado de datos para la tabla `producto`
+--
+
+INSERT INTO `producto` (`id_producto`, `id_categoria`, `id_proveedor`, `codigo`, `nombre`, `descripcion`, `stock_total`, `tipo_unidad`, `precio_compra`, `precio_venta`, `marca`, `modelo`, `estado`, `foto`, `fecha_ceacion`, `fecha_actualizacion`) VALUES
+(1, 1, 0, '121452112', 'Carcasa Disco Duro', '', '2.000', 'Pieza', '50.00', '120.00', 'OTG', 'Type-c', 1, '0000121452112_38.png', '2024-10-08 16:58:22', '2024-10-08 19:20:07'),
+(2, 2, 0, '12345678', 'Adaptador Vga', '', '9.000', 'Pieza', '35.00', '100.00', '', '', 1, '12345678_64.png', '2024-10-08 19:18:02', '2024-10-08 19:20:07'),
+(3, 1, 0, '12365498', 'Rasuradora Inalambrica', '', '2.000', 'Pieza', '50.00', '110.00', '', '', 1, '12365498_4.png', '2024-10-08 19:18:59', '2024-10-08 19:20:07');
 
 -- --------------------------------------------------------
 
@@ -307,11 +332,18 @@ CREATE TABLE `venta` (
   `pagado` decimal(30,2) NOT NULL,
   `cambio` decimal(30,2) NOT NULL,
   `descuento` decimal(10,3) NOT NULL,
-  `id_empleado` int(11) NOT NULL,
+  `id_usuario` int(11) NOT NULL,
   `id_cliente` int(11) NOT NULL,
   `id_caja` int(11) NOT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
+
+--
+-- Volcado de datos para la tabla `venta`
+--
+
+INSERT INTO `venta` (`id_venta`, `codigo`, `fecha_venta`, `hora_venta`, `total`, `pagado`, `cambio`, `descuento`, `id_usuario`, `id_cliente`, `id_caja`, `fecha_registro`) VALUES
+(3, 'D8C4E8S8V9-1', '2024-10-08', '02:20:00', '330.00', '500.00', '170.00', '0.000', 1, 4, 1, '2024-10-08 19:20:07');
 
 -- --------------------------------------------------------
 
@@ -320,15 +352,25 @@ CREATE TABLE `venta` (
 --
 
 CREATE TABLE `venta_detalle` (
-  `venta_detalle_id` int(100) NOT NULL,
-  `venta_detalle_cantidad` int(10) NOT NULL,
-  `venta_detalle_precio_compra` decimal(30,2) NOT NULL,
-  `venta_detalle_precio_venta` decimal(30,2) NOT NULL,
-  `venta_detalle_total` decimal(30,2) NOT NULL,
-  `venta_detalle_descripcion` varchar(200) NOT NULL,
-  `venta_codigo` varchar(200) NOT NULL,
-  `producto_id` int(20) NOT NULL
+  `id_detalle` int(100) NOT NULL,
+  `id_producto` int(20) NOT NULL,
+  `descripcion` varchar(200) NOT NULL,
+  `codigo` varchar(200) NOT NULL,
+  `cantidad` int(10) NOT NULL,
+  `precio_compra` decimal(30,2) NOT NULL,
+  `precio_venta` decimal(30,2) NOT NULL,
+  `total` decimal(30,2) NOT NULL,
+  `fecha_movimiento` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
+
+--
+-- Volcado de datos para la tabla `venta_detalle`
+--
+
+INSERT INTO `venta_detalle` (`id_detalle`, `id_producto`, `descripcion`, `codigo`, `cantidad`, `precio_compra`, `precio_venta`, `total`, `fecha_movimiento`) VALUES
+(3, 1, 'Carcasa Disco Duro', 'D8C4E8S8V9-1', 1, '50.00', '120.00', '120.00', '2024-10-08 19:20:07'),
+(4, 2, 'Adaptador Vga', 'D8C4E8S8V9-1', 1, '35.00', '100.00', '100.00', '2024-10-08 19:20:07'),
+(5, 3, 'Rasuradora Inalambrica', 'D8C4E8S8V9-1', 1, '50.00', '110.00', '110.00', '2024-10-08 19:20:07');
 
 --
 -- Índices para tablas volcadas
@@ -442,13 +484,14 @@ ALTER TABLE `venta`
   ADD PRIMARY KEY (`id_venta`),
   ADD KEY `id_cliente` (`id_cliente`),
   ADD KEY `id_caja` (`id_caja`),
-  ADD KEY `id_empleado` (`id_empleado`);
+  ADD KEY `venta_ibfk_3` (`id_usuario`);
 
 --
 -- Indices de la tabla `venta_detalle`
 --
 ALTER TABLE `venta_detalle`
-  ADD PRIMARY KEY (`venta_detalle_id`);
+  ADD PRIMARY KEY (`id_detalle`),
+  ADD KEY `id_producto` (`id_producto`);
 
 --
 -- AUTO_INCREMENT de las tablas volcadas
@@ -470,13 +513,13 @@ ALTER TABLE `cajaempleado`
 -- AUTO_INCREMENT de la tabla `categoria`
 --
 ALTER TABLE `categoria`
-  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_categoria` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- AUTO_INCREMENT de la tabla `detalleventa`
@@ -494,7 +537,7 @@ ALTER TABLE `empleado`
 -- AUTO_INCREMENT de la tabla `empresa`
 --
 ALTER TABLE `empresa`
-  MODIFY `empresa_id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `empresa_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT de la tabla `inventario`
@@ -530,7 +573,7 @@ ALTER TABLE `pago`
 -- AUTO_INCREMENT de la tabla `producto`
 --
 ALTER TABLE `producto`
-  MODIFY `id_producto` int(20) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_producto` int(20) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `proveedor`
@@ -548,13 +591,13 @@ ALTER TABLE `usuario`
 -- AUTO_INCREMENT de la tabla `venta`
 --
 ALTER TABLE `venta`
-  MODIFY `id_venta` int(30) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_venta` int(30) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `venta_detalle`
 --
 ALTER TABLE `venta_detalle`
-  MODIFY `venta_detalle_id` int(100) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_detalle` int(100) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Restricciones para tablas volcadas
@@ -617,7 +660,13 @@ ALTER TABLE `usuario`
 ALTER TABLE `venta`
   ADD CONSTRAINT `venta_ibfk_1` FOREIGN KEY (`id_cliente`) REFERENCES `cliente` (`id_cliente`),
   ADD CONSTRAINT `venta_ibfk_2` FOREIGN KEY (`id_caja`) REFERENCES `caja` (`id_caja`),
-  ADD CONSTRAINT `venta_ibfk_3` FOREIGN KEY (`id_empleado`) REFERENCES `empleado` (`id_empleado`);
+  ADD CONSTRAINT `venta_ibfk_3` FOREIGN KEY (`id_usuario`) REFERENCES `usuario` (`id_usuario`);
+
+--
+-- Filtros para la tabla `venta_detalle`
+--
+ALTER TABLE `venta_detalle`
+  ADD CONSTRAINT `venta_detalle_ibfk_1` FOREIGN KEY (`id_producto`) REFERENCES `producto` (`id_producto`);
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

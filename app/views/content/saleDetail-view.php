@@ -10,7 +10,8 @@
 
 	$code = $insLogin->limpiarCadena($url[1]);
 
-	$datos = $insLogin->seleccionarDatos("Normal", "venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario INNER JOIN caja ON venta.id_caja=caja.id_caja WHERE (codigo='" . $code . "')", "*", 0);
+	//$datos = $insLogin->seleccionarDatos("Normal", "venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario INNER JOIN caja ON venta.id_caja=caja.id_caja WHERE (codigo='" . $code . "')", "*", 0);
+	$datos = $insLogin->seleccionarDatos("Normal", "venta as ven INNER JOIN cliente as cli ON ven.id_cliente=cli.id_cliente INNER JOIN usuario as usu ON ven.id_usuario=usu.id_usuario INNER JOIN caja as caja ON ven.id_caja=caja.id_caja WHERE (codigo='$code')", "ven.*,caja.*,cli.nombre as 'nombreCliente',cli.celular,cli.apellidos,cli.domicilio,usu.nombre as 'nombreCajero'", 0);
 
 	if ($datos->rowCount() == 1) {
 		$datos_venta = $datos->fetch();
@@ -45,12 +46,12 @@
 
 				<div class="full-width sale-details text-condensedLight">
 					<div class="has-text-weight-bold">Vendedor</div>
-					<span class="has-text-link"><?php echo $datos_venta['nombre'] . " " . $datos_venta['usuario_apellido']; ?></span>
+					<span class="has-text-link"><?php echo $datos_venta['nombreCajero']  ?></span>
 				</div>
 
 				<div class="full-width sale-details text-condensedLight">
 					<div class="has-text-weight-bold">Cliente</div>
-					<span class="has-text-link"><?php echo $datos_venta['nombre'] . " " . $datos_venta['cliente_apellido']; ?></span>
+					<span class="has-text-link"><?php echo $datos_venta['nombreCliente'] . " " . $datos_venta['apellidos']; ?></span>
 				</div>
 
 			</div>
@@ -102,10 +103,10 @@
 							?>
 									<tr class="has-text-centered">
 										<td><?php echo $cc; ?></td>
-										<td><?php echo $detalle['venta_detalle_descripcion']; ?></td>
-										<td><?php echo $detalle['venta_detalle_cantidad']; ?></td>
-										<td><?php echo MONEDA_SIMBOLO . number_format($detalle['venta_detalle_precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
-										<td><?php echo MONEDA_SIMBOLO . number_format($detalle['venta_detalle_total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
+										<td><?php echo $detalle['descripcion']; ?></td>
+										<td><?php echo $detalle['cantidad']; ?></td>
+										<td><?php echo MONEDA_SIMBOLO . number_format($detalle['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
+										<td><?php echo MONEDA_SIMBOLO . number_format($detalle['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
 									</tr>
 								<?php
 									$cc++;

@@ -12,7 +12,7 @@ use app\controllers\saleController;
 
 $ins_venta = new saleController();
 
-$datos_venta = $ins_venta->seleccionarDatos("Normal", "venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario INNER JOIN caja ON venta.id_caja=caja.id_caja WHERE (codigo='$code')", "*", 0);
+$datos_venta = $ins_venta->seleccionarDatos("Normal", "venta as ven INNER JOIN cliente as cli ON ven.id_cliente=cli.id_cliente INNER JOIN usuario as usu ON ven.id_usuario=usu.id_usuario INNER JOIN caja as caja ON ven.id_caja=caja.id_caja WHERE (codigo='$code')", "ven.*,caja.*,cli.nombre as 'nombreCliente',cli.celular,cli.apellidos,cli.domicilio,usu.nombre as 'nombreCajero'", 0);
 
 if ($datos_venta->rowCount() == 1) {
 
@@ -44,7 +44,7 @@ if ($datos_venta->rowCount() == 1) {
 
     $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Fecha: " . date("d/m/Y", strtotime($datos_venta['fecha_venta'])) . " " . $datos_venta['hora_venta']), 0, 'C', false);
     $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Caja Nro: " . $datos_venta['numero']), 0, 'C', false);
-    $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Cajero: " . $datos_venta['nombre'] . " " . $datos_venta['usuario_apellido']), 0, 'C', false);
+    $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Vendedor: " . $datos_venta['nombreCajero']), 0, 'C', false);
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", strtoupper("Ticket Nro: " . $datos_venta['id_venta'])), 0, 'C', false);
     $pdf->SetFont('Arial', '', 9);
@@ -55,14 +55,12 @@ if ($datos_venta->rowCount() == 1) {
 
     if ($datos_venta['id_cliente'] == 1) {
         $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Cliente: N/A"), 0, 'C', false);
-        $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Documento: N/A"), 0, 'C', false);
         $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Teléfono: N/A"), 0, 'C', false);
         $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Dirección: N/A"), 0, 'C', false);
     } else {
-        $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Cliente: " . $datos_venta['nombre'] . " " . $datos_venta['cliente_apellido']), 0, 'C', false);
-        $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Documento: " . $datos_venta['cliente_tipo_documento'] . " " . $datos_venta['cliente_numero_documento']), 0, 'C', false);
-        $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Teléfono: " . $datos_venta['telefono']), 0, 'C', false);
-        $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Dirección: " . $datos_venta['cliente_provincia'] . ", " . $datos_venta['cliente_ciudad'] . ", " . $datos_venta['direccion']), 0, 'C', false);
+        $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Cliente: " . $datos_venta['nombreCliente'] . " " . $datos_venta['apellidos']), 0, 'C', false);
+        $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Celular: " . $datos_venta['celular']), 0, 'C', false);
+        $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", "Dirección: " .  $datos_venta['domicilio']), 0, 'C', false);
     }
 
     $pdf->Ln(1);
@@ -82,10 +80,10 @@ if ($datos_venta->rowCount() == 1) {
     $venta_detalle = $venta_detalle->fetchAll();
 
     foreach ($venta_detalle as $detalle) {
-        $pdf->MultiCell(0, 4, iconv("UTF-8", "ISO-8859-1", $detalle['venta_detalle_descripcion']), 0, 'C', false);
-        $pdf->Cell(18, 4, iconv("UTF-8", "ISO-8859-1", $detalle['venta_detalle_cantidad']), 0, 0, 'C');
-        $pdf->Cell(22, 4, iconv("UTF-8", "ISO-8859-1", MONEDA_SIMBOLO . number_format($detalle['venta_detalle_precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR)), 0, 0, 'C');
-        $pdf->Cell(32, 4, iconv("UTF-8", "ISO-8859-1", MONEDA_SIMBOLO . number_format($detalle['venta_detalle_total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR)), 0, 0, 'C');
+        $pdf->MultiCell(0, 4, iconv("UTF-8", "ISO-8859-1", $detalle['descripcion']), 0, 'C', false);
+        $pdf->Cell(18, 4, iconv("UTF-8", "ISO-8859-1", $detalle['cantidad']), 0, 0, 'C');
+        $pdf->Cell(22, 4, iconv("UTF-8", "ISO-8859-1", MONEDA_SIMBOLO . number_format($detalle['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR)), 0, 0, 'C');
+        $pdf->Cell(32, 4, iconv("UTF-8", "ISO-8859-1", MONEDA_SIMBOLO . number_format($detalle['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR)), 0, 0, 'C');
         $pdf->Ln(4);
         $pdf->Ln(3);
     }
