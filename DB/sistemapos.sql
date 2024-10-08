@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 05-10-2024 a las 21:14:42
+-- Tiempo de generación: 08-10-2024 a las 02:19:40
 -- Versión del servidor: 10.4.27-MariaDB
 -- Versión de PHP: 7.4.33
 
@@ -84,16 +84,16 @@ CREATE TABLE `categoria` (
 
 CREATE TABLE `cliente` (
   `id_cliente` int(11) NOT NULL,
-  `tipo_cliente` text NOT NULL,
-  `nombre` text NOT NULL,
-  `usuario` text NOT NULL,
-  `apellidos` text NOT NULL,
-  `email` varchar(50) NOT NULL,
-  `password` text NOT NULL,
-  `telefono` varchar(15) NOT NULL,
-  `celular` varchar(12) NOT NULL,
-  `direccion` text NOT NULL,
-  `facebook` text NOT NULL,
+  `tipo_cliente` text CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
+  `nombre` text CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
+  `apellidos` text CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
+  `usuario` text CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
+  `email` varchar(50) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
+  `password` text CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
+  `telefono` varchar(15) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
+  `celular` varchar(12) CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
+  `domicilio` text CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
+  `facebook` text CHARACTER SET utf8 COLLATE utf8_spanish_ci NOT NULL,
   `credito` decimal(30,3) NOT NULL,
   `pagado` decimal(30,3) NOT NULL,
   `pendiente` decimal(30,3) NOT NULL,
@@ -104,8 +104,10 @@ CREATE TABLE `cliente` (
 -- Volcado de datos para la tabla `cliente`
 --
 
-INSERT INTO `cliente` (`id_cliente`, `tipo_cliente`, `nombre`, `usuario`, `apellidos`, `email`, `password`, `telefono`, `celular`, `direccion`, `facebook`, `credito`, `pagado`, `pendiente`, `fecha_registro`) VALUES
-(1, 'Facebook', 'Publico', '', '', '', '', '', '', '', '', '0.000', '0.000', '0.000', '2024-10-04 20:11:45');
+INSERT INTO `cliente` (`id_cliente`, `tipo_cliente`, `nombre`, `apellidos`, `usuario`, `email`, `password`, `telefono`, `celular`, `domicilio`, `facebook`, `credito`, `pagado`, `pendiente`, `fecha_registro`) VALUES
+(1, 'Facebook', 'Publico', '', '', '', '', '', '', '', '', '0.000', '0.000', '0.000', '2024-10-04 20:11:45'),
+(2, 'Facebook', 'Marco Antonio', 'Lopez Perez', 'MarcWhoami', 'mlopez@sfd.com.mx', '', '', '2211636228', 'Dalias 6124 San Baltazar Lindavista', 'Marc Antoni Lopez Perrez', '0.000', '0.000', '0.000', '2024-10-07 21:33:32'),
+(3, 'Facebook', 'Marco', 'Lopez', 'fsdfsdfd', 'mlopezz@sfd.com.mx', 'Whoami929', '', '2211636228', 'Dalias 6124', 'sdfsdf', '0.000', '0.000', '0.000', '2024-10-07 21:44:13');
 
 -- --------------------------------------------------------
 
@@ -474,7 +476,7 @@ ALTER TABLE `categoria`
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `detalleventa`

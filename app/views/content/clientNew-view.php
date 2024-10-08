@@ -46,7 +46,7 @@
 			<div class="column">
 				<div class="control">
 					<label>Nombre Usuario <?php echo CAMPO_OBLIGATORIO; ?></label>
-					<input class="input" type="text" name="usuario" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,40}" maxlength="120" required>
+					<input class="input" type="text" name="usuario" maxlength="120" required>
 				</div>
 			</div>
 		</div>
@@ -60,7 +60,7 @@
 			<div class="column">
 				<div class="control">
 					<label>Contraseña <?php echo CAMPO_OBLIGATORIO; ?></label>
-					<input class="input" type="password" name="password_1" pattern="[a-zA-Z0-9$@.-]{7,100}" maxlength="100" required>
+					<input class="input" type="password" name="password" pattern="[a-zA-Z0-9$@.-]{7,100}" maxlength="100" required>
 				</div>
 			</div>
 
@@ -91,7 +91,7 @@
 			<div class="column">
 				<div class="control">
 					<label>Domicilio <?php echo CAMPO_OBLIGATORIO; ?></label>
-					<input class="input" type="text" name="direccion" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{4,70}" maxlength="150" required>
+					<input class="input" type="text" name="domicilio" required>
 				</div>
 			</div>
 		</div>
