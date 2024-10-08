@@ -45,7 +45,7 @@ class loginController extends mainModel
 				} else {
 
 					# Verificando usuario #
-					$check_usuario = $this->ejecutarConsulta("SELECT * FROM usuario WHERE usuario='$usuario'");
+					$check_usuario = $this->ejecutarConsulta("SELECT usr.id_usuario,usr.password,usr.nombre as 'nombreUsuario',usr.usuario,usr.foto,usr.id_caja,caja.nombre as 'nombreCaja' FROM usuario as usr INNER JOIN caja ON usr.id_caja = caja.id_caja WHERE usr.usuario='$usuario'");
 
 					if ($check_usuario->rowCount() == 1) {
 
@@ -54,10 +54,12 @@ class loginController extends mainModel
 						if ($check_usuario['usuario'] == $usuario && password_verify($clave, $check_usuario['password'])) {
 
 							$_SESSION['id'] = $check_usuario['id_usuario'];
-							$_SESSION['nombre'] = $check_usuario['nombre'];
+							$_SESSION['nombre'] = $check_usuario['nombreUsuario'];
 							$_SESSION['usuario'] = $check_usuario['usuario'];
 							$_SESSION['foto'] = $check_usuario['foto'];
 							$_SESSION['caja'] = $check_usuario['id_caja'];
+							$_SESSION['nombre_caja'] = $check_usuario['nombreCaja'];
+
 
 
 							if (headers_sent()) {

@@ -21,7 +21,7 @@
 			</figcaption>
 		</figure>
 		<div class="full-width tittles navLateral-body-tittle-menu has-text-centered is-uppercase">
-
+			<small><?php echo $_SESSION['nombre_caja']; ?></small>
 		</div>
 		<nav class="full-width">
 			<ul class="full-width list-unstyle menu-principal">
