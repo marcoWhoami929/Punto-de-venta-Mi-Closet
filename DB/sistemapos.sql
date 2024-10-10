@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 08-10-2024 a las 21:21:20
+-- Tiempo de generación: 10-10-2024 a las 02:19:56
 -- Versión del servidor: 10.4.27-MariaDB
 -- Versión de PHP: 7.4.33
 
@@ -114,9 +114,8 @@ CREATE TABLE `cliente` (
 
 INSERT INTO `cliente` (`id_cliente`, `tipo_cliente`, `nombre`, `apellidos`, `usuario`, `email`, `password`, `telefono`, `celular`, `domicilio`, `facebook`, `credito`, `pagado`, `pendiente`, `fecha_registro`) VALUES
 (1, 'Facebook', 'Publico', '', '', '', '', '', '', '', '', '0.000', '0.000', '0.000', '2024-10-04 20:11:45'),
-(2, 'Facebook', 'Marco Antonio', 'Lopez Perez', 'MarcWhoami', 'mlopez@sfd.com.mx', '', '', '2211636228', 'Dalias 6124 San Baltazar Lindavista', 'Marc Antoni Lopez Perrez', '100.000', '0.000', '0.000', '2024-10-07 21:33:32'),
-(3, 'Facebook', 'Marco', 'Lopez', 'fsdfsdfd', 'mlopezz@sfd.com.mx', 'Whoami929', '', '2211636228', 'Dalias 6124', 'sdfsdf', '0.000', '0.000', '0.000', '2024-10-07 21:44:13'),
-(4, 'Facebook', 'Carlos Daniel', 'Fuentes Ugarte', 'carDani', 'carlos@gmail.com', '12345678', '', '2222222222', 'Dalias 6124 Bugambilias Puebla', '', '0.000', '0.000', '0.000', '2024-10-08 19:16:04');
+(4, 'Facebook', 'Carlos Daniel', 'Fuentes Ugarte', 'carDani', 'carlos@gmail.com', '$2y$10$zChkMLwuF0jEGc/xsiPOQOT0WjJKy4mWyeofV.WtutpenwG7CIVOa', '', '2222222222', 'Dalias 6124 Bugambilias Puebla', '', '0.000', '0.000', '0.000', '2024-10-08 19:16:04'),
+(5, 'Facebook', 'Marco Antonio', 'Lopez Perez', 'marcWhoami', 'mlopez@sfd.com.mx', '$2y$10$zChkMLwuF0jEGc/xsiPOQOT0WjJKy4mWyeofV.WtutpenwG7CIVOa', '', '2211636228', 'Dalias 6124', '', '0.000', '0.000', '0.000', '2024-10-09 17:54:43');
 
 -- --------------------------------------------------------
 
@@ -315,7 +314,8 @@ CREATE TABLE `usuario` (
 
 INSERT INTO `usuario` (`id_usuario`, `nombre`, `email`, `usuario`, `password`, `foto`, `perfil`, `id_caja`) VALUES
 (1, 'Administrador', '', 'Administrador', '$2y$10$Jgm6xFb5Onz/BMdIkNK2Tur8yg/NYEMb/tdnhoV7kB1BwIG4R05D2', '', 'Administrador', 1),
-(2, 'Marco Antonio Lopez Perez', 'mm_marco_mar@hotmail.com', 'Marco', '$2y$10$wxXEdDCZk7B8KghwfWOoM.lj8C7N6ecUdcsNjnCN//SXytM/JY0WW', 'Marco_Antonio_Lopez_Perez_18.png', 'Administrador', 1);
+(2, 'Marco Antonio Lopez Perez', 'mm_marco_mar@hotmail.com', 'Marco', '$2y$10$wxXEdDCZk7B8KghwfWOoM.lj8C7N6ecUdcsNjnCN//SXytM/JY0WW', 'Marco_Antonio_Lopez_Perez_18.png', 'Administrador', 1),
+(3, 'Usuario Caja', '', 'user1', '$2y$10$e.mMd9YAYWA1xDHFoVUQd.7yXgsuv/nu8r8/El64d6SveRQs4vfDm', '', 'Caja', 2);
 
 -- --------------------------------------------------------
 
@@ -359,6 +359,9 @@ CREATE TABLE `venta_detalle` (
   `cantidad` int(10) NOT NULL,
   `precio_compra` decimal(30,2) NOT NULL,
   `precio_venta` decimal(30,2) NOT NULL,
+  `porc_descuento` decimal(30,2) NOT NULL,
+  `descuento` decimal(30,2) NOT NULL,
+  `subtotal` decimal(30,2) NOT NULL,
   `total` decimal(30,2) NOT NULL,
   `fecha_movimiento` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
@@ -367,10 +370,10 @@ CREATE TABLE `venta_detalle` (
 -- Volcado de datos para la tabla `venta_detalle`
 --
 
-INSERT INTO `venta_detalle` (`id_detalle`, `id_producto`, `descripcion`, `codigo`, `cantidad`, `precio_compra`, `precio_venta`, `total`, `fecha_movimiento`) VALUES
-(3, 1, 'Carcasa Disco Duro', 'D8C4E8S8V9-1', 1, '50.00', '120.00', '120.00', '2024-10-08 19:20:07'),
-(4, 2, 'Adaptador Vga', 'D8C4E8S8V9-1', 1, '35.00', '100.00', '100.00', '2024-10-08 19:20:07'),
-(5, 3, 'Rasuradora Inalambrica', 'D8C4E8S8V9-1', 1, '50.00', '110.00', '110.00', '2024-10-08 19:20:07');
+INSERT INTO `venta_detalle` (`id_detalle`, `id_producto`, `descripcion`, `codigo`, `cantidad`, `precio_compra`, `precio_venta`, `porc_descuento`, `descuento`, `subtotal`, `total`, `fecha_movimiento`) VALUES
+(3, 1, 'Carcasa Disco Duro', 'D8C4E8S8V9-1', 1, '50.00', '120.00', '0.00', '0.00', '0.00', '120.00', '2024-10-08 19:20:07'),
+(4, 2, 'Adaptador Vga', 'D8C4E8S8V9-1', 1, '35.00', '100.00', '0.00', '0.00', '0.00', '100.00', '2024-10-08 19:20:07'),
+(5, 3, 'Rasuradora Inalambrica', 'D8C4E8S8V9-1', 1, '50.00', '110.00', '0.00', '0.00', '0.00', '110.00', '2024-10-08 19:20:07');
 
 --
 -- Índices para tablas volcadas
@@ -519,7 +522,7 @@ ALTER TABLE `categoria`
 -- AUTO_INCREMENT de la tabla `cliente`
 --
 ALTER TABLE `cliente`
-  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_cliente` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT de la tabla `detalleventa`
@@ -585,7 +588,7 @@ ALTER TABLE `proveedor`
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id_usuario` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT de la tabla `venta`
