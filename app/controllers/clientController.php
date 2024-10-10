@@ -86,7 +86,7 @@ class clientController extends mainModel
 				exit();
 			}
 		}
-
+		$clave = password_hash($password, PASSWORD_BCRYPT, ["cost" => 10]);
 		$cliente_datos_reg = [
 			[
 				"campo_nombre" => "tipo_cliente",
@@ -116,7 +116,7 @@ class clientController extends mainModel
 			[
 				"campo_nombre" => "password",
 				"campo_marcador" => ":Password",
-				"campo_valor" => $password
+				"campo_valor" => $clave
 			],
 			[
 				"campo_nombre" => "telefono",
@@ -197,7 +197,7 @@ class clientController extends mainModel
 
 		$datos = $this->ejecutarConsulta($consulta_datos);
 		$datos = $datos->fetchAll();
-	
+
 		$total = $this->ejecutarConsulta($consulta_total);
 		$total = (int) $total->fetchColumn();
 
@@ -418,7 +418,7 @@ class clientController extends mainModel
 			exit();
 		}
 
-		
+
 
 		if ($celular != "") {
 			if ($this->verificarDatos("[0-9()+]{8,20}", $celular)) {
@@ -433,7 +433,7 @@ class clientController extends mainModel
 			}
 		}
 
-		
+
 
 		# Verificando email #
 		if ($email != "" && $datos['email'] != $email) {

@@ -1,3 +1,11 @@
+<?php
+if ($_SESSION['perfil'] == 'Administrador') {
+	$estado = "";
+} else {
+	$estado = "display:none";
+}
+
+?>
 <section class="full-width navLateral scroll" id="navLateral">
 	<div class="full-width navLateral-body">
 		<div class="full-width navLateral-body-logo has-text-centered tittles is-uppercase">
@@ -26,7 +34,7 @@
 		<nav class="full-width">
 			<ul class="full-width list-unstyle menu-principal">
 
-				<li class="full-width">
+				<li class="full-width" style="<?php echo $estado ?>">
 					<a href="<?php echo APP_URL; ?>dashboard/" class="full-width">
 						<div class="navLateral-body-cl">
 							<i class="fab fa-dashcube fa-fw"></i>
@@ -36,10 +44,21 @@
 						</div>
 					</a>
 				</li>
+				<li class="full-width">
+					<a href="<?php echo APP_URL; ?>myCashier/" class="full-width">
+						<div class="navLateral-body-cl">
+							<i class="fas fa-cash-register fa-fw"></i>
+						</div>
+						<div class="navLateral-body-cr">
+							MI CAJA
+						</div>
+					</a>
+				</li>
+
 
 				<li class="full-width divider-menu-h"></li>
 
-				<li class="full-width">
+				<li class="full-width" style="<?php echo $estado ?>">
 					<a href="#" class="full-width btn-subMenu">
 						<div class="navLateral-body-cl">
 							<i class="fas fa-cash-register fa-fw"></i>
@@ -85,7 +104,7 @@
 
 				<li class="full-width divider-menu-h"></li>
 
-				<li class="full-width">
+				<li class="full-width" style="<?php echo $estado ?>">
 					<a href="#" class="full-width btn-subMenu">
 						<div class="navLateral-body-cl">
 							<i class="fas fa-users fa-fw"></i>
@@ -177,7 +196,7 @@
 
 				<li class="full-width divider-menu-h"></li>
 
-				<li class="full-width">
+				<li class="full-width" style="<?php echo $estado ?>">
 					<a href="#" class="full-width btn-subMenu">
 						<div class="navLateral-body-cl">
 							<i class="fas fa-tags fa-fw"></i>
@@ -234,7 +253,7 @@
 						<span class="fas fa-chevron-down"></span>
 					</a>
 					<ul class="full-width menu-principal sub-menu-options">
-						<li class="full-width">
+						<li class="full-width" style="<?php echo $estado ?>">
 							<a href="<?php echo APP_URL; ?>productNew/" class="full-width">
 								<div class="navLateral-body-cl">
 									<i class="fas fa-box fa-fw"></i>
@@ -325,7 +344,7 @@
 
 				<li class="full-width divider-menu-h"></li>
 
-				<li class="full-width">
+				<li class="full-width" style="<?php echo $estado ?>">
 					<a href="#" class="full-width btn-subMenu">
 						<div class="navLateral-body-cl">
 							<i class="fas fa-cogs fa-fw"></i>

@@ -30,7 +30,7 @@ class saleController extends mainModel
 		}
 
 		/*== Seleccionando productos en la DB ==*/
-		$datos_productos = $this->ejecutarConsulta("SELECT * FROM producto WHERE (nombre LIKE '%$producto%' OR marca LIKE '%$producto%' OR modelo LIKE '%$producto%') ORDER BY nombre ASC");
+		$datos_productos = $this->ejecutarConsulta("SELECT * FROM producto WHERE (nombre LIKE '%$producto%' OR marca LIKE '%$producto%' OR modelo LIKE '%$producto%' OR codigo LIKE '%$producto%') ORDER BY nombre ASC");
 
 		if ($datos_productos->rowCount() >= 1) {
 
@@ -142,6 +142,7 @@ class saleController extends mainModel
 				"stock_total_old" => $campos['stock_total'],
 				"precio_compra" => $campos['precio_compra'],
 				"precio_venta" => $campos['precio_venta'],
+				"descuento" => '0.00',
 				"cantidad" => 1,
 				"total" => $detalle_total,
 				"descripcion" => $campos['nombre']
@@ -174,6 +175,7 @@ class saleController extends mainModel
 				"stock_total_old" => $campos['stock_total'],
 				"precio_compra" => $campos['precio_compra'],
 				"precio_venta" => $campos['precio_venta'],
+				"descuento" => '0.00',
 				"cantidad" => $detalle_cantidad,
 				"total" => $detalle_total,
 				"descripcion" => $campos['nombre']
@@ -312,6 +314,7 @@ class saleController extends mainModel
 				"stock_total_old" => $campos['stock_total'],
 				"precio_compra" => $campos['precio_compra'],
 				"precio_venta" => $campos['precio_venta'],
+				"descuento" => '0.00',
 				"cantidad" => $detalle_cantidad,
 				"total" => $detalle_total,
 				"descripcion" => $campos['nombre']
