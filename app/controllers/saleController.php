@@ -142,8 +142,10 @@ class saleController extends mainModel
 				"stock_total_old" => $campos['stock_total'],
 				"precio_compra" => $campos['precio_compra'],
 				"precio_venta" => $campos['precio_venta'],
+				"porc_descuento" => '0.00',
 				"descuento" => '0.00',
 				"cantidad" => 1,
+				"subtotal" => $detalle_total,
 				"total" => $detalle_total,
 				"descripcion" => $campos['nombre']
 			];
@@ -167,7 +169,9 @@ class saleController extends mainModel
 
 			$detalle_total = $detalle_cantidad * $campos['precio_venta'];
 			$detalle_total = number_format($detalle_total, MONEDA_DECIMALES, '.', '');
-
+			$descuento = 10;
+			$descuento_total = ($detalle_cantidad * $campos['precio_venta']);
+			$subtotal = (($detalle_cantidad * $campos['precio_venta']) / 100) * $descuento;
 			$_SESSION['datos_producto_venta'][$codigo] = [
 				"id_producto" => $campos['id_producto'],
 				"codigo" => $campos['codigo'],
@@ -177,6 +181,7 @@ class saleController extends mainModel
 				"precio_venta" => $campos['precio_venta'],
 				"descuento" => '0.00',
 				"cantidad" => $detalle_cantidad,
+				"subtotal" => $subtotal,
 				"total" => $detalle_total,
 				"descripcion" => $campos['nombre']
 			];

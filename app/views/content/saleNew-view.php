@@ -83,8 +83,10 @@
                                 <th class="has-text-centered">Producto</th>
                                 <th class="has-text-centered">Cant.</th>
                                 <th class="has-text-centered">Precio</th>
+                                <th class="has-text-centered">% Desc</th>
                                 <th class="has-text-centered">Desc</th>
                                 <th class="has-text-centered">Subtotal</th>
+                                <th class="has-text-centered">Total</th>
                                 <th class="has-text-centered">Actualizar</th>
                                 <th class="has-text-centered">Remover</th>
                             </tr>
@@ -108,7 +110,13 @@
                                             </div>
                                         </td>
                                         <td><?php echo MONEDA_SIMBOLO . number_format($productos['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
+                                        <td>
+                                            <div class="control">
+                                                <input class="input sale_input-cant has-text-centered" value="<?php echo $productos['porc_descuento']; ?>" id="porc_descuento<?php echo str_replace(" ", "_", $productos['codigo']); ?>" type="number" style="max-width: 80px;">
+                                            </div>
+                                        </td>
                                         <td><?php echo MONEDA_SIMBOLO . number_format($productos['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
+                                        <td><?php echo MONEDA_SIMBOLO . number_format($productos['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
                                         <td><?php echo MONEDA_SIMBOLO . number_format($productos['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
                                         <td>
                                             <button type="button" class="button is-success is-rounded is-small" onclick="actualizar_cantidad('#sale_input_<?php echo str_replace(" ", "_", $productos['codigo']); ?>','<?php echo $productos['codigo']; ?>')">
