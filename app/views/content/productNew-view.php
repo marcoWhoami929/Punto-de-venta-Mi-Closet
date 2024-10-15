@@ -12,8 +12,8 @@
 		<div class="columns">
 			<div class="column">
 				<div class="control">
-					<label>Código de barras <?php echo CAMPO_OBLIGATORIO; ?></label>
-					<input class="input" type="text" name="codigo" pattern="[a-zA-Z0-9- ]{1,77}" maxlength="77">
+					<label>Código de barras </label>
+					<input class="input" type="text" name="codigo" pattern="[a-zA-Z0-9- ]{1,77}" maxlength="77" placeholder="Codigo de barras del producto">
 				</div>
 			</div>
 			<div class="column">
@@ -32,8 +32,8 @@
 		<div class="columns">
 			<div class="column">
 				<div class="control">
-					<label>Precio de compra <?php echo CAMPO_OBLIGATORIO; ?></label>
-					<input class="input" type="text" name="precio_compra" pattern="[0-9.]{1,25}" maxlength="25" value="0.00" required>
+					<label>Precio de compra</label>
+					<input class="input" type="text" name="precio_compra" pattern="[0-9.]{1,25}" maxlength="25" value="0.00">
 				</div>
 			</div>
 			<div class="column">
@@ -45,7 +45,7 @@
 			<div class="column">
 				<div class="control">
 					<label>Stock Inicial<?php echo CAMPO_OBLIGATORIO; ?></label>
-					<input class="input" type="text" name="producto_stock" pattern="[0-9]{1,22}" maxlength="22" required>
+					<input class="input" type="text" name="producto_stock" pattern="[0-9]{1,22}" maxlength="22" required value="0">
 				</div>
 			</div>
 		</div>
@@ -67,7 +67,7 @@
 					<label>Presentación del producto <?php echo CAMPO_OBLIGATORIO; ?></label><br>
 					<div class="select">
 						<select name="producto_unidad">
-							<option value="" selected="">Seleccione una opción</option>
+
 							<?php
 							echo $insLogin->generarSelect(PRODUCTO_UNIDAD, "VACIO");
 							?>
@@ -92,6 +92,24 @@
 					</select>
 				</div>
 			</div>
+		</div>
+		<div class="columns">
+			<div class="column">
+				<div class="control">
+					<label>Colores</label>
+
+					<input class="input" type="tags" id="colores" name="colores" placeholder="Escribir colores disponibles">
+
+				</div>
+			</div>
+			<div class="column">
+				<div class="control">
+					<label>Tallas</label>
+					<input class="input" type="tags" id="tallas" name="tallas" placeholder="Escribir tallas disponibles">
+				</div>
+			</div>
+
+
 		</div>
 		<div class="columns">
 			<div class="column">

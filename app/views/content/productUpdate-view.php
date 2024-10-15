@@ -39,7 +39,7 @@
 				<div class="column">
 					<div class="control">
 						<label>Código de barra <?php echo CAMPO_OBLIGATORIO; ?></label>
-						<input class="input" type="text" name="codigo" value="<?php echo $datos['codigo']; ?>" pattern="[a-zA-Z0-9- ]{1,77}" maxlength="77" required>
+						<input class="input" type="text" name="codigo" value="<?php echo $datos['codigo']; ?>" pattern="[a-zA-Z0-9- ]{1,77}" maxlength="77">
 					</div>
 				</div>
 				<div class="column">
@@ -114,6 +114,24 @@
 						</select>
 					</div>
 				</div>
+			</div>
+			<div class="columns">
+				<div class="column">
+					<div class="control">
+						<label>Colores</label>
+
+						<input class="input" type="tags" id="colores" name="colores" value="<?php echo $datos['colores']; ?>" placeholder="Escribir colores disponibles">
+
+					</div>
+				</div>
+				<div class="column">
+					<div class="control">
+						<label>Tallas</label>
+						<input class="input" type="tags" id="tallas" name="tallas" value="<?php echo $datos['tallas']; ?>" placeholder="Escribir tallas disponibles">
+					</div>
+				</div>
+
+
 			</div>
 			<p class="has-text-centered">
 				<button type="submit" class="button is-success is-rounded"><i class="fas fa-sync-alt"></i> &nbsp; Actualizar</button>

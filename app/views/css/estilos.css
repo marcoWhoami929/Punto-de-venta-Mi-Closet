@@ -359,3 +359,10 @@ html {
     width: calc(100% - 300px);
   }
 }
+
+.tagsinput > input {
+  border: none;
+}
+.tagsinput > input:focus {
+  outline: none;
+}

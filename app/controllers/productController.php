@@ -23,9 +23,11 @@ class productController extends mainModel
 		$modelo = $this->limpiarCadena($_POST['modelo']);
 		$unidad = $this->limpiarCadena($_POST['producto_unidad']);
 		$categoria = $this->limpiarCadena($_POST['producto_categoria']);
+		$colores = $this->limpiarCadena($_POST['colores']);
+		$tallas = $this->limpiarCadena($_POST['tallas']);
 
 		# Verificando campos obligatorios #
-		if ($codigo == "" || $nombre == "" || $precio_compra == "" || $precio_venta == "" || $stock == "") {
+		if ($codigo == "" || $nombre == "" || $precio_venta == "" || $stock == "") {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -59,16 +61,7 @@ class productController extends mainModel
 			exit();
 		}
 
-		if ($this->verificarDatos("[0-9.]{1,25}", $precio_compra)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El PRECIO DE COMPRA no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
+
 
 		if ($this->verificarDatos("[0-9.]{1,25}", $precio_venta)) {
 			$alerta = [
@@ -92,31 +85,6 @@ class productController extends mainModel
 			exit();
 		}
 
-		if ($marca != "") {
-			if ($this->verificarDatos("[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{1,30}", $marca)) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "La MARCA no coincide con el formato solicitado",
-					"icono" => "error"
-				];
-				return json_encode($alerta);
-				exit();
-			}
-		}
-
-		if ($modelo != "") {
-			if ($this->verificarDatos("[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{1,30}", $modelo)) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "El MODELO no coincide con el formato solicitado",
-					"icono" => "error"
-				];
-				return json_encode($alerta);
-				exit();
-			}
-		}
 
 		# Comprobando presentacion del producto #
 		if (!in_array($unidad, PRODUCTO_UNIDAD)) {
@@ -155,18 +123,7 @@ class productController extends mainModel
 			exit();
 		}
 
-		# Comprobando precio de compra del producto #
-		$precio_compra = number_format($precio_compra, MONEDA_DECIMALES, '.', '');
-		if ($precio_compra <= 0) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El PRECIO DE COMPRA no puede ser menor o igual a 0",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
+
 
 		# Comprobando precio de venta del producto #
 		$precio_venta = number_format($precio_venta, MONEDA_DECIMALES, '.', '');
@@ -182,6 +139,7 @@ class productController extends mainModel
 		}
 
 		# Comprobando precio de compra y venta del producto #
+		/*
 		if ($precio_compra > $precio_venta) {
 			$alerta = [
 				"tipo" => "simple",
@@ -192,7 +150,7 @@ class productController extends mainModel
 			return json_encode($alerta);
 			exit();
 		}
-
+*/
 		# Comprobando codigo de producto #
 		$check_codigo = $this->ejecutarConsulta("SELECT codigo FROM producto WHERE codigo='$codigo'");
 		if ($check_codigo->rowCount() >= 1) {
@@ -333,6 +291,16 @@ class productController extends mainModel
 				"campo_nombre" => "modelo",
 				"campo_marcador" => ":Modelo",
 				"campo_valor" => $modelo
+			],
+			[
+				"campo_nombre" => "colores",
+				"campo_marcador" => ":Colores",
+				"campo_valor" => $colores
+			],
+			[
+				"campo_nombre" => "tallas",
+				"campo_marcador" => ":Tallas",
+				"campo_valor" => $tallas
 			],
 			[
 				"campo_nombre" => "estado",
@@ -604,9 +572,11 @@ class productController extends mainModel
 		$modelo = $this->limpiarCadena($_POST['modelo']);
 		$unidad = $this->limpiarCadena($_POST['producto_unidad']);
 		$categoria = $this->limpiarCadena($_POST['producto_categoria']);
+		$colores = $this->limpiarCadena($_POST['colores']);
+		$tallas = $this->limpiarCadena($_POST['tallas']);
 
 		# Verificando campos obligatorios #
-		if ($codigo == "" || $nombre == "" || $precio_compra == "" || $precio_venta == "" || $stock == "") {
+		if ($codigo == "" || $nombre == ""  || $precio_venta == "" || $stock == "") {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -640,16 +610,7 @@ class productController extends mainModel
 			exit();
 		}
 
-		if ($this->verificarDatos("[0-9.]{1,25}", $precio_compra)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El PRECIO DE COMPRA no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
+
 
 		if ($this->verificarDatos("[0-9.]{1,25}", $precio_venta)) {
 			$alerta = [
@@ -663,31 +624,7 @@ class productController extends mainModel
 		}
 
 
-		if ($marca != "") {
-			if ($this->verificarDatos("[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{1,30}", $marca)) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "La MARCA no coincide con el formato solicitado",
-					"icono" => "error"
-				];
-				return json_encode($alerta);
-				exit();
-			}
-		}
 
-		if ($modelo != "") {
-			if ($this->verificarDatos("[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ().,#\- ]{1,30}", $modelo)) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "El MODELO no coincide con el formato solicitado",
-					"icono" => "error"
-				];
-				return json_encode($alerta);
-				exit();
-			}
-		}
 
 		# Comprobando presentacion del producto #
 		if (!in_array($unidad, PRODUCTO_UNIDAD)) {
@@ -728,18 +665,7 @@ class productController extends mainModel
 			exit();
 		}
 
-		# Comprobando precio de compra del producto #
-		$precio_compra = number_format($precio_compra, MONEDA_DECIMALES, '.', '');
-		if ($precio_compra <= 0) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El PRECIO DE COMPRA no puede ser menor o igual a 0",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
+
 
 		# Comprobando precio de venta del producto #
 		$precio_venta = number_format($precio_venta, MONEDA_DECIMALES, '.', '');
@@ -755,6 +681,7 @@ class productController extends mainModel
 		}
 
 		# Comprobando precio de compra y venta del producto #
+		/*
 		if ($precio_compra > $precio_venta) {
 			$alerta = [
 				"tipo" => "simple",
@@ -765,7 +692,7 @@ class productController extends mainModel
 			return json_encode($alerta);
 			exit();
 		}
-
+*/
 		# Comprobando codigo de producto #
 		if ($datos['codigo'] != $codigo) {
 			$check_codigo = $this->ejecutarConsulta("SELECT codigo FROM producto WHERE codigo='$codigo'");
@@ -837,6 +764,16 @@ class productController extends mainModel
 				"campo_nombre" => "modelo",
 				"campo_marcador" => ":Modelo",
 				"campo_valor" => $modelo
+			],
+			[
+				"campo_nombre" => "colores",
+				"campo_marcador" => ":Colores",
+				"campo_valor" => $colores
+			],
+			[
+				"campo_nombre" => "tallas",
+				"campo_marcador" => ":Tallas",
+				"campo_valor" => $tallas
 			],
 			[
 				"campo_nombre" => "id_categoria",
