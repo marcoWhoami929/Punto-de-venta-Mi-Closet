@@ -39,18 +39,6 @@ class categoryController extends mainModel
 			exit();
 		}
 
-		if ($ubicacion != "") {
-			if ($this->verificarDatos("[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]{5,150}", $ubicacion)) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "La UBICACION no coincide con el formato solicitado",
-					"icono" => "error"
-				];
-				return json_encode($alerta);
-				exit();
-			}
-		}
 
 		# Verificando nombre #
 		$check_nombre = $this->ejecutarConsulta("SELECT nombre FROM categoria WHERE nombre='$nombre'");
@@ -329,18 +317,6 @@ class categoryController extends mainModel
 			exit();
 		}
 
-		if ($ubicacion != "") {
-			if ($this->verificarDatos("[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]{5,150}", $ubicacion)) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "La UBICACION no coincide con el formato solicitado",
-					"icono" => "error"
-				];
-				return json_encode($alerta);
-				exit();
-			}
-		}
 
 		# Verificando nombre #
 		if ($datos['nombre'] != $nombre) {

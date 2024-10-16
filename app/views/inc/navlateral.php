@@ -387,6 +387,43 @@ if ($_SESSION['perfil'] == 'Administrador') {
 						</li>
 					</ul>
 				</li>
+				<li class="full-width divider-menu-h"></li>
+
+				<li class="full-width" style="<?php echo $estado ?>">
+					<a href="#" class="full-width btn-subMenu">
+						<div class="navLateral-body-cl">
+
+							<i class="fas fa-clipboard-list"></i>
+						</div>
+						<div class="navLateral-body-cr">
+							Notas
+						</div>
+						<span class="fas fa-chevron-down"></span>
+					</a>
+					<ul class="full-width menu-principal sub-menu-options">
+						<li class="full-width">
+							<a href="<?php echo APP_URL; ?>notesNew/" class="full-width">
+								<div class="navLateral-body-cl">
+									<i class="fas fa-plus fa-fw"></i>
+								</div>
+								<div class="navLateral-body-cr">
+									Nueva nota
+								</div>
+							</a>
+						</li>
+						<li class="full-width">
+							<a href="<?php echo APP_URL; ?>notesList/" class="full-width">
+								<div class="navLateral-body-cl">
+									<i class="fas fa-book"></i>
+								</div>
+								<div class="navLateral-body-cr">
+									Lista de notas
+								</div>
+							</a>
+						</li>
+
+					</ul>
+				</li>
 
 				<li class="full-width divider-menu-h"></li>
 
