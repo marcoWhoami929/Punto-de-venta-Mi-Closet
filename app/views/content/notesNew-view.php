@@ -10,15 +10,17 @@
     $prefijo = 'NOT';
     $folioNota =  strtoupper($prefijo . "-" . substr(str_shuffle($caracteres_permitidos), 0, $longitud));
     ?>
-    <form class="FormularioAjax" action="<?php echo APP_URL; ?>app/ajax/cajaAjax.php" method="POST" autocomplete="off">
+    <form class="FormularioAjax" action="<?php echo APP_URL; ?>app/ajax/notasAjax.php" method="POST" autocomplete="off">
 
-        <input type="hidden" name="modulo_caja" value="registrar">
+        <input type="hidden" name="modulo_notas" value="registrar">
+        <input type="hidden" name="route" id="route" value="<?php echo APP_URL; ?>">
+        <input type="hidden" name="route_qr" id="route_qr" value="<?php echo APP_URL . "notas/" . $folioNota ?>">
 
         <div class="columns">
             <div class="column">
                 <div class="control">
                     <label>Folio Nota <?php echo CAMPO_OBLIGATORIO; ?></label>
-                    <input class="input" type="text" name="folio_nota" required value="<?= $folioNota ?>">
+                    <input class="input" type="text" name="folio_nota" id="folio_nota" required value="<?= $folioNota ?>">
                 </div>
             </div>
             <div class="column">

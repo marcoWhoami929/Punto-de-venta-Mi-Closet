@@ -109,17 +109,17 @@ class saleController extends mainModel
 			return json_encode($alerta);
 			exit();
 		} else {
-			$campos = $check_producto->fetch();
+			$value = $check_producto->fetch();
 		}
 
 		/*== Codigo de producto ==*/
-		$codigo = $campos['codigo'];
+		$codigo = $value['codigo'];
 
 		if (empty($_SESSION['datos_producto_venta'][$codigo])) {
 
 			$detalle_cantidad = 1;
 
-			$stock_total = $campos['stock_total'] - $detalle_cantidad;
+			$stock_total = $value['stock_total'] - $detalle_cantidad;
 
 			if ($stock_total < 0) {
 				$alerta = [
@@ -132,29 +132,34 @@ class saleController extends mainModel
 				exit();
 			}
 
-			$detalle_total = $detalle_cantidad * $campos['precio_venta'];
-			$detalle_total = number_format($detalle_total, MONEDA_DECIMALES, '.', '');
+
+			$porc_descuento = $_POST["porc_descuento"];
+			$descuento = (($value['precio_venta'] * $detalle_cantidad) * $porc_descuento) / 100;
+			$subtotal = ($detalle_cantidad * $value['precio_venta']);
+			$subtotal = number_format($subtotal, MONEDA_DECIMALES, '.', '');
+			$total = ($subtotal - $descuento);
+			$total = number_format($total, MONEDA_DECIMALES, '.', '');
 
 			$_SESSION['datos_producto_venta'][$codigo] = [
-				"id_producto" => $campos['id_producto'],
-				"codigo" => $campos['codigo'],
+				"id_producto" => $value['id_producto'],
+				"codigo" => $value['codigo'],
 				"stock_total" => $stock_total,
-				"stock_total_old" => $campos['stock_total'],
-				"precio_compra" => $campos['precio_compra'],
-				"precio_venta" => $campos['precio_venta'],
-				"porc_descuento" => '0.00',
-				"descuento" => '0.00',
-				"cantidad" => 1,
-				"subtotal" => $detalle_total,
-				"total" => $detalle_total,
-				"descripcion" => $campos['nombre']
+				"stock_total_old" => $value['stock_total'],
+				"precio_compra" => $value['precio_compra'],
+				"precio_venta" => $value['precio_venta'],
+				"porc_descuento" => $porc_descuento,
+				"descuento" => $descuento,
+				"cantidad" => $detalle_cantidad,
+				"subtotal" => $subtotal,
+				"total" => $total,
+				"descripcion" => $value['nombre']
 			];
 
-			$_SESSION['alerta_producto_agregado'] = "Se agrego <strong>" . $campos['nombre'] . "</strong> a la venta";
+			$_SESSION['alerta_producto_agregado'] = "Se agrego <strong>" . $value['nombre'] . "</strong> a la venta";
 		} else {
 			$detalle_cantidad = ($_SESSION['datos_producto_venta'][$codigo]['cantidad']) + 1;
 
-			$stock_total = $campos['stock_total'] - $detalle_cantidad;
+			$stock_total = $value['stock_total'] - $detalle_cantidad;
 
 			if ($stock_total < 0) {
 				$alerta = [
@@ -167,26 +172,30 @@ class saleController extends mainModel
 				exit();
 			}
 
-			$detalle_total = $detalle_cantidad * $campos['precio_venta'];
-			$detalle_total = number_format($detalle_total, MONEDA_DECIMALES, '.', '');
-			$descuento = 10;
-			$descuento_total = ($detalle_cantidad * $campos['precio_venta']);
-			$subtotal = (($detalle_cantidad * $campos['precio_venta']) / 100) * $descuento;
+			$porc_descuento = $_POST["porc_descuento"];
+			$descuento = (($value['precio_venta'] * $detalle_cantidad) * $porc_descuento) / 100;
+			$subtotal = ($detalle_cantidad * $value['precio_venta']);
+			$subtotal = number_format($subtotal, MONEDA_DECIMALES, '.', '');
+			$total = ($subtotal - $descuento);
+			$total = number_format($total, MONEDA_DECIMALES, '.', '');
+
+
 			$_SESSION['datos_producto_venta'][$codigo] = [
-				"id_producto" => $campos['id_producto'],
-				"codigo" => $campos['codigo'],
+				"id_producto" => $value['id_producto'],
+				"codigo" => $value['codigo'],
 				"stock_total" => $stock_total,
-				"stock_total_old" => $campos['stock_total'],
-				"precio_compra" => $campos['precio_compra'],
-				"precio_venta" => $campos['precio_venta'],
-				"descuento" => '0.00',
+				"stock_total_old" => $value['stock_total'],
+				"precio_compra" => $value['precio_compra'],
+				"precio_venta" => $value['precio_venta'],
+				"porc_descuento" => $porc_descuento,
+				"descuento" => $descuento,
 				"cantidad" => $detalle_cantidad,
 				"subtotal" => $subtotal,
-				"total" => $detalle_total,
-				"descripcion" => $campos['nombre']
+				"total" => $total,
+				"descripcion" => $value['nombre']
 			];
 
-			$_SESSION['alerta_producto_agregado'] = "Se agrego +1 <strong>" . $campos['nombre'] . "</strong> a la venta. Total en carrito: <strong>$detalle_cantidad</strong>";
+			$_SESSION['alerta_producto_agregado'] = "Se agrego +1 <strong>" . $value['nombre'] . "</strong> a la venta. Total en carrito: <strong>$detalle_cantidad</strong>";
 		}
 
 		$alerta = [
@@ -270,7 +279,7 @@ class saleController extends mainModel
 			return json_encode($alerta);
 			exit();
 		} else {
-			$campos = $check_producto->fetch();
+			$value = $check_producto->fetch();
 		}
 
 		/*== comprobando producto en carrito ==*/
@@ -296,7 +305,7 @@ class saleController extends mainModel
 
 			$detalle_cantidad = $cantidad;
 
-			$stock_total = $campos['stock_total'] - $detalle_cantidad;
+			$stock_total = $value['stock_total'] - $detalle_cantidad;
 
 			if ($stock_total < 0) {
 				$alerta = [
@@ -309,23 +318,29 @@ class saleController extends mainModel
 				exit();
 			}
 
-			$detalle_total = $detalle_cantidad * $campos['precio_venta'];
-			$detalle_total = number_format($detalle_total, MONEDA_DECIMALES, '.', '');
+			$descuento = (($value['precio_venta'] * $detalle_cantidad) * $_POST["porc_descuento"]) / 100;
+			$descuento = number_format($descuento, MONEDA_DECIMALES, '.', '');
+			$subtotal = ($value['precio_venta'] * $detalle_cantidad);
+			$subtotal = number_format($subtotal, MONEDA_DECIMALES, '.', '');
+			$total = ($subtotal - $descuento);
+			$total = number_format($total, MONEDA_DECIMALES, '.', '');
 
 			$_SESSION['datos_producto_venta'][$codigo] = [
-				"id_producto" => $campos['id_producto'],
-				"codigo" => $campos['codigo'],
+				"id_producto" => $value['id_producto'],
+				"codigo" => $value['codigo'],
 				"stock_total" => $stock_total,
-				"stock_total_old" => $campos['stock_total'],
-				"precio_compra" => $campos['precio_compra'],
-				"precio_venta" => $campos['precio_venta'],
-				"descuento" => '0.00',
+				"stock_total_old" => $value['stock_total'],
+				"precio_compra" => $value['precio_compra'],
+				"precio_venta" => $value['precio_venta'],
+				"descuento" => $descuento,
+				"porc_descuento" => $_POST["porc_descuento"],
 				"cantidad" => $detalle_cantidad,
-				"total" => $detalle_total,
-				"descripcion" => $campos['nombre']
+				"subtotal" => $subtotal,
+				"total" => $total,
+				"descripcion" => $value['nombre']
 			];
 
-			$_SESSION['alerta_producto_agregado'] = "Se $diferencia_productos <strong>" . $campos['nombre'] . "</strong> a la venta. Total en carrito <strong>$detalle_cantidad</strong>";
+			$_SESSION['alerta_producto_agregado'] = "Se $diferencia_productos <strong>" . $value['nombre'] . "</strong> a la venta. Total en carrito <strong>$detalle_cantidad</strong>";
 
 			$alerta = [
 				"tipo" => "redireccionar",
@@ -424,14 +439,14 @@ class saleController extends mainModel
 			return json_encode($alerta);
 			exit();
 		} else {
-			$campos = $check_cliente->fetch();
+			$value = $check_cliente->fetch();
 		}
 
 		if ($_SESSION['datos_cliente_venta']['id_cliente'] == 1) {
 			$_SESSION['datos_cliente_venta'] = [
-				"id_cliente" => $campos['id_cliente'],
-				"nombre" => $campos['nombre'],
-				"apellidos" => $campos['apellidos']
+				"id_cliente" => $value['id_cliente'],
+				"nombre" => $value['nombre'],
+				"apellidos" => $value['apellidos']
 			];
 
 			$alerta = [
@@ -552,6 +567,9 @@ class saleController extends mainModel
 		/*== Formateando variables ==*/
 		$pagado = number_format($pagado, MONEDA_DECIMALES, '.', '');
 		$total = number_format($_SESSION['total'], MONEDA_DECIMALES, '.', '');
+		$subtotal = number_format($_SESSION['subtotal'], MONEDA_DECIMALES, '.', '');
+		$descuento = number_format($_SESSION['descuento'], MONEDA_DECIMALES, '.', '');
+		$porc_descuento = number_format($_SESSION['porc_descuento'], MONEDA_DECIMALES, '.', '');
 
 		$fecha_venta = date("Y-m-d");
 		$hora_venta = date("h:i a");
@@ -684,6 +702,21 @@ class saleController extends mainModel
 				"campo_valor" => $total_final
 			],
 			[
+				"campo_nombre" => "subtotal",
+				"campo_marcador" => ":Subtotal",
+				"campo_valor" => $subtotal
+			],
+			[
+				"campo_nombre" => "descuento",
+				"campo_marcador" => ":Descuento",
+				"campo_valor" => $descuento
+			],
+			[
+				"campo_nombre" => "porc_descuento",
+				"campo_marcador" => ":PorcDescuento",
+				"campo_valor" => $porc_descuento
+			],
+			[
 				"campo_nombre" => "pagado",
 				"campo_marcador" => ":Pagado",
 				"campo_valor" => $pagado
@@ -770,6 +803,21 @@ class saleController extends mainModel
 					"campo_valor" => $venta_detalle['total']
 				],
 				[
+					"campo_nombre" => "subtotal",
+					"campo_marcador" => ":Subtotal",
+					"campo_valor" => $venta_detalle['subtotal']
+				],
+				[
+					"campo_nombre" => "descuento",
+					"campo_marcador" => ":Descuento",
+					"campo_valor" => $venta_detalle['descuento']
+				],
+				[
+					"campo_nombre" => "porc_descuento",
+					"campo_marcador" => ":PorcDescuento",
+					"campo_valor" => $venta_detalle['porc_descuento']
+				],
+				[
 					"campo_nombre" => "descripcion",
 					"campo_marcador" => ":Descripcion",
 					"campo_valor" => $venta_detalle['descripcion']
@@ -791,6 +839,8 @@ class saleController extends mainModel
 			if ($agregar_detalle_venta->rowCount() != 1) {
 				$errores_venta_detalle = 1;
 				break;
+			} else {
+				$_SESSION["porc_descuento"] = "0.00";
 			}
 		}
 
@@ -912,16 +962,16 @@ class saleController extends mainModel
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
 		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
 
-		$campos_tablas = "venta.id_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre as 'nombreVendedor',cliente.id_cliente,cliente.nombre as 'nombreCliente',cliente.apellidos";
+		$value_tablas = "venta.id_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre as 'nombreVendedor',cliente.id_cliente,cliente.nombre as 'nombreCliente',cliente.apellidos";
 
 		if (isset($busqueda) && $busqueda != "") {
 
-			$consulta_datos = "SELECT $campos_tablas FROM venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario WHERE (venta.codigo='$busqueda') ORDER BY venta.id_venta DESC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $value_tablas FROM venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario WHERE (venta.codigo='$busqueda') ORDER BY venta.id_venta DESC LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_venta) FROM venta WHERE (venta.codigo='$busqueda')";
 		} else {
 
-			$consulta_datos = "SELECT $campos_tablas FROM venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario ORDER BY venta.id_venta DESC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $value_tablas FROM venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario ORDER BY venta.id_venta DESC LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_venta) FROM venta";
 		}
@@ -1088,6 +1138,41 @@ class saleController extends mainModel
 				"icono" => "error"
 			];
 		}
+
+		return json_encode($alerta);
+	}
+	public function actualizarCarritoVentaControlador()
+	{
+		$_SESSION["porc_descuento"] = $_POST["porc_descuento"];
+		$productos = $_SESSION['datos_producto_venta'];
+		$sumaTotal = 0;
+
+		foreach ($productos as $key => $value) {
+			$descuento = (($value['precio_venta'] * $value['cantidad']) * $_POST["porc_descuento"]) / 100;
+			$subtotal = ($value['precio_venta'] * $value['cantidad']);
+			$total = ($subtotal - $descuento);
+			$_SESSION['datos_producto_venta'][$value["codigo"]] = [
+				"id_producto" => $value['id_producto'],
+				"codigo" => $value['codigo'],
+				"stock_total" => $value['stock_total'],
+				"stock_total_old" => $value['stock_total_old'],
+				"precio_compra" => $value['precio_compra'],
+				"precio_venta" => $value['precio_venta'],
+				"porc_descuento" => $_POST["porc_descuento"],
+				"descuento" => $descuento,
+				"cantidad" => $value['cantidad'],
+				"subtotal" => $subtotal,
+				"total" => $total,
+				"descripcion" => $value['descripcion']
+
+			];
+			$sumaTotal += $total;
+		}
+		$_SESSION['alerta_carrito_actualizado'] = "Carrito actualizado. Total en carrito: <strong>$" . number_format($sumaTotal, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, "") . "</strong>";
+		$alerta = [
+			"tipo" => "redireccionar",
+			"url" => APP_URL . "saleNew/"
+		];
 
 		return json_encode($alerta);
 	}

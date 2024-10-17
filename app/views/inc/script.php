@@ -3,4 +3,4 @@
 <script src="<?php echo APP_URL; ?>app/views/js/main.js"></script>
 <script src="<?php echo APP_URL; ?>app/views/js/sales.js"></script>
 <script src="<?php echo APP_URL; ?>app/views/js/dashboard.js"></script>
-<script type="text/javascript" src="app/views/js/ajax_generate_code.js"></script>
+<script src="<?php echo APP_URL; ?>app/views/js/code_notas.js"></script>

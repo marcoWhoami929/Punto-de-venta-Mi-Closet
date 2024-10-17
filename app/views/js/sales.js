@@ -15,12 +15,13 @@ sale_input_barcode.addEventListener("paste", function () {
 /* Agregar producto */
 function agregar_producto() {
   let codigo_producto = document.querySelector("#sale-barcode-input").value;
-
+  var descuento = $("#descuento").val();
   codigo_producto = codigo_producto.trim();
 
   if (codigo_producto != "") {
     let datos = new FormData();
     datos.append("codigo", codigo_producto);
+    datos.append("porc_descuento", descuento);
     datos.append("modulo_venta", "agregar_producto");
 
     fetch(url + "app/ajax/ventaAjax.php", {
@@ -80,6 +81,7 @@ function agregar_codigo($codigo) {
 /* Actualizar cantidad de producto */
 function actualizar_cantidad(id, codigo) {
   let cantidad = document.querySelector(id).value;
+  var porcentaje = $("#descuento").val();
 
   cantidad = cantidad.trim();
   codigo.trim();
@@ -88,6 +90,7 @@ function actualizar_cantidad(id, codigo) {
     let datos = new FormData();
     datos.append("codigo", codigo);
     datos.append("producto_cantidad", cantidad);
+    datos.append("porc_descuento", porcentaje);
     datos.append("modulo_venta", "actualizar_producto");
 
     fetch(url + "app/ajax/ventaAjax.php", {

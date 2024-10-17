@@ -46,6 +46,14 @@
                     ';
                     unset($_SESSION['alerta_producto_agregado']);
                 }
+                if (isset($_SESSION['alerta_carrito_actualizado']) && $_SESSION['alerta_carrito_actualizado'] != "") {
+                    echo '
+                    <div class="notification is-success is-light">
+                      ' . $_SESSION['alerta_carrito_actualizado'] . '
+                    </div>
+                    ';
+                    unset($_SESSION['alerta_carrito_actualizado']);
+                }
 
                 if (isset($_SESSION['codigo_factura']) && $_SESSION['codigo_factura'] != "") {
                 ?>
@@ -96,6 +104,8 @@
                             if (isset($_SESSION['datos_producto_venta']) && count($_SESSION['datos_producto_venta']) >= 1) {
 
                                 $_SESSION['total'] = 0;
+                                $_SESSION['subtotal'] = 0;
+                                $_SESSION['descuento'] = 0;
                                 $cc = 1;
 
                                 foreach ($_SESSION['datos_producto_venta'] as $productos) {
@@ -112,12 +122,13 @@
                                         <td><?php echo MONEDA_SIMBOLO . number_format($productos['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
                                         <td>
                                             <div class="control">
-                                                <input class="input sale_input-cant has-text-centered" value="<?php echo $productos['porc_descuento']; ?>" id="porc_descuento<?php echo str_replace(" ", "_", $productos['codigo']); ?>" type="number" style="max-width: 80px;">
+                                                <input class="input sale_input-cant has-text-centered" value="<?php echo $productos['porc_descuento']; ?>" id="porc_descuento<?php echo str_replace(" ", "_", $productos['codigo']); ?>" type="number" style="max-width: 80px;" readonly>
                                             </div>
                                         </td>
                                         <td><?php echo MONEDA_SIMBOLO . number_format($productos['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
                                         <td><?php echo MONEDA_SIMBOLO . number_format($productos['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
                                         <td><?php echo MONEDA_SIMBOLO . number_format($productos['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
+
                                         <td>
                                             <button type="button" class="button is-success is-rounded is-small" onclick="actualizar_cantidad('#sale_input_<?php echo str_replace(" ", "_", $productos['codigo']); ?>','<?php echo $productos['codigo']; ?>')">
                                                 <i class="fas fa-redo-alt fa-fw"></i>
@@ -137,6 +148,11 @@
                                     </tr>
                                 <?php
                                     $cc++;
+                                    /*
+                                    $_SESSION['subtotal'] += $productos['subtotal'];
+                                    $_SESSION['descuento'] += $productos['descuento'];
+                                    $_SESSION['total'] += $productos['total'];
+                                    */
                                     $_SESSION['subtotal'] += $productos['subtotal'];
                                     $_SESSION['descuento'] += $productos['descuento'];
                                     $_SESSION['total'] += $productos['total'];
@@ -150,7 +166,7 @@
                                     <td class="has-text-weight-bold">
                                         <?php echo MONEDA_SIMBOLO . number_format($_SESSION['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?>
                                     </td>
-                                    <td colspan="2"></td>
+                                    <td colspan="5"></td>
                                 </tr>
                                 <tr class="has-text-centered">
                                     <td colspan="4"></td>
@@ -160,7 +176,7 @@
                                     <td class="has-text-weight-bold">
                                         <?php echo MONEDA_SIMBOLO . number_format($_SESSION['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?>
                                     </td>
-                                    <td colspan="2"></td>
+                                    <td colspan="5"></td>
                                 </tr>
                                 <tr class="has-text-centered">
                                     <td colspan="4"></td>
@@ -170,14 +186,14 @@
                                     <td class="has-text-weight-bold">
                                         <?php echo MONEDA_SIMBOLO . number_format($_SESSION['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?>
                                     </td>
-                                    <td colspan="2"></td>
+                                    <td colspan="5"></td>
                                 </tr>
                             <?php
                             } else {
                                 $_SESSION['total'] = 0;
                             ?>
                                 <tr class="has-text-centered">
-                                    <td colspan="8">
+                                    <td colspan="13">
                                         No hay productos agregados
                                     </td>
                                 </tr>
@@ -189,6 +205,15 @@
 
             <div class="column is-one-quarter">
                 <h2 class="title has-text-centered">Datos de la venta</h2>
+                <?php
+
+                if (isset($_SESSION["porc_descuento"])) {
+                } else {
+                    $_SESSION["porc_descuento"] = "0.00";
+                }
+
+                ?>
+
                 <hr>
 
                 <?php if ($_SESSION['total'] > 0) { ?>
@@ -269,7 +294,7 @@
                         <?php } ?>
                         <div class="control mb-5">
                             <label>% Descuento</label>
-                            <input class="input" type="text" name="descuento" id="descuento" value="0.00" pattern="[0-9.]{1,25}" maxlength="25">
+                            <input class="input" type="text" name="descuento" id="descuento" value="<?= (isset($_SESSION['porc_descuento']) ? $_SESSION['porc_descuento'] : '0.00')  ?>" maxlength="25" onchange="actualizarCarrito();">
                         </div>
                         <div class="control mb-5">
                             <label>Total pagado por cliente <?php echo CAMPO_OBLIGATORIO; ?></label>
@@ -291,8 +316,9 @@
                         <p class="has-text-centered pt-6">
                             <small>Los campos marcados con <?php echo CAMPO_OBLIGATORIO; ?> son obligatorios</small>
                         </p>
-                        <input type="text" value="<?php echo number_format($_SESSION['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="total_hidden">
-                        <input type="text" value="" id="descuento_hidden">
+                        <input type="hidden" value="<?php echo number_format($_SESSION['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="total_hidden">
+                        <input type="hidden" value="<?php echo number_format($_SESSION['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="subtotal_hidden">
+                        <input type="hidden" value="<?php echo number_format($_SESSION['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="descuento_hidden">
                         </form>
             </div>
 
