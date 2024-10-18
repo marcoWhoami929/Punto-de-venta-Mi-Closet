@@ -20,6 +20,7 @@ if (isset($_POST['modulo_venta'])) {
 		echo $insVenta->agregarProductoCarritoControlador();
 	}
 
+
 	/*--------- Remover producto de carrito ---------*/
 	if ($_POST['modulo_venta'] == "remover_producto") {
 		echo $insVenta->removerProductoCarritoControlador();

@@ -14,17 +14,29 @@ sale_input_barcode.addEventListener("paste", function () {
 
 /* Agregar producto */
 function agregar_producto() {
+  var tipo_busqueda = $("#tipo_busqueda").val();
   let codigo_producto = document.querySelector("#sale-barcode-input").value;
-  var descuento = $("#descuento").val();
+
   codigo_producto = codigo_producto.trim();
 
   if (codigo_producto != "") {
     let datos = new FormData();
-    datos.append("codigo", codigo_producto);
-    datos.append("porc_descuento", descuento);
-    datos.append("modulo_venta", "agregar_producto");
 
-    fetch(url + "app/ajax/ventaAjax.php", {
+    if (tipo_busqueda == "nota") {
+      var descuento = $("#porc_descuento").val();
+      var path = "app/ajax/notasAjax.php";
+      datos.append("codigo", codigo_producto);
+      datos.append("porc_descuento", descuento);
+      datos.append("modulo_notas", "agregar_producto_nota");
+    } else {
+      var descuento = $("#descuento").val();
+      var path = "app/ajax/ventaAjax.php";
+      datos.append("codigo", codigo_producto);
+      datos.append("porc_descuento", descuento);
+      datos.append("modulo_venta", "agregar_producto");
+    }
+
+    fetch(url + path, {
       method: "POST",
       body: datos,
     })

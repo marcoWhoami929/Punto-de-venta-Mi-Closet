@@ -26,6 +26,7 @@
                             <div class="field is-grouped">
                                 <p class="control is-expanded">
                                     <input class="input" type="text" pattern="[a-zA-Z0-9- ]{1,70}" maxlength="70" autofocus="autofocus" placeholder="Código de barras" id="sale-barcode-input">
+                                    <input type="hidden" id="tipo_busqueda" value="venta">
                                 </p>
                                 <a class="control">
                                     <button type="submit" class="button is-info">

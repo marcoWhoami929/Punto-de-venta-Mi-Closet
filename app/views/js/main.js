@@ -76,5 +76,4 @@ document.addEventListener("DOMContentLoaded", () => {
       closeAllModals();
     }
   });
-  bulmaTagsinput.attach();
 });
