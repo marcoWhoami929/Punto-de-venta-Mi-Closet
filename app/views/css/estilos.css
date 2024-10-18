@@ -359,7 +359,9 @@ html {
     width: calc(100% - 300px);
   }
 }
-
+.tagsinput  {
+  border: none;
+}
 .tagsinput > input {
   border: none;
 }

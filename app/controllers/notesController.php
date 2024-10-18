@@ -75,46 +75,7 @@ class notesController extends mainModel
 
             $_SESSION['alerta_producto_agregado'] = "Se agrego <strong>" . $value['nombre'] . "</strong> a la nota actual";
         } else {
-            /*
-			$detalle_cantidad = 1;
-
-			$stock_total = $value['stock_total'];
-
-			if ($stock_total < 0) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "Lo sentimos, no hay existencias disponibles del producto seleccionado",
-					"icono" => "error"
-				];
-				return json_encode($alerta);
-				exit();
-			}
-
-			$porc_descuento = $_POST["porc_descuento"];
-			$descuento = (($value['precio_venta'] * $detalle_cantidad) * $porc_descuento) / 100;
-			$subtotal = ($detalle_cantidad * $value['precio_venta']);
-			$subtotal = number_format($subtotal, MONEDA_DECIMALES, '.', '');
-			$total = ($subtotal - $descuento);
-			$total = number_format($total, MONEDA_DECIMALES, '.', '');
-
-
-			$_SESSION['datos_producto_venta'][$codigo] = [
-				"id_producto" => $value['id_producto'],
-				"codigo" => $value['codigo'],
-				"stock_total" => $stock_total,
-				"stock_total_old" => $value['stock_total'],
-				"precio_venta" => $value['precio_venta'],
-				"porc_descuento" => $porc_descuento,
-				"descuento" => $descuento,
-				"limite_venta" => $stock_total,
-				"subtotal" => $subtotal,
-				"total" => $total,
-				"descripcion" => $value['nombre']
-			];
-
-			$_SESSION['alerta_producto_agregado'] = "Se agrego +1 <strong>" . $value['nombre'] . "</strong> a la venta. Total en carrito: <strong>$detalle_cantidad</strong>";
-			*/
+            
         }
 
         $alerta = [
@@ -124,4 +85,30 @@ class notesController extends mainModel
 
         return json_encode($alerta);
     }
+    /*---------- Controlador remover producto de nota ----------*/
+	public function removerProductoNotaControlador()
+	{
+
+		/*== Recuperando codigo del producto ==*/
+		$codigo = $this->limpiarCadena($_POST['codigo']);
+
+		unset($_SESSION['datos_producto_nota'][$codigo]);
+
+		if (empty($_SESSION['datos_producto_nota'][$codigo])) {
+			$alerta = [
+				"tipo" => "recargar",
+				"titulo" => "¡Producto removido!",
+				"texto" => "El producto se ha removido de la nota",
+				"icono" => "success"
+			];
+		} else {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No hemos podido remover el producto, por favor intente nuevamente",
+				"icono" => "error"
+			];
+		}
+		return json_encode($alerta);
+	}
 }

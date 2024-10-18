@@ -12,4 +12,5 @@
 <script src="<?php echo APP_URL; ?>app/views/js/sweetalert2.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/bulma-tagsinput/dist/js/bulma-tagsinput.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/bulma-tagsinput@2.0.0/dist/js/bulma-tagsinput.min.js">
+</script>

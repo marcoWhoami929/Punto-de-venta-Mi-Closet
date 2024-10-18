@@ -26,6 +26,10 @@ if (isset($_POST['modulo_notas'])) {
     if ($_POST['modulo_notas'] == "agregar_producto_nota") {
         echo $insNotes->agregarProductoNotaControlador();
     }
+    /*--------- Remover producto de de nota ---------*/
+	if ($_POST['modulo_notas'] == "remover_producto") {
+		echo $insNotes->removerProductoNotaControlador();
+	}
 } else {
     session_destroy();
     header("Location: " . APP_URL . "login/");

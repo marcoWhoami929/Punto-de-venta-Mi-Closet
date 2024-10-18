@@ -134,8 +134,12 @@ $mainModel = new mainModel();
             </div>
         </div>
     </form>
+    
     <div class="table-container">
         <?php
+        if(isset($_SESSION['datos_producto_nota'])){
+
+       
         $total = count($_SESSION['datos_producto_nota']);
         $registros = 5;
 
@@ -174,12 +178,11 @@ $mainModel = new mainModel();
                                  <div class="columns">
                                     <div class="column">
                                     <strong>TALLAS:</strong>
-                                    <input class="input" type="text" class="input" data-type="tags" id="tallas" name="tallas" value="' . $productos['tallas'] . '" placeholder="...">
+                                    <input class="input" type="tags" id="tallas" name="tallas" value="' . $productos['tallas'] . '" placeholder="...">
                                     </div>
                                      <div class="column">
                                     <strong>COLORES:</strong>
-                                    <input class="input" type="text" class="input" data-type="tags" id="colores" name="colores" value="' . $productos['colores'] . '" placeholder="...">
-                                
+                                    <input class="input"  type="tags" id="colores" name="colores" value="' . $productos['colores'] . '" placeholder="...">
                                     </div>
                                     
                                 </div>
@@ -187,15 +190,15 @@ $mainModel = new mainModel();
                            
 		                    <div class="has-text-right">
 		                      
-		                        <form class="FormularioAjax is-inline-block" action="' . APP_URL . 'app/ajax/productoAjax.php" method="POST" autocomplete="off" >
+		                        <form class="FormularioAjax" action="'. APP_URL.'app/ajax/notasAjax.php" method="POST" autocomplete="off">
 
-			                		<input type="hidden" name="modulo_producto" value="eliminar">
-			                		<input type="hidden" name="id_producto" value="' . $productos['id_producto'] . '">
+                                                <input type="hidden" name="codigo" value="'.$productos['codigo'].'">
+                                                <input type="hidden" name="modulo_notas" value="remover_producto">
 
-			                    	<button type="submit" class="button is-danger is-rounded is-small">
-			                    		<i class="far fa-trash-alt fa-fw"></i>
-			                    	</button>
-			                    </form>
+                                                <button type="submit" class="button is-danger is-rounded " title="Remover producto">
+                                                    <i class="fas fa-trash fa-fw"></i>
+                                                </button>
+                                            </form>
 		                    </div>
 		                </div>
 		            </article>
@@ -207,12 +210,38 @@ $mainModel = new mainModel();
             }
             $pag_final = $contador - 1;
         } else {
+            $tabla = '
+            <section class="hero-body">
+                 <div class="hero-body">
+                     <p class="has-text-centered  pb-3">
+                        
+                            <i class="fas fa-gifts  fa-8x"></i>
+                     </p>
+                     <p class="title has-text-centered">Upps</p>
+                     <p class="subtitle has-text-centered">No hay productos agregados a la nota</p>
+                 </div>
+             </section>
+         ';
         }
         ### Paginacion ###
         if ($total > 0 && $pagina <= $numeroPaginas) {
             $tabla .= '<p class="has-text-right">Mostrando productos <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
 
             $tabla .= $mainModel->paginadorTablas($pagina, $numeroPaginas, $url, 7);
+        }
+     } else{
+            $tabla = '
+               <section class="hero-body">
+                    <div class="hero-body">
+                        <p class="has-text-centered  pb-3">
+       
+                            <i class="fas fa-gifts  fa-8x"></i>
+                        </p>
+                        <p class="title has-text-centered">Upps</p>
+                        <p class="subtitle has-text-centered">No hay productos agregados a la nota</p>
+                    </div>
+                </section>
+            ';
         }
 
         echo $tabla;
@@ -242,40 +271,3 @@ $mainModel = new mainModel();
         </section>
     </div>
 </div>
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Inicializar el plugin
-        bulmaTagsinput.attach();
-
-        // Seleccionar el input donde están las etiquetas
-        const tagsInput = document.querySelector('input[data-type="tags"]');
-
-        // Evento cuando se añade una etiqueta
-        tagsInput.addEventListener('bulmaTagsinput:add', function(event) {
-            const newTag = event.detail.value;
-            console.log('Etiqueta añadida:', newTag);
-        });
-
-        // Evento cuando se elimina una etiqueta
-        tagsInput.addEventListener('bulmaTagsinput:remove', function(event) {
-            const removedTag = event.detail.value;
-            console.log('Etiqueta eliminada:', removedTag);
-        });
-
-        // Evento cuando se selecciona una etiqueta del autocompletado
-        tagsInput.addEventListener('bulmaTagsinput:select', function(event) {
-            const selectedTag = event.detail.value;
-            console.log('Etiqueta seleccionada del autocompletado:', selectedTag);
-        });
-
-        // Evento cuando el campo gana foco
-        tagsInput.addEventListener('bulmaTagsinput:focus', function() {
-            console.log('El campo de etiquetas ha ganado foco');
-        });
-
-        // Evento cuando el campo pierde foco
-        tagsInput.addEventListener('bulmaTagsinput:blur', function() {
-            console.log('El campo de etiquetas ha perdido foco');
-        });
-    });
-</script>
