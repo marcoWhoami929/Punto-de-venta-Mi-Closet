@@ -206,18 +206,18 @@ class clientController extends mainModel
 		$tabla .= '
 		        <div class="table-container">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-		            <thead>
+		            <thead style="background:#B99654;color:#ffffff;">
 		                <tr>
-		                    <th class="has-text-centered">#</th>
-		                    <th class="has-text-centered">Tipo Cliente</th>
-		                    <th class="has-text-centered">Nombre</th>
-		                    <th class="has-text-centered">Email</th>
-							<th class="has-text-centered">Celular</th>
-							<th class="has-text-centered">Crédito</th>
-							<th class="has-text-centered">Pagado</th>
-							<th class="has-text-centered">Pendiente</th>
-		                    <th class="has-text-centered">Actualizar</th>
-		                    <th class="has-text-centered">Eliminar</th>
+		                    <th class="has-text-centered" style="color:#ffffff">#</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Tipo Cliente</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Nombre</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Email</th>
+							<th class="has-text-centered" style="color:#ffffff">Celular</th>
+							<th class="has-text-centered" style="color:#ffffff">Crédito</th>
+							<th class="has-text-centered" style="color:#ffffff">Pagado</th>
+							<th class="has-text-centered" style="color:#ffffff">Pendiente</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Actualizar</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Eliminar</th>
 		                </tr>
 		            </thead>
 		            <tbody>

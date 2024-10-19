@@ -15,8 +15,82 @@
 
 	if ($datos->rowCount() == 1) {
 		$datos_venta = $datos->fetch();
+		switch ($datos_venta["estatus"]) {
+			case '1':
+				$estatus1 = "is-active";
+				$estatus2 = "";
+				$estatus3 = "";
+				$estatus4 = "";
+				break;
+			case '2':
+				$estatus1 = "";
+				$estatus2 = "is-active";
+				$estatus3 = "";
+				$estatus4 = "";
+				break;
+			case '3':
+				$estatus1 = "";
+				$estatus2 = "";
+				$estatus3 = "is-active";
+				$estatus4 = "";
+				break;
+			case '4':
+				$estatus1 = "";
+				$estatus2 = "";
+				$estatus3 = "";
+				$estatus4 = "is-active";
+				break;
+		}
+
 	?>
 		<h2 class="title has-text-centered">Datos de la venta <?php echo " (" . $code . ")"; ?></h2>
+		<div class="columns">
+			<div class="column">
+				<ul class="steps is-medium has-content-centered">
+					<li class="steps-segment <?php echo  $estatus1  ?>">
+						<span class="steps-marker is-primary">
+							<span class="icon">
+								<i class="fa fa-shopping-cart"></i>
+							</span></span>
+						<div class="steps-content">
+							<code>Recibido</code>
+						</div>
+					</li>
+					<li class="steps-segment <?php echo  $estatus2  ?>">
+						<span class="steps-marker is-info">
+							<span class="icon">
+								<i class="fas fa-dolly-flatbed"></i>
+							</span></span>
+						</span>
+						<div class="steps-content <?php echo $estatus3  ?>">
+							<code>En Preparación</code>
+						</div>
+					</li>
+					<li class="steps-segment <?php echo $estatus3 ?>">
+						<span class="steps-marker is-success">
+							<span class="icon">
+								<i class="fas fa-truck-moving"></i>
+							</span></span>
+						</span>
+						<div class="steps-content">
+							<code>Enviado</code>
+						</div>
+					</li>
+					<li class="steps-segment <?php echo  $estatus4  ?>">
+						<span class="steps-marker is-warning">
+							<span class="icon">
+								<i class="fas fa-thumbs-up"></i>
+							</span></span>
+						</span>
+						<div class="steps-content">
+							<code>Entregado</code>
+						</div>
+					</li>
+
+				</ul>
+			</div>
+		</div>
+
 		<div class="columns pb-6 pt-6">
 			<div class="column">
 
@@ -83,11 +157,11 @@
 					<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 						<thead>
 							<tr>
-								<th class="has-text-centered">#</th>
-								<th class="has-text-centered">Producto</th>
-								<th class="has-text-centered">Cant.</th>
-								<th class="has-text-centered">Precio</th>
-								<th class="has-text-centered">Subtotal</th>
+								<th class="has-text-centered" style="color:#ffffff">#</th>
+								<th class="has-text-centered" style="color:#ffffff">Producto</th>
+								<th class="has-text-centered" style="color:#ffffff">Cant.</th>
+								<th class="has-text-centered" style="color:#ffffff">Precio</th>
+								<th class="has-text-centered" style="color:#ffffff">Subtotal</th>
 							</tr>
 						</thead>
 						<tbody>

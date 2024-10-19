@@ -284,46 +284,6 @@ class saleController extends mainModel
 
 			$_SESSION['alerta_producto_agregado'] = "Se agrego <strong>" . $value['nombre'] . "</strong> a la nota actual";
 		} else {
-			/*
-			$detalle_cantidad = 1;
-
-			$stock_total = $value['stock_total'];
-
-			if ($stock_total < 0) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "Lo sentimos, no hay existencias disponibles del producto seleccionado",
-					"icono" => "error"
-				];
-				return json_encode($alerta);
-				exit();
-			}
-
-			$porc_descuento = $_POST["porc_descuento"];
-			$descuento = (($value['precio_venta'] * $detalle_cantidad) * $porc_descuento) / 100;
-			$subtotal = ($detalle_cantidad * $value['precio_venta']);
-			$subtotal = number_format($subtotal, MONEDA_DECIMALES, '.', '');
-			$total = ($subtotal - $descuento);
-			$total = number_format($total, MONEDA_DECIMALES, '.', '');
-
-
-			$_SESSION['datos_producto_venta'][$codigo] = [
-				"id_producto" => $value['id_producto'],
-				"codigo" => $value['codigo'],
-				"stock_total" => $stock_total,
-				"stock_total_old" => $value['stock_total'],
-				"precio_venta" => $value['precio_venta'],
-				"porc_descuento" => $porc_descuento,
-				"descuento" => $descuento,
-				"limite_venta" => $stock_total,
-				"subtotal" => $subtotal,
-				"total" => $total,
-				"descripcion" => $value['nombre']
-			];
-
-			$_SESSION['alerta_producto_agregado'] = "Se agrego +1 <strong>" . $value['nombre'] . "</strong> a la venta. Total en carrito: <strong>$detalle_cantidad</strong>";
-			*/
 		}
 
 		$alerta = [
@@ -867,6 +827,11 @@ class saleController extends mainModel
 				"campo_nombre" => "id_caja",
 				"campo_marcador" => ":Caja",
 				"campo_valor" => $caja
+			],
+			[
+				"campo_nombre" => "estatus",
+				"campo_marcador" => ":Estatus",
+				"campo_valor" => '1'
 			]
 		];
 
@@ -1089,7 +1054,7 @@ class saleController extends mainModel
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
 		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
 
-		$value_tablas = "venta.id_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre as 'nombreVendedor',cliente.id_cliente,cliente.nombre as 'nombreCliente',cliente.apellidos";
+		$value_tablas = "venta.id_venta,venta.estatus,venta.subtotal,venta.descuento,venta.tipo_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre as 'nombreVendedor',cliente.id_cliente,cliente.nombre as 'nombreCliente',cliente.apellidos";
 
 		if (isset($busqueda) && $busqueda != "") {
 
@@ -1114,15 +1079,19 @@ class saleController extends mainModel
 		$tabla .= '
 		        <div class="table-container">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-		            <thead>
+		            <thead style="background:#B99654;color:#ffffff;">
 		                <tr>
-		                    <th class="has-text-centered">NRO.</th>
-		                    <th class="has-text-centered">Codigo</th>
-		                    <th class="has-text-centered">Fecha</th>
-		                    <th class="has-text-centered">Cliente</th>
-		                    <th class="has-text-centered">Vendedor</th>
-		                    <th class="has-text-centered">Total</th>
-		                    <th class="has-text-centered">Opciones</th>
+							<th class="has-text-centered" style="color:#ffffff"></th>
+		                    <th class="has-text-centered" style="color:#ffffff">NRO.</th>
+							<th class="has-text-centered" style="color:#ffffff">Tipo</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Codigo</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Fecha</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Cliente</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Vendedor</th>
+							<th class="has-text-centered" style="color:#ffffff">Subtotal</th>
+							<th class="has-text-centered" style="color:#ffffff">Descuento</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Total</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Opciones</th>
 		                </tr>
 		            </thead>
 		            <tbody>
@@ -1132,13 +1101,39 @@ class saleController extends mainModel
 			$contador = $inicio + 1;
 			$pag_inicio = $inicio + 1;
 			foreach ($datos as $rows) {
+				switch ($rows['estatus']) {
+					case '0':
+						$estatus = '<button class="button is-danger" >Cancelado</button>';
+						$disabled = "display:none";
+						break;
+					case '1':
+						$estatus = '<button class="button is-info" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'2\')">Recibido</button>';
+						$disabled = "";
+						break;
+					case '2':
+						$estatus = '<button class="button is-warning" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'3\')">En Preparación</button>';
+						$disabled = "";
+						break;
+					case '3':
+						$estatus = '<button class="button is-primary" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'4\')">Enviado</button>';
+						$disabled = "";
+						break;
+					case '4':
+						$estatus = '<button class="button is-success">Entregado</button>';
+						$disabled = "";
+						break;
+				}
 				$tabla .= '
 						<tr class="has-text-centered" >
+						    <td>' . $estatus . '</td>
 							<td>' . $rows['id_venta'] . '</td>
+							<td>' . strtoupper($rows['tipo_venta']) . '</td>
 							<td>' . $rows['codigo'] . '</td>
 							<td>' . date("d-m-Y", strtotime($rows['fecha_venta'])) . ' ' . $rows['hora_venta'] . '</td>
 							<td>' . $this->limitarCadena($rows['nombreCliente'] . ' ' . $rows['apellidos'], 30, "...") . '</td>
 							<td>' . $this->limitarCadena($rows['nombreVendedor'], 30, "...") . '</td>
+							<td>' . MONEDA_SIMBOLO . number_format($rows['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
+							<td>' . MONEDA_SIMBOLO . number_format($rows['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
 							<td>' . MONEDA_SIMBOLO . number_format($rows['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
 			                <td>
 
@@ -1159,8 +1154,8 @@ class saleController extends mainModel
 			                		<input type="hidden" name="modulo_venta" value="eliminar_venta">
 			                		<input type="hidden" name="id_venta" value="' . $rows['id_venta'] . '">
 
-			                    	<button type="submit" class="button is-danger is-rounded is-small" title="Eliminar venta Nro. ' . $rows['id_venta'] . '" >
-			                    		<i class="far fa-trash-alt fa-fw"></i>
+			                    	<button type="submit" class="button is-danger is-rounded is-small" style="' . $disabled . '" title="Cancelar venta Nro. ' . $rows['id_venta'] . '" >
+			                    		<i class="fas fa-times fa-fw"></i>
 			                    	</button>
 			                    </form>
 
@@ -1212,12 +1207,12 @@ class saleController extends mainModel
 		$id = $this->limpiarCadena($_POST['id_venta']);
 
 		# Verificando venta #
-		$datos = $this->ejecutarConsulta("SELECT * FROM venta WHERE id_venta='$id'");
+		$datos = $this->ejecutarConsulta("SELECT * FROM venta WHERE id_venta='$id' and estatus <=1");
 		if ($datos->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos encontrado la venta en el sistema",
+				"texto" => "No se puede cancelar la venta porque se encuentra en preparación.",
 				"icono" => "error"
 			];
 			return json_encode($alerta);
@@ -1227,6 +1222,7 @@ class saleController extends mainModel
 		}
 
 		# Verificando detalles de venta #
+		/*
 		$check_detalle_venta = $this->ejecutarConsulta("SELECT id_detalle FROM venta_detalle WHERE codigo='" . $datos['codigo'] . "'");
 		$check_detalle_venta = $check_detalle_venta->rowCount();
 
@@ -1245,23 +1241,26 @@ class saleController extends mainModel
 				exit();
 			}
 		}
-
-
+			
 		$eliminarVenta = $this->eliminarRegistro("venta", "id_venta", $id);
+			*/
 
-		if ($eliminarVenta->rowCount() == 1) {
+
+		$cancelarVenta = $this->cancelarRegistro("venta", "estatus", "id_venta", $id);
+
+		if ($cancelarVenta->rowCount() == 1) {
 
 			$alerta = [
 				"tipo" => "recargar",
-				"titulo" => "Venta eliminada",
-				"texto" => "La venta ha sido eliminada del sistema correctamente",
+				"titulo" => "Venta Cancelada",
+				"texto" => "La venta ha sido cancelada del sistema correctamente",
 				"icono" => "success"
 			];
 		} else {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos podido eliminar la venta del sistema, por favor intente nuevamente",
+				"texto" => "No hemos podido cancelar la venta del sistema, por favor intente nuevamente",
 				"icono" => "error"
 			];
 		}
@@ -1300,6 +1299,51 @@ class saleController extends mainModel
 			"tipo" => "redireccionar",
 			"url" => APP_URL . "saleNew/"
 		];
+
+		return json_encode($alerta);
+	}
+	/*----------  Controlador actualizar estatus venta  ----------*/
+	public function actualizarEstatusVentaControlador()
+	{
+
+		$id = $this->limpiarCadena($_POST['id_venta']);
+		$estatus = $this->limpiarCadena($_POST['estatus']);
+		$tabla = $this->limpiarCadena($_POST['tabla']);
+
+		# Verificando venta #
+		$datos = $this->ejecutarConsulta("SELECT * FROM $tabla WHERE id_venta='$id'");
+		if ($datos->rowCount() <= 0) {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No se puede actualizar la venta porque la venta no se encuentra.",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		} else {
+			$datos = $datos->fetch();
+		}
+
+
+		$actualizarEstatus = $this->actualizarRegistro($tabla, "estatus", "id_venta", $id, $estatus);
+
+		if ($actualizarEstatus->rowCount() == 1) {
+
+			$alerta = [
+				"tipo" => "recargar",
+				"titulo" => "Venta Actualizada",
+				"texto" => "Estatus de venta actualizado correctamente",
+				"icono" => "success"
+			];
+		} else {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No hemos podido actualizar el estatus de la venta del sistema, por favor intente nuevamente",
+				"icono" => "error"
+			];
+		}
 
 		return json_encode($alerta);
 	}

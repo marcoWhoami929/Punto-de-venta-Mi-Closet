@@ -315,15 +315,15 @@ class userController extends mainModel
 		$tabla .= '
 		        <div class="table-container">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-		            <thead>
+		            <thead style="background:#B99654;color:#ffffff;">
 		                <tr>
-		                    <th class="has-text-centered">#</th>
-		                    <th class="has-text-centered">Nombre</th>
-		                    <th class="has-text-centered">Usuario</th>
-		                    <th class="has-text-centered">Email</th>
-		                    <th class="has-text-centered">Foto</th>
-		                    <th class="has-text-centered">Actualizar</th>
-		                    <th class="has-text-centered">Eliminar</th>
+		                    <th class="has-text-centered" style="color:#ffffff">#</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Nombre</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Usuario</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Email</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Foto</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Actualizar</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Eliminar</th>
 		                </tr>
 		            </thead>
 		            <tbody>

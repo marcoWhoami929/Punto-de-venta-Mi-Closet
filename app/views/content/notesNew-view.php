@@ -27,13 +27,14 @@ $mainModel = new mainModel();
     } else {
         $_SESSION["porc_descuento"] = "0.00";
     }
+
     ?>
 
     <form class="FormularioAjax" action="<?php echo APP_URL; ?>app/ajax/notasAjax.php" method="POST" autocomplete="off">
 
         <input type="hidden" name="modulo_notas" value="registrar">
         <input type="hidden" name="route" id="route" value="<?php echo APP_URL; ?>">
-        <input type="hidden" name="route_qr" id="route_qr" value="<?php echo APP_URL . "notas/" . $folioNota ?>">
+        <input type="hidden" name="route_qr" id="route_qr" value="http://localhost/pos2/notas/<?php echo $folioNota ?>">
         <div class="columns">
             <div class="column is-narrow">
                 <div class="box" style="width: 300px">
@@ -61,7 +62,7 @@ $mainModel = new mainModel();
                     <div class="control">
                         <label>%Descuento <?php echo CAMPO_OBLIGATORIO; ?></label>
 
-                        <input class="input" type="number" name="porc_descuento_nota" id="porc_descuento_nota" onchange="datosNota()" value="<?= (isset($_SESSION['porc_descuento_nota']) ? $_SESSION['porc_descuento_nota'] : '0')  ?>" maxlength="25">
+                        <input class="input" type="number" name="porc_descuento_nota" required id="porc_descuento_nota" onchange="datosNota()" value="<?= (isset($_SESSION['porc_descuento_nota']) ? $_SESSION['porc_descuento_nota'] : '0')  ?>" maxlength="25">
                     </div>
                 </div>
                 <div class="columns" style="padding-left:10px;width:100%">
@@ -86,15 +87,15 @@ $mainModel = new mainModel();
             </div>
         </div>
 
-        <!--
+
         <p class="has-text-centered">
-            <button type="reset" class="button is-link is-light is-rounded"><i class="fas fa-paint-roller"></i> &nbsp; Limpiar</button>
+
             <button type="submit" class="button is-info is-rounded"><i class="far fa-save"></i> &nbsp; Guardar</button>
         </p>
         <p class="has-text-centered pt-6">
             <small>Los campos marcados con <?php echo CAMPO_OBLIGATORIO; ?> son obligatorios</small>
         </p>
--->
+
     </form>
     <?php
     if (isset($_SESSION['alerta_producto_agregado']) && $_SESSION['alerta_producto_agregado'] != "") {
@@ -134,37 +135,38 @@ $mainModel = new mainModel();
             </div>
         </div>
     </form>
-    
+
     <div class="table-container">
         <?php
-        if(isset($_SESSION['datos_producto_nota'])){
 
-       
-        $total = count($_SESSION['datos_producto_nota']);
-        $registros = 5;
+        if (isset($_SESSION['datos_producto_nota'])) {
 
-        $pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
-        $inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
-        $pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
-        $numeroPaginas = ceil($total / $registros);
 
-        $url = $url[0];
+            $total = count($_SESSION['datos_producto_nota']);
+            $registros = 5;
 
-        if ($total >= 1 && $pagina <= $numeroPaginas) {
-            $tabla = "";
-            $contador = $inicio + 1;
-            $pag_inicio = $inicio + 1;
-            foreach ($_SESSION['datos_producto_nota'] as $productos) {
-                $tabla .= '
+            $pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+            $inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+            $pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+            $numeroPaginas = ceil($total / $registros);
+
+            $url = $url[0];
+
+            if ($total >= 1 && $pagina <= $numeroPaginas) {
+                $tabla = "";
+                $contador = $inicio + 1;
+                $pag_inicio = $inicio + 1;
+                foreach ($_SESSION['datos_producto_nota'] as $productos) {
+                    $tabla .= '
 		            <article class="media pb-3 pt-3">
 		                <figure class="media-left">
 		                    <p class="image is-64x64">';
-                if (is_file("./app/views/productos/" . $productos['foto'])) {
-                    $tabla .= '<img src="' . APP_URL . 'app/views/productos/' . $productos['foto'] . '">';
-                } else {
-                    $tabla .= '<img src="' . APP_URL . 'app/views/productos/default.png">';
-                }
-                $tabla .= '</p>
+                    if (is_file("./app/views/productos/" . $productos['foto'])) {
+                        $tabla .= '<img src="' . APP_URL . 'app/views/productos/' . $productos['foto'] . '">';
+                    } else {
+                        $tabla .= '<img src="' . APP_URL . 'app/views/productos/default.png">';
+                    }
+                    $tabla .= '</p>
 		                </figure>
 		                <div class="media-content">
 		                    <div class="content">
@@ -190,9 +192,9 @@ $mainModel = new mainModel();
                            
 		                    <div class="has-text-right">
 		                      
-		                        <form class="FormularioAjax" action="'. APP_URL.'app/ajax/notasAjax.php" method="POST" autocomplete="off">
+		                        <form class="FormularioAjax" action="' . APP_URL . 'app/ajax/notasAjax.php" method="POST" autocomplete="off">
 
-                                                <input type="hidden" name="codigo" value="'.$productos['codigo'].'">
+                                                <input type="hidden" name="codigo" value="' . $productos['codigo'] . '">
                                                 <input type="hidden" name="modulo_notas" value="remover_producto">
 
                                                 <button type="submit" class="button is-danger is-rounded " title="Remover producto">
@@ -206,11 +208,11 @@ $mainModel = new mainModel();
 
 		            <hr>
 		            ';
-                $contador++;
-            }
-            $pag_final = $contador - 1;
-        } else {
-            $tabla = '
+                    $contador++;
+                }
+                $pag_final = $contador - 1;
+            } else {
+                $tabla = '
             <section class="hero-body">
                  <div class="hero-body">
                      <p class="has-text-centered  pb-3">
@@ -222,14 +224,14 @@ $mainModel = new mainModel();
                  </div>
              </section>
          ';
-        }
-        ### Paginacion ###
-        if ($total > 0 && $pagina <= $numeroPaginas) {
-            $tabla .= '<p class="has-text-right">Mostrando productos <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+            }
+            ### Paginacion ###
+            if ($total > 0 && $pagina <= $numeroPaginas) {
+                $tabla .= '<p class="has-text-right">Mostrando productos <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
 
-            $tabla .= $mainModel->paginadorTablas($pagina, $numeroPaginas, $url, 7);
-        }
-     } else{
+                $tabla .= $mainModel->paginadorTablas($pagina, $numeroPaginas, $url, 7);
+            }
+        } else {
             $tabla = '
                <section class="hero-body">
                     <div class="hero-body">

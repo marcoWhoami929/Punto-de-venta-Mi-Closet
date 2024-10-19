@@ -241,3 +241,19 @@ descuento_input.addEventListener("keyup", function (e) {
     document.querySelector("#cambio").value = "0.00";
   }
 });
+function actualizarEstatus(tabla, id, estatus) {
+  let datos = new FormData();
+  datos.append("tabla", tabla);
+  datos.append("id_venta", id);
+  datos.append("estatus", estatus);
+  datos.append("modulo_venta", "actualizar_estatus");
+
+  fetch(url + "app/ajax/ventaAjax.php", {
+    method: "POST",
+    body: datos,
+  })
+    .then((respuesta) => respuesta.json())
+    .then((respuesta) => {
+      return alertas_ajax(respuesta);
+    });
+}

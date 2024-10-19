@@ -59,6 +59,10 @@ if (isset($_POST['modulo_venta'])) {
 	if ($_POST['modulo_venta'] == "actualizar_carrito") {
 		echo $insVenta->actualizarCarritoVentaControlador();
 	}
+	/*--------- Actualizar esattus de venta ---------*/
+	if ($_POST['modulo_venta'] == "actualizar_estatus") {
+		echo $insVenta->actualizarEstatusVentaControlador();
+	}
 } else {
 	session_destroy();
 	header("Location: " . APP_URL . "login/");

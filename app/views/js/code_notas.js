@@ -63,3 +63,6 @@ function datosNota() {
       return alertas_ajax(respuesta);
     });
 }
+function copiarNota(route_qr) {
+  navigator.clipboard.writeText(route_qr);
+}

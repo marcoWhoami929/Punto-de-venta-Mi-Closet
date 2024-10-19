@@ -5,6 +5,7 @@
 <title><?php echo APP_NAME; ?></title>
 <link rel="icon" type="image/x-icon" href="app/views/img/icono.ico">
 <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/css/bulma.min.css">
+<link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/css/bulma-steps.css">
 <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/css/all.css">
 <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/css/estilos.css">
 <link rel="stylesheet" href="<?php echo APP_URL; ?>app/views/css/sweetalert2.min.css">

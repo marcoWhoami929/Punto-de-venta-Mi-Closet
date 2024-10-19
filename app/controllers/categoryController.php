@@ -128,14 +128,14 @@ class categoryController extends mainModel
 		$tabla .= '
 		        <div class="table-container">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-		            <thead>
+		            <thead style="background:#B99654;color:#ffffff;">
 		                <tr>
-		                    <th class="has-text-centered">#</th>
-		                    <th class="has-text-centered">Nombre</th>
-		                    <th class="has-text-centered">Ubicacion</th>
-		                    <th class="has-text-centered">Productos</th>
-		                    <th class="has-text-centered">Actualizar</th>
-		                    <th class="has-text-centered">Eliminar</th>
+		                    <th class="has-text-centered" style="color:#ffffff">#</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Nombre</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Ubicacion</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Productos</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Actualizar</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Eliminar</th>
 		                </tr>
 		            </thead>
 		            <tbody>

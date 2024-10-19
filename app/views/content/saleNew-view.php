@@ -85,19 +85,19 @@
                 ?>
                 <div class="table-container">
                     <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-                        <thead>
+                        <thead style="background:#B99654;color:#ffffff;">
                             <tr>
-                                <th class="has-text-centered">#</th>
-                                <th class="has-text-centered">Código de barras</th>
-                                <th class="has-text-centered">Producto</th>
-                                <th class="has-text-centered">Cant.</th>
-                                <th class="has-text-centered">Precio</th>
-                                <th class="has-text-centered">% Desc</th>
-                                <th class="has-text-centered">Desc</th>
-                                <th class="has-text-centered">Subtotal</th>
-                                <th class="has-text-centered">Total</th>
-                                <th class="has-text-centered">Actualizar</th>
-                                <th class="has-text-centered">Remover</th>
+                                <th class="has-text-centered" style="color:#ffffff">#</th>
+                                <th class="has-text-centered" style="color:#ffffff">Código de barras</th>
+                                <th class="has-text-centered" style="color:#ffffff">Producto</th>
+                                <th class="has-text-centered" style="color:#ffffff">Cant.</th>
+                                <th class="has-text-centered" style="color:#ffffff">Precio</th>
+                                <th class="has-text-centered" style="color:#ffffff">% Desc</th>
+                                <th class="has-text-centered" style="color:#ffffff">Desc</th>
+                                <th class="has-text-centered" style="color:#ffffff">Subtotal</th>
+                                <th class="has-text-centered" style="color:#ffffff">Total</th>
+                                <th class="has-text-centered" style="color:#ffffff">Actualizar</th>
+                                <th class="has-text-centered" style="color:#ffffff">Remover</th>
                             </tr>
                         </thead>
                         <tbody>

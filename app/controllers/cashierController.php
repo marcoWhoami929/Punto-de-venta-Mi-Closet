@@ -181,7 +181,7 @@ class cashierController extends mainModel
 		$tabla .= '
 		        <div class="table-container">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-		            <thead>
+		            <thead style="background:#B99654;color:#ffffff;">
 		                <tr>
 		                    <th class="has-text-centered is-primary">Numero</th>
 		                    <th class="has-text-centered is-primary">Nombre</th>

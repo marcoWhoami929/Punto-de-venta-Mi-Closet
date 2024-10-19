@@ -165,7 +165,25 @@ class mainModel
 
 		return $sql;
 	}
+	/*---------- Funcion eliminar registro ----------*/
+	protected function cancelarRegistro($tabla, $campo, $campo2, $id)
+	{
+		$sql = $this->conectar()->prepare("UPDATE $tabla SET $campo = '0' WHERE $campo2=:id");
+		$sql->bindParam(":id", $id);
+		$sql->execute();
 
+		return $sql;
+	}
+	/*---------- Funcion actualizar registro ----------*/
+	protected function actualizarRegistro($tabla, $campo, $campo2, $id, $estatus)
+	{
+		$sql = $this->conectar()->prepare("UPDATE $tabla SET $campo = :estatus WHERE $campo2=:id");
+		$sql->bindParam(":id", $id);
+		$sql->bindParam(":estatus", $estatus);
+		$sql->execute();
+
+		return $sql;
+	}
 
 	/*---------- Paginador de tablas ----------*/
 	public function paginadorTablas($pagina, $numeroPaginas, $url, $botones)
