@@ -30,6 +30,14 @@ if (isset($_POST['modulo_notas'])) {
     if ($_POST['modulo_notas'] == "remover_producto") {
         echo $insNotes->removerProductoNotaControlador();
     }
+    /*--------- eliminar nota ---------*/
+    if ($_POST['modulo_notas'] == "eliminar_nota") {
+        echo $insNotes->eliminarNotaControlador();
+    }
+    /*--------- actualizar nota ---------*/
+    if ($_POST['modulo_notas'] == "actualizar_nota") {
+        echo $insNotes->actualizarNotaControlador();
+    }
 } else {
     session_destroy();
     header("Location: " . APP_URL . "login/");

@@ -346,16 +346,16 @@ class notesController extends mainModel
 	                                <i class="fas fa-copy fa-fw"></i>
 	                            </button>
 
-			                    <a href="' . APP_URL . 'saleDetail/' . $rows['codigo'] . '/" class="button is-link is-rounded is-small" title="Informacion de venta Nro. ' . $rows['id_nota'] . '" >
+			                    <a href="' . APP_URL . 'noteDetail/' . $rows['codigo'] . '/" class="button is-link is-rounded is-small" title="Informacion de nota Nro. ' . $rows['id_nota'] . '" >
 			                    	<i class="fas fa-shopping-bag fa-fw"></i>
 			                    </a>
 
-			                	<form class="FormularioAjax is-inline-block" action="' . APP_URL . 'app/ajax/ventaAjax.php" method="POST" autocomplete="off" >
+			                	<form class="FormularioAjax is-inline-block" action="' . APP_URL . 'app/ajax/notasAjax.php" method="POST" autocomplete="off" >
 
-			                		<input type="hidden" name="modulo_venta" value="eliminar_venta">
+			                		<input type="hidden" name="modulo_notas" value="eliminar_nota">
 			                		<input type="hidden" name="id_nota" value="' . $rows['id_nota'] . '">
 
-			                    	<button type="submit" class="button is-danger is-rounded is-small" title="Eliminar venta Nro. ' . $rows['id_nota'] . '" >
+			                    	<button type="submit" class="button is-danger is-rounded is-small" title="Eliminar nota Nro. ' . $rows['id_nota'] . '" >
 			                    		<i class="far fa-trash-alt fa-fw"></i>
 			                    	</button>
 			                    </form>
@@ -398,5 +398,169 @@ class notesController extends mainModel
         }
 
         return $tabla;
+    }
+    /*----------  Controlador eliminar nota  ----------*/
+    public function eliminarNotaControlador()
+    {
+
+
+        $id = $this->limpiarCadena($_POST['id_nota']);
+
+        # Verificando venta #
+        $datos = $this->ejecutarConsulta("SELECT * FROM notas WHERE id_nota='$id'");
+        if ($datos->rowCount() <= 0) {
+            $alerta = [
+                "tipo" => "simple",
+                "titulo" => "Ocurrió un error inesperado",
+                "texto" => "La nota no se encuentra en el sistema",
+                "icono" => "error"
+            ];
+            return json_encode($alerta);
+            exit();
+        } else {
+            $datos = $datos->fetch();
+        }
+
+        $consultarVentas = $this->ejecutarConsulta("SELECT * FROM venta WHERE codigo_nota='" . $datos['codigo'] . "'");
+
+        if ($consultarVentas->rowCount() <= 0) {
+            # Verificando detalles de nota #
+
+            $check_detalle_nota = $this->ejecutarConsulta("SELECT id_detalle_nota FROM productos_notas WHERE codigo_nota ='" . $datos['codigo'] . "'");
+            $check_detalle_nota = $check_detalle_nota->rowCount();
+
+            if ($check_detalle_nota > 0) {
+
+                $eliminarVentaDetalle = $this->eliminarRegistro("productos_notas", "codigo_nota", $datos['codigo']);
+
+                if ($eliminarVentaDetalle->rowCount() != $check_detalle_nota) {
+                    $alerta = [
+                        "tipo" => "simple",
+                        "titulo" => "Ocurrió un error inesperado",
+                        "texto" => "No hemos podido eliminar la nota del sistema, por favor intente nuevamente",
+                        "icono" => "error"
+                    ];
+                    return json_encode($alerta);
+                    exit();
+                }
+            }
+
+            $eliminarNota = $this->eliminarRegistro("notas", "id_nota", $id);
+
+            if ($eliminarNota->rowCount() == 1) {
+
+                $alerta = [
+                    "tipo" => "recargar",
+                    "titulo" => "Nota Eliminada",
+                    "texto" => "La nota ha sido eliminada del sistema correctamente",
+                    "icono" => "success"
+                ];
+            } else {
+                $alerta = [
+                    "tipo" => "simple",
+                    "titulo" => "Ocurrió un error inesperado",
+                    "texto" => "No hemos podido eliminar la nota del sistema, por favor intente nuevamente",
+                    "icono" => "error"
+                ];
+            }
+        } else {
+            $alerta = [
+                "tipo" => "simple",
+                "titulo" => "Uppps",
+                "texto" => "No se puede eliminar la nota porque tiene ventas asociadas.",
+                "icono" => "error"
+            ];
+        }
+
+
+
+        return json_encode($alerta);
+    }
+    /*----------  Controlador actualizar nota  ----------*/
+    public function actualizarNotaControlador()
+    {
+
+        $id = $this->limpiarCadena($_POST['id_nota']);
+
+        # Verificando cliente #
+        $datos = $this->ejecutarConsulta("SELECT * FROM notas WHERE id_nota ='$id'");
+        if ($datos->rowCount() <= 0) {
+            $alerta = [
+                "tipo" => "simple",
+                "titulo" => "Ocurrió un error inesperado",
+                "texto" => "No hemos encontrado la nota en el sistema",
+                "icono" => "error"
+            ];
+            return json_encode($alerta);
+            exit();
+        } else {
+            $datos = $datos->fetch();
+        }
+
+        # Almacenando datos#
+
+        $titulo_nota = $this->limpiarCadena($_POST['titulo_nota']);
+        $fecha_publicacion = $this->limpiarCadena($_POST['fecha_publicacion']);
+        $fecha_expiracion = $this->limpiarCadena($_POST['fecha_expiracion']);
+        $porc_descuento_nota = $this->limpiarCadena($_POST['porc_descuento_nota']);
+
+        # Verificando campos obligatorios #
+        if ($titulo_nota == "" || $fecha_publicacion == "" || $fecha_expiracion == "" || $porc_descuento_nota == "") {
+            $alerta = [
+                "tipo" => "simple",
+                "titulo" => "Ocurrió un error inesperado",
+                "texto" => "No has llenado todos los campos que son obligatorios",
+                "icono" => "error"
+            ];
+            return json_encode($alerta);
+            exit();
+        }
+
+        $cliente_datos_up = [
+            [
+                "campo_nombre" => "titulo_nota",
+                "campo_marcador" => ":TituloNota",
+                "campo_valor" => $titulo_nota
+            ],
+            [
+                "campo_nombre" => "fecha_publicacion",
+                "campo_marcador" => ":FechaPublicacion",
+                "campo_valor" => $fecha_publicacion
+            ],
+            [
+                "campo_nombre" => "fecha_expiracion",
+                "campo_marcador" => ":FechaExpiracion",
+                "campo_valor" => $fecha_expiracion
+            ],
+            [
+                "campo_nombre" => "porc_descuento",
+                "campo_marcador" => ":PorcDescuento",
+                "campo_valor" => $porc_descuento_nota
+            ]
+        ];
+
+        $condicion = [
+            "condicion_campo" => "id_nota",
+            "condicion_marcador" => ":ID",
+            "condicion_valor" => $id
+        ];
+
+        if ($this->actualizarDatos("notas", $cliente_datos_up, $condicion)) {
+            $alerta = [
+                "tipo" => "recargar",
+                "titulo" => "Nota Actulizada",
+                "texto" => "La nota " . $datos['codigo'] . " se actualizó correctamente",
+                "icono" => "success"
+            ];
+        } else {
+            $alerta = [
+                "tipo" => "simple",
+                "titulo" => "Ocurrió un error inesperado",
+                "texto" => "No hemos podido actualizar la nota, por favor intente nuevamente",
+                "icono" => "error"
+            ];
+        }
+
+        return json_encode($alerta);
     }
 }

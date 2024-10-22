@@ -359,7 +359,7 @@ html {
     width: calc(100% - 300px);
   }
 }
-.tagsinput  {
+.tagsinput {
   border: none;
 }
 .tagsinput > input {
@@ -367,4 +367,34 @@ html {
 }
 .tagsinput > input:focus {
   outline: none;
+}
+.input-note {
+  width: 85%;
+  display: block;
+  border: none;
+  padding: 10px 0;
+  border-bottom: solid 1px #b99654;
+  transition: all 0.3s cubic-bezier(0.64, 0.09, 0.08, 1);
+  background: linear-gradient(
+    to bottom,
+    rgba(255, 255, 255, 0) 96%,
+    #b99654 4%
+  );
+  background-position: -200px 0;
+  background-size: 100%;
+  background-repeat: no-repeat;
+  color: #b99654;
+}
+.input-note:focus,
+.input-note:valid {
+  box-shadow: none;
+  outline: none;
+  background-position: 0 0;
+}
+.input-note:focus::-webkit-input-placeholder,
+.input-note:valid::-webkit-input-placeholder {
+  color: #b99654;
+  font-size: 11px;
+  transform: translateY(-20px);
+  visibility: visible !important;
 }

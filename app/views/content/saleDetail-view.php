@@ -157,11 +157,13 @@
 					<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 						<thead>
 							<tr>
-								<th class="has-text-centered" style="color:#ffffff">#</th>
-								<th class="has-text-centered" style="color:#ffffff">Producto</th>
-								<th class="has-text-centered" style="color:#ffffff">Cant.</th>
-								<th class="has-text-centered" style="color:#ffffff">Precio</th>
-								<th class="has-text-centered" style="color:#ffffff">Subtotal</th>
+								<th class="has-text-centered" style="color:#B99654">#</th>
+								<th class="has-text-centered" style="color:#B99654">Producto</th>
+								<th class="has-text-centered" style="color:#B99654">Cant.</th>
+								<th class="has-text-centered" style="color:#B99654">Precio</th>
+								<th class="has-text-centered" style="color:#B99654">Descuento</th>
+								<th class="has-text-centered" style="color:#B99654">Subtotal</th>
+								<th class="has-text-centered" style="color:#B99654">Total</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -180,6 +182,8 @@
 										<td><?php echo $detalle['descripcion']; ?></td>
 										<td><?php echo $detalle['cantidad']; ?></td>
 										<td><?php echo MONEDA_SIMBOLO . number_format($detalle['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
+										<td><?php echo MONEDA_SIMBOLO . number_format($detalle['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
+										<td><?php echo MONEDA_SIMBOLO . number_format($detalle['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
 										<td><?php echo MONEDA_SIMBOLO . number_format($detalle['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
 									</tr>
 								<?php
@@ -187,7 +191,7 @@
 								}
 								?>
 								<tr class="has-text-centered">
-									<td colspan="3"></td>
+									<td colspan="5"></td>
 									<td class="has-text-weight-bold">
 										TOTAL
 									</td>

@@ -17,6 +17,7 @@ const MONEDA_NOMBRE = "MXN";
 const MONEDA_DECIMALES = "2";
 const MONEDA_SEPARADOR_MILLAR = ",";
 const MONEDA_SEPARADOR_DECIMAL = ".";
+const ROUTE_QR = APP_URL . "app/ajax/codes/";
 
 
 /*----------  Marcador de campos obligatorios (Font Awesome) ----------*/
