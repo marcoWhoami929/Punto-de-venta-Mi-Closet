@@ -44,6 +44,7 @@ if ($_SESSION['perfil'] == 'Administrador') {
 						</div>
 					</a>
 				</li>
+				<!--
 				<li class="full-width">
 					<a href="<?php echo APP_URL; ?>myCashier/" class="full-width">
 						<div class="navLateral-body-cl">
@@ -54,7 +55,7 @@ if ($_SESSION['perfil'] == 'Administrador') {
 						</div>
 					</a>
 				</li>
-
+			-->
 
 				<li class="full-width divider-menu-h"></li>
 
