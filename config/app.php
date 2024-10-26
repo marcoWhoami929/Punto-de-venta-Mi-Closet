@@ -1,6 +1,7 @@
 <?php
 
 const APP_URL = "http://localhost/pos/";
+const APP_URL_CLIENT = "http://localhost/pos2/";
 const APP_NAME = "Ventas Mi Closet";
 const APP_SESSION_NAME = "POS";
 

@@ -55,7 +55,7 @@ function generarQrNota()
             include('../phpqrcode/qrlib.php');
             $codesDir = "codes/";
             $codeFile = $_POST['folio'] . '.png';
-            $texto = $_POST['route'] . "notas/" . $_POST['folio'];
+            $texto = $_POST['route'] . "detalleNota/" . $_POST['folio'];
             $_SESSION["QrNota"] =  $_POST['folio'];
             QRcode::png($texto, $codesDir . $codeFile, $_POST['ecc'], $_POST['size']);
 

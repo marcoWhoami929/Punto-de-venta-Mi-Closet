@@ -34,7 +34,7 @@ $mainModel = new mainModel();
 
         <input type="hidden" name="modulo_notas" value="registrar">
         <input type="hidden" name="route" id="route" value="<?php echo APP_URL; ?>">
-        <input type="hidden" name="route_qr" id="route_qr" value="http://localhost/pos2/notas/<?php echo $folioNota ?>">
+        <input type="hidden" name="route_qr" id="route_qr" value="<?php echo APP_URL_CLIENT; ?>detalleNota/<?php echo $folioNota ?>">
         <div class="columns">
             <div class="column is-narrow">
                 <div class="box" style="width: 300px">
