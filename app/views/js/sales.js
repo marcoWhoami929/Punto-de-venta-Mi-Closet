@@ -257,3 +257,38 @@ function actualizarEstatus(tabla, id, estatus) {
       return alertas_ajax(respuesta);
     });
 }
+
+function actualizarEstatusPago(tabla, id, estatus) {
+  let datos = new FormData();
+  datos.append("tabla", tabla);
+  datos.append("id_venta", id);
+  datos.append("estatus_pago", estatus);
+  datos.append("modulo_venta", "actualizar_estatus_pago");
+
+  fetch(url + "app/ajax/ventaAjax.php", {
+    method: "POST",
+    body: datos,
+  })
+    .then((respuesta) => respuesta.json())
+    .then((respuesta) => {
+      return alertas_ajax(respuesta);
+    });
+}
+function establecerFormaPago(formaPago, total_pago) {
+  $("#forma_pago_venta").val(formaPago);
+  $("#total_pagar_venta").val(parseFloat(total_pago).toFixed(2));
+}
+function confirmacionPago(el) {
+  var forma_pago = $(el).val();
+  alert(forma_pago);
+}
+function calcularCambio(el) {
+  var total_pago = $("#total_pagar_venta").val();
+  var total_pago = parseFloat(total_pago);
+
+  var total_pagado = $(el).val();
+  var total_pagado = parseFloat(total_pagado);
+
+  var cambio = total_pagado - total_pago;
+  $("#total_cambio_venta").val(parseFloat(cambio).toFixed(2));
+}

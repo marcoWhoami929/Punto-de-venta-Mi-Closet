@@ -63,3 +63,84 @@
     }
     ?>
 </div>
+<div class="modal fade is-large" id="modal-pago-venta" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head" style="background:#B99654">
+            <p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-cashier"></i> &nbsp; Confirmar Pago</p>
+            <button class="delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <div class="columns">
+                <div class="column">
+                    <div class="field mt-2 mb-2">
+                        <label class="label">Elegir Forma de Pago</label>
+                        <div class="control has-text-centered">
+                            <div class="select is-primary  is-rounded is-large">
+                                <select onchange="confirmacionPago(this)" id="forma_pago_venta">
+                                    <option value="1">Efectivo</option>
+                                    <option value="2">Transferencia Electrónica</option>
+                                    <option value="3">Tarjeta de Crédito</option>
+                                    <option value="4">Tarjeta de Débito</option>
+
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="columns  mb-6">
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Total a Pagar:</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input class="input is-large" type="text" placeholder="0.00" style="font-size:50px;font-weight:bold" id="total_pagar_venta" disabled />
+                            <span class="icon is-medium is-left " style="margin-top:20px">
+                                <i class="fas fa-dollar-sign fa-3x"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="columns  mb-6">
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Su Pago</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input class="input is-large" type="text" placeholder="0.00" style="font-size:40px;font-weight:bold" id="total_pagado_venta" onkeyup="calcularCambio(this)" value="0" />
+                            <span class="icon is-medium is-left " style="margin-top:20px">
+                                <i class="fas fa-dollar-sign fa-3x"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Cambio</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input class="input is-large" type="text" placeholder="0.00" style="font-size:40px;font-weight:bold" id="total_cambio_venta" readonly />
+                            <span class="icon is-medium is-left " style="margin-top:20px">
+                                <i class="fas fa-dollar-sign fa-3x"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <p class="has-text-centered">
+                        <button type="button" class="button is-success button-lg"><i class="fas fa-money-check-alt"></i> &nbsp; Confirmar Pago</button>
+                    </p>
+                </div>
+            </div>
+
+
+
+        </section>
+    </div>
+</div>
