@@ -73,7 +73,7 @@
                                 <div class="column has-text-centered">
                                     <button type="button" class="button is-link is-light" onclick="print_invoice('<?php echo APP_URL . "app/pdf/invoice.php?code=" . $_SESSION['codigo_factura']; ?>')">
                                         <i class="fas fa-file-invoice-dollar fa-2x"></i> &nbsp;
-                                        Imprimir factura de venta
+                                        Imprimir nota de venta
                                     </button>
                                 </div>
                             </div>

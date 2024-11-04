@@ -1104,30 +1104,32 @@ class saleController extends mainModel
 			$pag_inicio = $inicio + 1;
 			foreach ($datos as $rows) {
 				if ($rows['estatus_pago'] == 0) {
-					$estatus_pago = '<button class="button is-danger is-light js-modal-trigger" data-target="modal-pago-venta" onclick="establecerFormaPago(' . $rows['forma_pago'] . ',' . $rows['total'] . ')">Sin Pagar</button>';
+					$estatus_pago = '<button class="button is-danger is-light js-modal-trigger" data-target="modal-pago-venta" onclick="establecerFormaPago(' . $rows['forma_pago'] . ',' . $rows['total'] . ',' . $rows['id_venta'] . ')">Sin Pagar</button>';
+					$disabled = "";
 				} else {
 					$estatus_pago = '<button class="button is-success">Pagado</button>';
+					$disabled = "display:none";
 				}
 				switch ($rows['estatus']) {
 					case '0':
 						$estatus = '<button class="button is-danger" >Cancelado</button>';
-						$disabled = "display:none";
+
 						break;
 					case '1':
-						$estatus = '<button class="button is-danger  is-light" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'2\')">Recibido</button>';
-						$disabled = "";
+						$estatus = '<button class="button is-info  " onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'2\',' . $rows['estatus_pago'] . ')">Recibido</button>';
+
 						break;
 					case '2':
-						$estatus = '<button class="button is-warning" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'3\')">En Preparación</button>';
-						$disabled = "";
+						$estatus = '<button class="button is-warning" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'3\',' . $rows['estatus_pago'] . ')">En Preparación</button>';
+
 						break;
 					case '3':
-						$estatus = '<button class="button is-primary" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'4\')">Enviado</button>';
-						$disabled = "";
+						$estatus = '<button class="button is-primary" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'4\',' . $rows['estatus_pago'] . ')">Enviado</button>';
+
 						break;
 					case '4':
 						$estatus = '<button class="button is-success">Entregado</button>';
-						$disabled = "";
+
 						break;
 				}
 				$tabla .= '
@@ -1146,7 +1148,7 @@ class saleController extends mainModel
 							<td>' . MONEDA_SIMBOLO . number_format($rows['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
 			                <td>
 
-			                	<button type="button" class="button is-link is-outlined is-rounded is-small btn-sale-options" onclick="print_invoice(\'' . APP_URL . 'app/pdf/invoice.php?code=' . $rows['codigo'] . '\')" title="Imprimir factura Nro. ' . $rows['id_venta'] . '" >
+			                	<button type="button" class="button is-link is-outlined is-rounded is-small btn-sale-options" onclick="print_invoice(\'' . APP_URL . 'app/pdf/invoice.php?code=' . $rows['codigo'] . '\')" title="Imprimir nota Nro. ' . $rows['id_venta'] . '" >
 	                                <i class="fas fa-file-invoice-dollar fa-fw"></i>
 	                            </button>
 
@@ -1318,21 +1320,34 @@ class saleController extends mainModel
 		$id = $this->limpiarCadena($_POST['id_venta']);
 		$estatus = $this->limpiarCadena($_POST['estatus']);
 		$tabla = $this->limpiarCadena($_POST['tabla']);
+		$estatus_pago = $this->limpiarCadena($_POST['estatus_pago']);
 
-		# Verificando venta #
-		$datos = $this->ejecutarConsulta("SELECT * FROM $tabla WHERE id_venta='$id'");
-		if ($datos->rowCount() <= 0) {
+		if ($estatus_pago == "0") {
 			$alerta = [
 				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No se puede actualizar la venta porque la venta no se encuentra.",
+				"titulo" => "Upps!",
+				"texto" => "Para actualizar el estatus, la venta debe estar pagada.",
 				"icono" => "error"
 			];
 			return json_encode($alerta);
 			exit();
 		} else {
-			$datos = $datos->fetch();
+			# Verificando venta #
+			$datos = $this->ejecutarConsulta("SELECT * FROM $tabla WHERE id_venta='$id'");
+			if ($datos->rowCount() <= 0) {
+				$alerta = [
+					"tipo" => "simple",
+					"titulo" => "Ocurrió un error inesperado",
+					"texto" => "No se puede actualizar la venta porque la venta no se encuentra.",
+					"icono" => "error"
+				];
+				return json_encode($alerta);
+				exit();
+			} else {
+				$datos = $datos->fetch();
+			}
 		}
+
 
 
 		$actualizarEstatus = $this->actualizarRegistro($tabla, "estatus", "id_venta", $id, $estatus);
@@ -1357,15 +1372,17 @@ class saleController extends mainModel
 		return json_encode($alerta);
 	}
 	/*----------  Controlador actualizar estatus de pago de  venta  ----------*/
-	public function actualizarEstatusPagoVentaControlador()
+	public function generarPagoVentaControlador()
 	{
 
-		$id = $this->limpiarCadena($_POST['id_venta']);
-		$estatus = $this->limpiarCadena($_POST['estatus_pago']);
-		$tabla = $this->limpiarCadena($_POST['tabla']);
-
+		$id_venta = $this->limpiarCadena($_POST['id_venta']);
+		$id_metodo_pago = $this->limpiarCadena($_POST['forma_pago']);
+		$total_pago = $this->limpiarCadena($_POST['total_pago']);
+		$total_pagado = $this->limpiarCadena($_POST['total_pagado']);
+		$total_cambio = $this->limpiarCadena($_POST['total_cambio']);
+		$referencia = $this->limpiarCadena($_POST['referencia_venta']);
 		# Verificando venta #
-		$datos = $this->ejecutarConsulta("SELECT * FROM $tabla WHERE id_venta='$id'");
+		$datos = $this->ejecutarConsulta("SELECT * FROM venta WHERE id_venta='$id_venta'");
 		if ($datos->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -1380,17 +1397,104 @@ class saleController extends mainModel
 		}
 
 
-		$actualizarEstatus = $this->actualizarRegistro($tabla, "estatus_pago", "id_venta", $id, $estatus);
-		$generarPago = $this->generarPagoVenta();
+
+		$datos_venta = [
+			[
+				"campo_nombre" => "forma_pago",
+				"campo_marcador" => ":FormaPago",
+				"campo_valor" => $id_metodo_pago
+			],
+			[
+				"campo_nombre" => "estatus_pago",
+				"campo_marcador" => ":EstatusPago",
+				"campo_valor" => 1,
+			],
+			[
+				"campo_nombre" => "pagado",
+				"campo_marcador" => ":Pagado",
+				"campo_valor" => $total_pagado,
+			],
+			[
+				"campo_nombre" => "cambio",
+				"campo_marcador" => ":Cambio",
+				"campo_valor" => $total_cambio,
+			]
+		];
+
+		$condicion = [
+			"condicion_campo" => "id_venta",
+			"condicion_marcador" => ":ID",
+			"condicion_valor" => $id_venta
+		];
+		$actualizarEstatus = $this->actualizarDatos("venta", $datos_venta, $condicion);
+		/*== generando codigo de pago ==*/
+		$correlativo = $this->ejecutarConsulta("SELECT id_pago FROM pago");
+		$correlativo = ($correlativo->rowCount()) + 1;
+		$caracteres_permitidos = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+		$longitud = 22;
+		$prefijo = 'PAY';
+		$codigo_pago =  strtoupper($prefijo . "-" . substr(str_shuffle($caracteres_permitidos), 0, $longitud) . "-" . $correlativo);
 
 		if ($actualizarEstatus->rowCount() == 1) {
 
-			$alerta = [
-				"tipo" => "recargar",
-				"titulo" => "Pago Actualizado",
-				"texto" => "Estatus de pago actualizado correctamente",
-				"icono" => "success"
+			$datos_pago_reg = [
+				[
+					"campo_nombre" => "codigo_pago",
+					"campo_marcador" => ":CodigoPago",
+					"campo_valor" => $codigo_pago
+				],
+				[
+					"campo_nombre" => "id_venta",
+					"campo_marcador" => ":IdVenta",
+					"campo_valor" => $id_venta
+				],
+				[
+					"campo_nombre" => "id_metodo_pago",
+					"campo_marcador" => ":MetodoPago",
+					"campo_valor" => $id_metodo_pago
+				],
+				[
+					"campo_nombre" => "total_pago",
+					"campo_marcador" => ":TotalPago",
+					"campo_valor" => $total_pago
+				],
+				[
+					"campo_nombre" => "total_pagado",
+					"campo_marcador" => ":TotalPagado",
+					"campo_valor" => $total_pagado
+				],
+				[
+					"campo_nombre" => "total_cambio",
+					"campo_marcador" => ":TotalCambio",
+					"campo_valor" => $total_cambio
+				],
+				[
+					"campo_nombre" => "referencia",
+					"campo_marcador" => ":Referencia",
+					"campo_valor" => $referencia
+				],
+
 			];
+
+			/*== Agregando venta ==*/
+			$generar_pago = $this->guardarDatos("pago", $datos_pago_reg);
+
+			if ($generar_pago->rowCount() == 1) {
+
+				$alerta = [
+					"tipo" => "recargar",
+					"titulo" => "Pago Generado Exitosamente",
+					"texto" => "Estatus de pago actualizado correctamente",
+					"icono" => "success"
+				];
+			} else {
+				$alerta = [
+					"tipo" => "simple",
+					"titulo" => "Ocurrió un error inesperado",
+					"texto" => "No hemos podido actualizar el estatus de pago de la venta del sistema, por favor intente nuevamente",
+					"icono" => "error"
+				];
+			}
 		} else {
 			$alerta = [
 				"tipo" => "simple",

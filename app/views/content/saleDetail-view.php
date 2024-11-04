@@ -15,6 +15,20 @@
 
 	if ($datos->rowCount() == 1) {
 		$datos_venta = $datos->fetch();
+
+		if ($datos_venta["estatus_pago"] == 1) {
+			$buttonPago = '<p class="has-text-centered ">
+			<a href="#" class="button is-link is-rounded is-success is-large">
+				<i class="fas fa-check-circle"></i> &nbsp;Pago Realizado </a>
+		</p>';
+		} else {
+			$buttonPago = '<p class="has-text-centered ">
+			<a href="#" class="button is-link is-rounded is-danger is-large">
+				<i class="fas fa-exclamation-triangle"></i>&nbsp;Sin Pagar </a>
+		</p>';
+		}
+
+
 		switch ($datos_venta["estatus"]) {
 			case '1':
 				$estatus1 = "is-active";
@@ -41,8 +55,11 @@
 				$estatus4 = "is-active";
 				break;
 		}
+		echo $buttonPago;
 
 	?>
+
+
 		<h2 class="title has-text-centered">Datos de la venta <?php echo " (" . $code . ")"; ?></h2>
 		<div class="columns">
 			<div class="column">
@@ -100,7 +117,7 @@
 				</div>
 
 				<div class="full-width sale-details text-condensedLight">
-					<div class="has-text-weight-bold">Nro. de factura</div>
+					<div class="has-text-weight-bold">Nro. de nota</div>
 					<span class="has-text-link"><?php echo $datos_venta['id_venta']; ?></span>
 				</div>
 
@@ -160,6 +177,8 @@
 								<th class="has-text-centered" style="color:#B99654">#</th>
 								<th class="has-text-centered" style="color:#B99654">Producto</th>
 								<th class="has-text-centered" style="color:#B99654">Cant.</th>
+								<th class="has-text-centered" style="color:#B99654">Talla.</th>
+								<th class="has-text-centered" style="color:#B99654">Color.</th>
 								<th class="has-text-centered" style="color:#B99654">Precio</th>
 								<th class="has-text-centered" style="color:#B99654">Descuento</th>
 								<th class="has-text-centered" style="color:#B99654">Subtotal</th>
@@ -181,6 +200,8 @@
 										<td><?php echo $cc; ?></td>
 										<td><?php echo $detalle['descripcion']; ?></td>
 										<td><?php echo $detalle['cantidad']; ?></td>
+										<td><?php echo $detalle['talla']; ?></td>
+										<td><?php echo $detalle['color']; ?></td>
 										<td><?php echo MONEDA_SIMBOLO . number_format($detalle['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
 										<td><?php echo MONEDA_SIMBOLO . number_format($detalle['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
 										<td><?php echo MONEDA_SIMBOLO . number_format($detalle['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
@@ -191,7 +212,25 @@
 								}
 								?>
 								<tr class="has-text-centered">
-									<td colspan="5"></td>
+									<td colspan="7"></td>
+									<td class="has-text-weight-bold">
+										SUBTOTAL
+									</td>
+									<td class="has-text-weight-bold">
+										<?php echo MONEDA_SIMBOLO . number_format($datos_venta['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?>
+									</td>
+								</tr>
+								<tr class="has-text-centered">
+									<td colspan="7"></td>
+									<td class="has-text-weight-bold">
+										DESCUENTO
+									</td>
+									<td class="has-text-weight-bold">
+										<?php echo MONEDA_SIMBOLO . number_format($datos_venta['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?>
+									</td>
+								</tr>
+								<tr class="has-text-centered">
+									<td colspan="7"></td>
 									<td class="has-text-weight-bold">
 										TOTAL
 									</td>
@@ -217,8 +256,8 @@
 		<div class="columns pb-6 pt-6">
 			<p class="has-text-centered full-width">
 				<?php
-				echo '<button type="button" class="button is-link is-light is-medium" onclick="print_invoice(\'' . APP_URL . 'app/pdf/invoice.php?code=' . $datos_venta['codigo'] . '\')" title="Imprimir factura Nro. ' . $datos_venta['id_venta'] . '" >
-			<i class="fas fa-file-invoice-dollar fa-fw"></i> &nbsp; Imprimir factura
+				echo '<button type="button" class="button is-link is-light is-medium" onclick="print_invoice(\'' . APP_URL . 'app/pdf/invoice.php?code=' . $datos_venta['codigo'] . '\')" title="Imprimir nota Nro. ' . $datos_venta['id_venta'] . '" >
+			<i class="fas fa-file-invoice-dollar fa-fw"></i> &nbsp; Imprimir nota
 			</button> &nbsp;&nbsp; 
 
 			<button type="button" class="button is-link is-light is-medium" onclick="print_ticket(\'' . APP_URL . 'app/pdf/ticket.php?code=' . $datos_venta['codigo'] . '\')" title="Imprimir ticket Nro. ' . $datos_venta['id_venta'] . '" ><i class="fas fa-receipt fa-fw"></i> &nbsp; Imprimir ticket</button>';

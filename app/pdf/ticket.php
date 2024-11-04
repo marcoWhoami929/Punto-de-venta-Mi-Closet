@@ -85,6 +85,8 @@ if ($datos_venta->rowCount() == 1) {
         $pdf->Cell(22, 4, iconv("UTF-8", "ISO-8859-1", MONEDA_SIMBOLO . number_format($detalle['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR)), 0, 0, 'C');
         $pdf->Cell(32, 4, iconv("UTF-8", "ISO-8859-1", MONEDA_SIMBOLO . number_format($detalle['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR)), 0, 0, 'C');
         $pdf->Ln(4);
+        $pdf->Cell(33, 4, iconv("UTF-8", "ISO-8859-1", "Color:" . $detalle['color']), 0, 0, 'C');
+        $pdf->Cell(33, 4, iconv("UTF-8", "ISO-8859-1", "Talla:" . $detalle['talla']), 0, 0, 'C');
         $pdf->Ln(3);
     }
 

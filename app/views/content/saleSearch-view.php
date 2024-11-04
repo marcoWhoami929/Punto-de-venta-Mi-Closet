@@ -28,7 +28,13 @@
                 </form>
             </div>
         </div>
-    <?php } else { ?>
+    <?php
+
+
+        echo $insVenta->listarVentaControlador($url[1], 15, $url[0], "");
+
+        include "./app/views/inc/print_invoice_script.php";
+    } else { ?>
         <div class="columns">
             <div class="column">
                 <form class=FormularioAjaxNew action="<?php echo APP_URL; ?>app/ajax/buscadorAjax.php" method="POST" autocomplete="off">
@@ -57,6 +63,7 @@
             </div>
         </div>
     <?php
+
         echo $insVenta->listarVentaControlador($url[1], 15, $url[0], $_SESSION[$url[0]]);
 
         include "./app/views/inc/print_invoice_script.php";
@@ -77,7 +84,7 @@
                         <label class="label">Elegir Forma de Pago</label>
                         <div class="control has-text-centered">
                             <div class="select is-primary  is-rounded is-large">
-                                <select onchange="confirmacionPago(this)" id="forma_pago_venta">
+                                <select onchange="eleccionFormaPago()" id="forma_pago_venta">
                                     <option value="1">Efectivo</option>
                                     <option value="2">Transferencia Electrónica</option>
                                     <option value="3">Tarjeta de Crédito</option>
@@ -105,12 +112,12 @@
                 </div>
 
             </div>
-            <div class="columns  mb-6">
+            <div class="columns  mb-6" style="display:none" id="div-payment-efectivo">
                 <div class="column">
                     <div class="field">
                         <label class="label">Su Pago</label>
                         <div class="control has-icons-left has-icons-right">
-                            <input class="input is-large" type="text" placeholder="0.00" style="font-size:40px;font-weight:bold" id="total_pagado_venta" onkeyup="calcularCambio(this)" value="0" />
+                            <input class="input is-large" type="text" placeholder="0.00" style="font-size:40px;font-weight:bold" id="total_pagado_venta" onkeyup="calcularCambio()" value="0.00" />
                             <span class="icon is-medium is-left " style="margin-top:20px">
                                 <i class="fas fa-dollar-sign fa-3x"></i>
                             </span>
@@ -131,10 +138,26 @@
                     </div>
                 </div>
             </div>
+            <div class="columns  mb-6" style="display:none" id="div-payment-transferencia">
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Referencia Pago</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input class="input is-large" type="text" placeholder="Capturar referencia de pago" style="font-size:20px;font-weight:bold" id="referencia_venta" />
+                            <span class="icon is-medium is-left">
+
+                                <i class="fas fa-receipt"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
             <div class="columns">
                 <div class="column">
                     <p class="has-text-centered">
-                        <button type="button" class="button is-success button-lg"><i class="fas fa-money-check-alt"></i> &nbsp; Confirmar Pago</button>
+                        <button type="button" class="button is-success button-lg" onclick="confirmacionPago()"><i class="fas fa-money-check-alt"></i> &nbsp; Confirmar Pago</button>
                     </p>
                 </div>
             </div>

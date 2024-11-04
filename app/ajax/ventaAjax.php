@@ -63,9 +63,9 @@ if (isset($_POST['modulo_venta'])) {
 	if ($_POST['modulo_venta'] == "actualizar_estatus") {
 		echo $insVenta->actualizarEstatusVentaControlador();
 	}
-	/*--------- Actualizar esattus de pago de venta ---------*/
-	if ($_POST['modulo_venta'] == "actualizar_estatus_pago") {
-		echo $insVenta->actualizarEstatusPagoVentaControlador();
+	/*--------- Actualizar estatus de pago de venta ---------*/
+	if ($_POST['modulo_venta'] == "generar_pago_venta") {
+		echo $insVenta->generarPagoVentaControlador();
 	}
 } else {
 	session_destroy();

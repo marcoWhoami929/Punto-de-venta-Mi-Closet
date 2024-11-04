@@ -6,6 +6,7 @@ $(function () {
     case "notesNew": {
       generarQrNotas();
     }
+  
   }
 });
 function generarQrNotas() {

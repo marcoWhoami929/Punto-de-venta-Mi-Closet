@@ -62,7 +62,7 @@ if ($datos_venta->rowCount() == 1) {
 	$pdf->Cell(116, 7, iconv("UTF-8", "ISO-8859-1", date("d/m/Y", strtotime($datos_venta['fecha_venta'])) . " " . $datos_venta['hora_venta']), 0, 0, 'L');
 	$pdf->SetFont('Arial', 'B', 10);
 	$pdf->SetTextColor(39, 39, 51);
-	$pdf->Cell(35, 7, iconv("UTF-8", "ISO-8859-1", strtoupper('Factura Nro.')), 0, 0, 'C');
+	$pdf->Cell(35, 7, iconv("UTF-8", "ISO-8859-1", strtoupper('Nota Nro.')), 0, 0, 'C');
 
 	$pdf->Ln(7);
 
@@ -171,7 +171,7 @@ if ($datos_venta->rowCount() == 1) {
 	$pdf->SetFont('Arial', '', 9);
 
 	$pdf->SetTextColor(39, 39, 51);
-	$pdf->MultiCell(0, 9, iconv("UTF-8", "ISO-8859-1", "*** Precios de productos incluyen impuestos. Para poder realizar un reclamo o devolución debe de presentar esta factura ***"), 0, 'C', false);
+	$pdf->MultiCell(0, 9, iconv("UTF-8", "ISO-8859-1", "*** Precios de productos incluyen impuestos. Para poder realizar un reclamo o devolución debe de presentar esta nota ***"), 0, 'C', false);
 
 	$pdf->Ln(9);
 
@@ -182,7 +182,7 @@ if ($datos_venta->rowCount() == 1) {
 	$pdf->SetFont('Arial', '', 12);
 	$pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", $datos_venta['codigo']), 0, 'C', false);
 
-	$pdf->Output("I", "Factura_Nro" . $datos_venta['id_venta'] . ".pdf", true);
+	$pdf->Output("I", "Nota_Nro" . $datos_venta['id_venta'] . ".pdf", true);
 } else {
 ?>
 	<!DOCTYPE html>
