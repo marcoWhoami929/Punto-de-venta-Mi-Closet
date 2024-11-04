@@ -320,26 +320,30 @@ if ($_SESSION['perfil'] == 'Administrador') {
 								</div>
 							</a>
 						</li>
-						<li class="full-width">
-							<a href="<?php echo APP_URL; ?>saleList/" class="full-width">
-								<div class="navLateral-body-cl">
-									<i class="fas fa-clipboard-list fa-fw"></i>
-								</div>
-								<div class="navLateral-body-cr">
-									Lista de ventas
-								</div>
-							</a>
-						</li>
+
 						<li class="full-width">
 							<a href="<?php echo APP_URL; ?>saleSearch/" class="full-width">
 								<div class="navLateral-body-cl">
 									<i class="fas fa-search-dollar fa-fw"></i>
 								</div>
 								<div class="navLateral-body-cr">
-									Buscar venta
+									Ventas
 								</div>
 							</a>
 						</li>
+						<!--
+						<li class="full-width">
+							<a href="<?php echo APP_URL; ?>paymentList/" class="full-width">
+								<div class="navLateral-body-cl">
+
+									<i class="fas fa-wallet  fa-fw"></i>
+								</div>
+								<div class="navLateral-body-cr">
+									Pagos
+								</div>
+							</a>
+						</li>
+			-->
 					</ul>
 				</li>
 

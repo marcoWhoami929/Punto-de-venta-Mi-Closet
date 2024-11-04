@@ -241,7 +241,7 @@ descuento_input.addEventListener("keyup", function (e) {
     document.querySelector("#cambio").value = "0.00";
   }
 });
-function actualizarEstatus(tabla, id, estatus,estatus_pago) {
+function actualizarEstatus(tabla, id, estatus, estatus_pago) {
   let datos = new FormData();
   datos.append("tabla", tabla);
   datos.append("id_venta", id);
@@ -259,34 +259,37 @@ function actualizarEstatus(tabla, id, estatus,estatus_pago) {
     });
 }
 
-
-function establecerFormaPago(formaPago, total_pago,id_venta) {
-  localStorage.setItem("id_venta",id_venta);
+function establecerFormaPago(formaPago, total_pago, id_venta, estatus) {
+  localStorage.setItem("id_venta", id_venta);
   $("#forma_pago_venta").val(formaPago);
   $("#total_pagar_venta").val(parseFloat(total_pago).toFixed(2));
-  new Promise(function (resolve) {
-    resolve(
-      eleccionFormaPago()
-    );
-  }).then(function (result) {
-    calcularCambio();
-  });
+  if (estatus == 0) {
+    var respuesta = {
+      tipo: "simple",
+      titulo: "La Nota se encuentra cancelada",
+      text: "",
+      icono: "error",
+    };
 
+    return alertas_ajax(respuesta);
+  } else {
+    new Promise(function (resolve) {
+      resolve(eleccionFormaPago());
+    }).then(function (result) {
+      calcularCambio();
+    });
+  }
 }
 function eleccionFormaPago() {
   var forma_pago = $("#forma_pago_venta").val();
-  
- 
-  if(forma_pago === "1"){
-      document.getElementById("div-payment-efectivo").style.display = "";
-      document.getElementById("div-payment-transferencia").style.display = "none";
-      
-  }else{
+
+  if (forma_pago === "1") {
+    document.getElementById("div-payment-efectivo").style.display = "";
+    document.getElementById("div-payment-transferencia").style.display = "none";
+  } else {
     document.getElementById("div-payment-efectivo").style.display = "none";
     document.getElementById("div-payment-transferencia").style.display = "";
-    
   }
- 
 }
 function calcularCambio() {
   var total_pago = $("#total_pagar_venta").val();
@@ -295,29 +298,25 @@ function calcularCambio() {
   var total_pagado = $("#total_pagado_venta").val();
   var total_pagado = parseFloat(total_pagado);
 
-
   var cambio = total_pagado - total_pago;
   $("#total_cambio_venta").val(parseFloat(cambio).toFixed(2));
 }
-function confirmacionPago(){
+function confirmacionPago() {
   var forma_pago = $("#forma_pago_venta").val();
   var total_pago = $("#total_pagar_venta").val();
   var total_pagado = $("#total_pagado_venta").val();
   var total_Cambio = $("#total_cambio_venta").val();
   var referencia_venta = $("#referencia_venta").val();
   var id_venta = localStorage.getItem("id_venta");
-  if(forma_pago == "1"){
-
-    if(total_pagado < total_pago ){
-
+  if (forma_pago == "1") {
+    if (total_pagado < total_pago) {
       Swal.fire({
         icon: "error",
         title: "Error de pago",
         text: "El monto pagado no puede ser menor al total de la venta.",
         confirmButtonText: "Aceptar",
       });
-    }else{
-  
+    } else {
       let datos = new FormData();
       datos.append("id_venta", id_venta);
       datos.append("forma_pago", forma_pago);
@@ -326,7 +325,7 @@ function confirmacionPago(){
       datos.append("total_cambio", total_Cambio);
       datos.append("referencia_venta", "");
       datos.append("modulo_venta", "generar_pago_venta");
-  
+
       fetch(url + "app/ajax/ventaAjax.php", {
         method: "POST",
         body: datos,
@@ -335,18 +334,14 @@ function confirmacionPago(){
         .then((respuesta) => {
           return alertas_ajax(respuesta);
         });
-        
-      
     }
-
-  }else{
-
+  } else {
     let datos = new FormData();
     datos.append("id_venta", id_venta);
     datos.append("forma_pago", forma_pago);
     datos.append("total_pago", total_pago);
     datos.append("total_pagado", total_pago);
-    datos.append("total_cambio", '0.00');
+    datos.append("total_cambio", "0.00");
     datos.append("referencia_venta", referencia_venta);
     datos.append("modulo_venta", "generar_pago_venta");
 
@@ -358,9 +353,5 @@ function confirmacionPago(){
       .then((respuesta) => {
         return alertas_ajax(respuesta);
       });
-      
-
   }
-
-  
 }

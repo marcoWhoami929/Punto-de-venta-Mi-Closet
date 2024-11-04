@@ -36,6 +36,20 @@ if ($datos_venta->rowCount() == 1) {
 	$pdf->SetTextColor(185, 150, 84);
 	$pdf->Cell(150, 10, iconv("UTF-8", "ISO-8859-1", strtoupper($datos_empresa['empresa_nombre'])), 0, 0, 'L');
 
+	if ($datos_venta["estatus"] == 0) {
+
+
+		$pdf->SetFont('Arial', 'B', 16);
+		$pdf->SetTextColor(255, 78, 78);
+		$pdf->Cell(110, 0, iconv("UTF-8", "ISO-8859-1", strtoupper("Cancelada")), 0, 0, 'L');
+	} else {
+
+		$pdf->SetFont('Arial', 'B', 16);
+		$pdf->SetTextColor(72, 199, 142);
+		$pdf->Cell(110, 0, iconv("UTF-8", "ISO-8859-1", strtoupper("Vigente")), 0, 0, 'L');
+	}
+
+
 	$pdf->Ln(9);
 
 	$pdf->SetFont('Arial', '', 10);

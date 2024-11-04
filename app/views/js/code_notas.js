@@ -3,10 +3,11 @@ $(function () {
   url = "http://localhost/pos/";
   ruta = urlPath.split("/");
   switch (ruta[2]) {
-    case "notesNew": {
+    case "notesNew":
       generarQrNotas();
-    }
-  
+      break;
+    case "saleSearch":
+      break;
   }
 });
 function generarQrNotas() {

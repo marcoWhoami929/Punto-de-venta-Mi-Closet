@@ -70,8 +70,6 @@ class searchController extends mainModel
 
 		return json_encode($alerta);
 	}
-
-
 	/*----------  Controlador eliminar busqueda  ----------*/
 	public function eliminarBuscadorControlador()
 	{

@@ -1056,14 +1056,16 @@ class saleController extends mainModel
 
 		$value_tablas = "venta.forma_pago,venta.tipo_entrega,venta.estatus_pago,venta.id_venta,venta.estatus,venta.subtotal,venta.descuento,venta.tipo_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre as 'nombreVendedor',cliente.id_cliente,cliente.nombre as 'nombreCliente',cliente.apellidos";
 
+
+
 		if (isset($busqueda) && $busqueda != "") {
 
-			$consulta_datos = "SELECT $value_tablas FROM venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario WHERE (venta.codigo='$busqueda') ORDER BY venta.id_venta DESC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $value_tablas FROM venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario WHERE (venta.codigo='$busqueda')  ORDER BY venta.id_venta DESC LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_venta) FROM venta WHERE (venta.codigo='$busqueda')";
 		} else {
 
-			$consulta_datos = "SELECT $value_tablas FROM venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario ORDER BY venta.id_venta DESC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $value_tablas FROM venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario WHERE venta.id_venta != 0  ORDER BY venta.id_venta DESC LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_venta) FROM venta";
 		}
@@ -1077,7 +1079,7 @@ class saleController extends mainModel
 		$numeroPaginas = ceil($total / $registros);
 
 		$tabla .= '
-		        <div class="table-container">
+		        <div class="table-container" style="margin-top:50px">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 		            <thead style="background:#B99654;color:#ffffff;">
 		                <tr>
@@ -1103,8 +1105,13 @@ class saleController extends mainModel
 			$contador = $inicio + 1;
 			$pag_inicio = $inicio + 1;
 			foreach ($datos as $rows) {
+				if ($rows["estatus"] == 0) {
+					$modalPago = '';
+				} else {
+					$modalPago = 'data-target="modal-pago-venta"';
+				}
 				if ($rows['estatus_pago'] == 0) {
-					$estatus_pago = '<button class="button is-danger is-light js-modal-trigger" data-target="modal-pago-venta" onclick="establecerFormaPago(' . $rows['forma_pago'] . ',' . $rows['total'] . ',' . $rows['id_venta'] . ')">Sin Pagar</button>';
+					$estatus_pago = '<button class="button is-danger is-light js-modal-trigger" ' . $modalPago . ' onclick="establecerFormaPago(' . $rows['forma_pago'] . ',' . $rows['total'] . ',' . $rows['id_venta'] . ',' . $rows['estatus'] . ')">Sin Pagar</button>';
 					$disabled = "";
 				} else {
 					$estatus_pago = '<button class="button is-success">Pagado</button>';
