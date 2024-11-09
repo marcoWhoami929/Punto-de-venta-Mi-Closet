@@ -9,6 +9,7 @@ $(function () {
     case "saleNew":
       cargarListaCamaras();
       cargarCatalogoProductos(1);
+      cargarCarritoVenta();
      break;
     case "notesNew":
       generarQrNotas();
@@ -41,14 +42,28 @@ function actualizarCarrito() {
   datos.append("porc_descuento", porcentaje);
   datos.append("modulo_venta", "actualizar_carrito");
 
-  fetch(url + "app/ajax/ventaAjax.php", {
-    method: "POST",
-    body: datos,
-  })
-    .then((respuesta) => respuesta.json())
-    .then((respuesta) => {
-      return alertas_ajax(respuesta);
-    });
+  new Promise(function (resolve) {
+    resolve(
+      fetch(url + "app/ajax/ventaAjax.php", {
+        method: "POST",
+        body: datos,
+      })
+        .then((respuesta) => respuesta.json())
+        .then((respuesta) => {
+          $(".alerta_producto").html('<div class="notification is-success is-light ">'+respuesta+'</div>');
+        })
+    );
+  }).then(function (result) {
+   
+    cargarCarritoVenta();
+    setTimeout(function() {
+      
+      document.getElementById("sale-barcode-input").value = "";
+      $(".alerta_producto").html('').fadeIn("slow");
+    }, 2000);
+  });
+
+  
 }
 function datosNota() {
   var titulo_nota = $("#titulo_nota").val();
@@ -222,4 +237,64 @@ function cargarCatalogoProductos(page){
         let tabla_productos = document.querySelector("#tabla_productos");
         tabla_productos.innerHTML = respuesta;
       });
+}
+function incrementarCarrito(codigo,token) {
+  var actual = $("#cantidadCarrito" + token).val();
+
+  var cantidad = Number.parseInt(actual) + 1;
+  if (cantidad == 0) {
+  } else {
+    actualizarProductoCarrito(
+      codigo,
+      cantidad,
+      token
+    );
+  }
+}
+function decrementarCarrito(codigo,token) {
+  var actual = $("#cantidadCarrito" + token).val();
+
+  var cantidad = Number.parseInt(actual) - 1;
+
+  if (cantidad == 0) {
+  } else {
+    actualizarProductoCarrito(
+      codigo,
+      cantidad,
+      token
+    );
+  }
+}
+function totalesCarritoVenta() {
+  $.ajax({
+    url: "../app/ajax/ventaAjax.php",
+    type: "POST",
+    data: {
+      modulo_venta: "totales_carrito_venta",
+    },
+    success: function (response) {
+      $(".container-totales").html(response);
+    },
+  })
+
+}
+function cargarCarritoVenta() {
+
+  new Promise(function (resolve) {
+    resolve(
+      $.ajax({
+        url: "../app/ajax/ventaAjax.php",
+        type: "POST",
+        data: {
+          modulo_venta: "carrito_venta",
+        },
+        success: function (response) {
+          $(".container-carrito").html(response);
+        },
+      })
+    );
+  }).then(function (result) {
+    totalesCarritoVenta();
+  });
+ 
 }

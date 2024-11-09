@@ -4,8 +4,28 @@ namespace app\controllers;
 
 use app\models\mainModel;
 
+function generarCodigoAleatorio($longitud)
+{
+	$codigo = "";
+	$caracter = "Letra";
+	for ($i = 1; $i <= $longitud; $i++) {
+		if ($caracter == "Letra") {
+			$letra_aleatoria = chr(rand(ord("a"), ord("z")));
+			$letra_aleatoria = strtoupper($letra_aleatoria);
+			$codigo .= $letra_aleatoria;
+			$caracter = "Numero";
+		} else {
+			$numero_aleatorio = rand(0, 9);
+			$codigo .= $numero_aleatorio;
+			$caracter = "Letra";
+		}
+	}
+	return $codigo;
+}
+
 class saleController extends mainModel
 {
+
 
 	/*---------- Controlador buscar codigo de producto ----------*/
 	public function buscarCodigoVentaControlador($datos)
@@ -114,6 +134,7 @@ class saleController extends mainModel
 
 		/*== Recuperando codigo del producto ==*/
 		$codigo = $this->limpiarCadena($_POST['codigo']);
+		$token = generarCodigoAleatorio(8);
 
 		if ($codigo == "") {
 			$alerta = [
@@ -126,17 +147,6 @@ class saleController extends mainModel
 			exit();
 		}
 
-		/*== Verificando integridad de los datos ==*/
-		if ($this->verificarDatos("[a-zA-Z0-9- ]{1,70}", $codigo)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El código de barras no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
 
 		/*== Comprobando producto en la DB ==*/
 		$check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE codigo='$codigo'");
@@ -185,6 +195,7 @@ class saleController extends mainModel
 				"id_producto" => $value['id_producto'],
 				"codigo" => $value['codigo'],
 				"foto" => $value['foto'],
+				"token" => $token,
 				"stock_total" => $stock_total,
 				"stock_total_old" => $value['stock_total'],
 				"precio_compra" => $value['precio_compra'],
@@ -197,7 +208,7 @@ class saleController extends mainModel
 				"descripcion" => $value['nombre']
 			];
 
-			$_SESSION['alerta_producto_agregado'] = "Se agrego <strong>" . $value['nombre'] . "</strong> a la venta";
+			$alerta = "Se agrego <strong>" . $value['nombre'] . "</strong> a la venta";
 		} else {
 			$detalle_cantidad = ($_SESSION['datos_producto_venta'][$codigo]['cantidad']) + 1;
 
@@ -226,6 +237,7 @@ class saleController extends mainModel
 				"id_producto" => $value['id_producto'],
 				"codigo" => $value['codigo'],
 				"foto" => $value['foto'],
+				"token" => $token,
 				"stock_total" => $stock_total,
 				"stock_total_old" => $value['stock_total'],
 				"precio_compra" => $value['precio_compra'],
@@ -238,13 +250,10 @@ class saleController extends mainModel
 				"descripcion" => $value['nombre']
 			];
 
-			$_SESSION['alerta_producto_agregado'] = "Se agrego +1 <strong>" . $value['nombre'] . "</strong> a la venta. Total en carrito: <strong>$detalle_cantidad</strong>";
+			$alerta = "Se agrego +1 <strong>" . $value['nombre'] . "</strong> a la venta. Total en carrito: <strong>$detalle_cantidad</strong>";
 		}
 
-		$alerta = [
-			"tipo" => "redireccionar",
-			"url" => APP_URL . "saleNew/"
-		];
+
 
 		return json_encode($alerta);
 	}
@@ -347,19 +356,10 @@ class saleController extends mainModel
 		unset($_SESSION['datos_producto_venta'][$codigo]);
 
 		if (empty($_SESSION['datos_producto_venta'][$codigo])) {
-			$alerta = [
-				"tipo" => "recargar",
-				"titulo" => "¡Producto removido!",
-				"texto" => "El producto se ha removido de la venta",
-				"icono" => "success"
-			];
+
+			$alerta = "El producto se ha removido de la venta";
 		} else {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos podido remover el producto, por favor intente nuevamente",
-				"icono" => "error"
-			];
+			$alerta = "No hemos podido remover el producto, por favor intente nuevamente";
 		}
 		return json_encode($alerta);
 	}
@@ -371,28 +371,21 @@ class saleController extends mainModel
 
 		/*== Recuperando codigo & cantidad del producto ==*/
 		$codigo = $this->limpiarCadena($_POST['codigo']);
-		$cantidad = $this->limpiarCadena($_POST['producto_cantidad']);
+		$cantidad = $this->limpiarCadena($_POST['cantidad']);
+		$porc_descuento = $_SESSION["porc_descuento"];
+
 
 		/*== comprobando campos vacios ==*/
 		if ($codigo == "" || $cantidad == "") {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No podemos actualizar la cantidad de productos debido a que faltan algunos parámetros de configuración",
-				"icono" => "error"
-			];
+			$alerta = "No podemos actualizar la cantidad de productos debido a que faltan algunos parámetros de configuración";
 			return json_encode($alerta);
 			exit();
 		}
 
 		/*== comprobando cantidad de productos ==*/
 		if ($cantidad <= 0) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "Debes de introducir una cantidad mayor a 0",
-				"icono" => "error"
-			];
+
+			$alerta = "Debes de introducir una cantidad mayor a 0";
 			return json_encode($alerta);
 			exit();
 		}
@@ -400,12 +393,8 @@ class saleController extends mainModel
 		/*== Comprobando producto en la DB ==*/
 		$check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE codigo='$codigo'");
 		if ($check_producto->rowCount() <= 0) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos encontrado el producto con código de barras : '$codigo'",
-				"icono" => "error"
-			];
+
+			$alerta = "No hemos encontrado el producto con código de barras : '$codigo'";
 			return json_encode($alerta);
 			exit();
 		} else {
@@ -416,12 +405,7 @@ class saleController extends mainModel
 		if (!empty($_SESSION['datos_producto_venta'][$codigo])) {
 
 			if ($_SESSION['datos_producto_venta'][$codigo]["cantidad"] == $cantidad) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "No has modificado la cantidad de productos",
-					"icono" => "error"
-				];
+				$alerta = "No has modificado la cantidad de productos";
 				return json_encode($alerta);
 				exit();
 			}
@@ -438,17 +422,13 @@ class saleController extends mainModel
 			$stock_total = $value['stock_total'] - $detalle_cantidad;
 
 			if ($stock_total < 0) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "Lo sentimos, no hay existencias suficientes del producto seleccionado. Existencias disponibles: " . ($stock_total + $detalle_cantidad) . "",
-					"icono" => "error"
-				];
+
+				$alerta = "Lo sentimos, no hay existencias suficientes del producto seleccionado. Existencias disponibles: " . ($stock_total + $detalle_cantidad) . "";
 				return json_encode($alerta);
 				exit();
 			}
 
-			$descuento = (($value['precio_venta'] * $detalle_cantidad) * $_POST["porc_descuento"]) / 100;
+			$descuento = (($value['precio_venta'] * $detalle_cantidad) * $porc_descuento) / 100;
 			$descuento = number_format($descuento, MONEDA_DECIMALES, '.', '');
 			$subtotal = ($value['precio_venta'] * $detalle_cantidad);
 			$subtotal = number_format($subtotal, MONEDA_DECIMALES, '.', '');
@@ -456,38 +436,17 @@ class saleController extends mainModel
 			$total = number_format($total, MONEDA_DECIMALES, '.', '');
 
 
-			$_SESSION['datos_producto_venta'][$codigo] = [
-				"id_producto" => $value['id_producto'],
-				"codigo" => $value['codigo'],
-				"foto" => $value['foto'],
-				"stock_total" => $stock_total,
-				"stock_total_old" => $value['stock_total'],
-				"precio_compra" => $value['precio_compra'],
-				"precio_venta" => $value['precio_venta'],
-				"descuento" => $descuento,
-				"porc_descuento" => $_POST["porc_descuento"],
-				"cantidad" => $detalle_cantidad,
-				"subtotal" => $subtotal,
-				"total" => $total,
-				"descripcion" => $value['nombre'],
-				"dsad" => 'sdsd'
-			];
+			$_SESSION['datos_producto_venta'][$codigo]["cantidad"] = $detalle_cantidad;
+			$_SESSION['datos_producto_venta'][$codigo]["subtotal"] = $subtotal;
+			$_SESSION['datos_producto_venta'][$codigo]["descuento"] = $descuento;
+			$_SESSION['datos_producto_venta'][$codigo]["total"] = $total;
 
-			$_SESSION['alerta_producto_agregado'] = "Se $diferencia_productos <strong>" . $value['nombre'] . "</strong> a la venta. Total en carrito <strong>$detalle_cantidad</strong>";
-
-			$alerta = [
-				"tipo" => "redireccionar",
-				"url" => APP_URL . "saleNew/"
-			];
+			$alerta = "Se $diferencia_productos <strong>" . $value['nombre'] . "</strong> a la venta. Total en carrito <strong>$detalle_cantidad</strong>";
 
 			return json_encode($alerta);
 		} else {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos encontrado el producto que desea actualizar en el carrito",
-				"icono" => "error"
-			];
+
+			$alerta = "No hemos encontrado el producto que desea actualizar en el carrito";
 			return json_encode($alerta);
 		}
 	}
@@ -1341,29 +1300,14 @@ class saleController extends mainModel
 			$descuento = (($value['precio_venta'] * $value['cantidad']) * $_POST["porc_descuento"]) / 100;
 			$subtotal = ($value['precio_venta'] * $value['cantidad']);
 			$total = ($subtotal - $descuento);
-			$_SESSION['datos_producto_venta'][$value["codigo"]] = [
-				"id_producto" => $value['id_producto'],
-				"codigo" => $value['codigo'],
-				"foto" => $value['foto'],
-				"stock_total" => $value['stock_total'],
-				"stock_total_old" => $value['stock_total_old'],
-				"precio_compra" => $value['precio_compra'],
-				"precio_venta" => $value['precio_venta'],
-				"porc_descuento" => $_POST["porc_descuento"],
-				"descuento" => $descuento,
-				"cantidad" => $value['cantidad'],
-				"subtotal" => $subtotal,
-				"total" => $total,
-				"descripcion" => $value['descripcion']
 
-			];
+			$_SESSION['datos_producto_venta'][$value["codigo"]]["subtotal"] = $subtotal;
+			$_SESSION['datos_producto_venta'][$value["codigo"]]["descuento"] = $descuento;
+			$_SESSION['datos_producto_venta'][$value["codigo"]]["total"] = $total;
 			$sumaTotal += $total;
 		}
-		$_SESSION['alerta_carrito_actualizado'] = "Carrito actualizado. Total en carrito: <strong>$" . number_format($sumaTotal, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, "") . "</strong>";
-		$alerta = [
-			"tipo" => "redireccionar",
-			"url" => APP_URL . "saleNew/"
-		];
+		$alerta = "Carrito actualizado. Total en carrito: <strong>$" . number_format($sumaTotal, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, "") . "</strong>";
+
 
 		return json_encode($alerta);
 	}
@@ -1559,5 +1503,191 @@ class saleController extends mainModel
 		}
 
 		return json_encode($alerta);
+	}
+	/*----------  Controlador Carrito Venta  ----------*/
+	public function cargarCarritoVentaControlador()
+	{
+
+		$tabla = "";
+
+		$_SESSION['total'] = 0;
+		$_SESSION['subtotal'] = 0;
+		$_SESSION['descuento'] = 0;
+		$cc = 1;
+		if (isset($_SESSION['datos_producto_venta'])) {
+			if (empty($_SESSION['datos_producto_venta'])) {
+				$tabla = '
+			<article class="message is-warning mt-4 mb-4">
+				 <div class="message-header">
+					
+				 </div>
+				<div class="message-body has-text-centered">
+					<i class="fas fa-exclamation-triangle fa-2x"></i><br>
+					No hay productos agregados en el carrito
+				</div>
+			</article>';
+			} else {
+				foreach ($_SESSION['datos_producto_venta'] as $productos) {
+
+					if (is_file("./app/views/productos/" . $productos['foto'])) {
+						$foto = '<img src="' . APP_URL . 'app/views/productos/' . $productos['foto'] . '">';
+					} else {
+						$foto = '<img src="' . APP_URL . 'app/views/productos/default.png">';
+					}
+
+
+					$tabla .= '<div class="card pt-4">
+								<header class="card-header">
+								 <p class="card-header-title"><strong>' . $productos['descripcion'] . '</strong></p>
+								   <p class="card-header-title"><strong>' . $productos['codigo'] . '</strong></p>
+									<button type="submit" class="button is-danger is-rounded " onclick="removerProductoCarrito(\'' . $productos['codigo'] . '\')">
+														<i class="fas fa-trash fa-fw"></i>
+											</button>
+										
+								</header>
+								<div class="card-content">
+									<div class="content">
+										<div class="columns">
+											<div class="column">
+												<figure class="media-left">
+													<p class="image is-64x64">
+														' . $foto . '
+													</p>
+													</figure>
+											</div>
+										 
+											<div class="column is-two-fifths">
+												<div class="columns ">
+													<div class="column">
+													<div class="field has-addons">
+													<div class="control">
+														  <button type="button" class="button is-info is-rounded" onclick="decrementarCarrito(\'' . $productos['codigo'] . '\',\'' . $productos['token'] . '\')" >
+																<i class="fas fa-minus "></i>
+														 </button>
+													</div>
+													<div class="control">
+														
+														<input class="input has-text-centered" value="' . $productos['cantidad'] . '" id="cantidadCarrito' . $productos['token'] . '"  type="text"  >
+													</div>
+													<div class="control">
+														 <button type="button" class="button is-info is-rounded" onclick="incrementarCarrito(\'' . $productos['codigo'] . '\',\'' . $productos['token'] . '\')" >
+																<i class="fas fa-plus "></i>
+														 </button>
+													</div>
+													</div>
+					
+				
+													</div>
+													
+												</div>
+											</div>
+											 <div class="column">
+													<div class="columns">
+													<label><strong>Precio:</strong></label>
+													</div>
+													<div class="columns">
+													' . MONEDA_SIMBOLO . " " . number_format($productos['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+													 </div>
+											</div>
+											<div class="column">
+													<div class="columns">
+													<label><strong>Descuento:</strong></label>
+													</div>
+													<div class="columns">
+													' . MONEDA_SIMBOLO . " " . number_format($productos['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+													</div>
+											</div>
+											  
+										</div>
+										
+										
+									</div>
+								</div>
+								<footer class="card-footer">
+									
+									<a href="#" class="card-footer-item">
+										<div class="columns has-text-centered">
+										<label><strong>Subtotal:</strong></label>
+										</div>
+										<div class="columns pt-4">
+										' . MONEDA_SIMBOLO . " " . number_format($productos['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+										</div>
+									</a>
+									<a href="#" class="card-footer-item">
+									 <div class="columns has-text-centered">
+									  <label><strong>Total:</strong></label>
+									</div>
+									<div class="columns pt-4">
+									' . MONEDA_SIMBOLO . " " . number_format($productos['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+									</div>
+									</a>
+								</footer>
+								</div>';
+					$cc++;
+					$_SESSION['subtotal'] += $productos['subtotal'];
+					$_SESSION['descuento'] += $productos['descuento'];
+					$_SESSION['total'] += $productos['total'];
+				}
+			}
+		} else {
+			$tabla = '
+			<article class="message is-warning mt-4 mb-4">
+				 <div class="message-header">
+					
+				 </div>
+				<div class="message-body has-text-centered">
+					<i class="fas fa-exclamation-triangle fa-2x"></i><br>
+					No hay productos agregados en el carrito
+				</div>
+			</article>';
+		}
+
+
+		return $tabla;
+	}
+	/*----------  Controlador Totales Carrito Venta  ----------*/
+	public function cargarTotalesCarritoVentaControlador()
+	{
+?>
+		<div class="columns is-full">
+			<div class="card">
+				<header class="card-header">
+					<div class="columns">
+						<div class="column is-two-fifths">
+							<p class="card-header-title">SUBTOTAL:</p>
+						</div>
+						<div class="column  is-three-fifths">
+							<P class="card-header-title"><?php echo MONEDA_SIMBOLO . " " . number_format($_SESSION['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></P>
+						</div>
+					</div>
+				</header>
+				<header class="card-header">
+					<div class="columns">
+						<div class="column is-two-fifths">
+							<p class="card-header-title">DESCUENTO:</p>
+						</div>
+						<div class="column is-three-fifths">
+							<P class="card-header-title"><?php echo MONEDA_SIMBOLO . " " . number_format($_SESSION['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></P>
+						</div>
+					</div>
+
+				</header>
+				<header class="card-header">
+					<div class="columns">
+						<div class="column is-two-fifths">
+							<p class="card-header-title">TOTAL A PAGAR:</p>
+						</div>
+						<div class="column is-three-fifths">
+							<h4 class="card-header-title"><?php echo MONEDA_SIMBOLO . " " . number_format($_SESSION['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></h4>
+						</div>
+					</div>
+
+				</header>
+			</div>
+		</div>
+
+<?php
+
+
 	}
 }

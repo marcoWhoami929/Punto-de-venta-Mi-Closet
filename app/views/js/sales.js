@@ -1,4 +1,4 @@
-var url = "http://localhost/pos/";
+var urlPathNew = "http://localhost/pos/";
 /* Detectar cuando se envia el formulario para agregar producto */
 let sale_form_barcode = document.querySelector("#sale-barcode-form");
 sale_form_barcode.addEventListener("submit", function (event) {
@@ -35,15 +35,26 @@ function agregar_producto() {
       datos.append("porc_descuento", descuento);
       datos.append("modulo_venta", "agregar_producto");
     }
-
-    fetch(url + path, {
-      method: "POST",
-      body: datos,
-    })
-      .then((respuesta) => respuesta.json())
+     new Promise(function (resolve) {
+    resolve(
+      fetch(urlPathNew + path, {
+        method: "POST",
+        body: datos,
+      })
+        .then((respuesta) => respuesta.json())
       .then((respuesta) => {
-        return alertas_ajax(respuesta);
-      });
+        $(".alerta_producto").html('<div class="notification is-success is-light ">'+respuesta+'</div>');
+      })
+    );
+  }).then(function (result) {
+   
+    cargarCarritoVenta();
+    setTimeout(function() {
+      document.getElementById("sale-barcode-input").value = "";
+      $(".alerta_producto").html('').fadeIn("slow");;
+    }, 2000);
+  });
+    
   } else {
     Swal.fire({
       icon: "error",
@@ -54,37 +65,7 @@ function agregar_producto() {
   }
 }
 
-/*----------  Buscar codigo  ----------*/
-/*
-function buscar_codigo() {
-  let input_codigo = document.querySelector("#input_codigo").value;
 
-  input_codigo = input_codigo.trim();
-
-  if (input_codigo != "") {
-    let datos = new FormData();
-    datos.append("buscar_codigo", input_codigo);
-    datos.append("modulo_venta", "buscar_codigo");
-
-    fetch(url + "app/ajax/ventaAjax.php", {
-      method: "POST",
-      body: datos,
-    })
-      .then((respuesta) => respuesta.text())
-      .then((respuesta) => {
-        let tabla_productos = document.querySelector("#tabla_productos");
-        tabla_productos.innerHTML = respuesta;
-      });
-  } else {
-    Swal.fire({
-      icon: "error",
-      title: "Ocurrió un error inesperado",
-      text: "Debes de introducir el Nombre, Marca o Modelo del producto",
-      confirmButtonText: "Aceptar",
-    });
-  }
-}
-*/
 
 /*----------  Agregar codigo  ----------*/
 function agregar_codigo($codigo) {
@@ -92,39 +73,80 @@ function agregar_codigo($codigo) {
   setTimeout("agregar_producto()", 100);
 }
 
-/* Actualizar cantidad de producto */
-function actualizar_cantidad(id, codigo) {
-  let cantidad = document.querySelector(id).value;
-  var porcentaje = $("#descuento").val();
+function actualizarProductoCarrito(codigo,cantidad){
+  var tipo_busqueda = $("#tipo_busqueda").val();
+  let datos = new FormData();
+  var actual = cantidad
 
-  cantidad = cantidad.trim();
-  codigo.trim();
-
-  if (cantidad > 0) {
-    let datos = new FormData();
+  var cantidad = Number.parseInt(actual);
+  if (tipo_busqueda == "nota") {
+   
+    var path = "app/ajax/notasAjax.php";
+    datos.append("cantidad", cantidad);
     datos.append("codigo", codigo);
-    datos.append("producto_cantidad", cantidad);
-    datos.append("porc_descuento", porcentaje);
+    datos.append("modulo_notas", "actualizar_producto_nota");
+  } else {
+  
+    var path = "app/ajax/ventaAjax.php";
+    datos.append("cantidad", cantidad);
+    datos.append("codigo", codigo);
     datos.append("modulo_venta", "actualizar_producto");
-
-    fetch(url + "app/ajax/ventaAjax.php", {
+  }
+   new Promise(function (resolve) {
+  resolve(
+    fetch(urlPathNew + path, {
       method: "POST",
       body: datos,
     })
       .then((respuesta) => respuesta.json())
-      .then((respuesta) => {
-        return alertas_ajax(respuesta);
-      });
-  } else {
-    Swal.fire({
-      icon: "error",
-      title: "Ocurrió un error inesperado",
-      text: "Debes de introducir una cantidad mayor a 0",
-      confirmButtonText: "Aceptar",
-    });
-  }
+    .then((respuesta) => {
+      $(".alerta_producto").html('<div class="notification is-success is-light ">'+respuesta+'</div>');
+    })
+  );
+}).then(function (result) {
+ 
+  cargarCarritoVenta();
+  setTimeout(function() {
+    document.getElementById("sale-barcode-input").value = "";
+    $(".alerta_producto").html('').fadeIn("slow");;
+  }, 2000);
+});
 }
+function removerProductoCarrito(codigo){
+  let datos = new FormData();
+  var tipo_busqueda = $("#tipo_busqueda").val();
+  if (tipo_busqueda == "nota") {
+   
+    var path = "app/ajax/notasAjax.php";
+    datos.append("codigo", codigo);
+    datos.append("modulo_notas", "remover_producto_nota");
+  } else {
+  
+    var path = "app/ajax/ventaAjax.php";
+    datos.append("codigo", codigo);
+    datos.append("modulo_venta", "remover_producto");
+  }
+   new Promise(function (resolve) {
+  resolve(
+    fetch(urlPathNew + path, {
+      method: "POST",
+      body: datos,
+    })
+      .then((respuesta) => respuesta.json())
+    .then((respuesta) => {
+      $(".alerta_producto").html('<div class="notification is-success is-light ">'+respuesta+'</div>');
+    })
+  );
+}).then(function (result) {
+ 
+  cargarCarritoVenta();
+  setTimeout(function() {
 
+    $(".alerta_producto").html('').fadeIn("slow");;
+  }, 2000);
+});
+
+}
 /*----------  Buscar cliente  ----------*/
 function buscar_cliente() {
   let input_cliente = document.querySelector("#input_cliente").value;
@@ -136,7 +158,7 @@ function buscar_cliente() {
     datos.append("buscar_cliente", input_cliente);
     datos.append("modulo_venta", "buscar_cliente");
 
-    fetch(url + "app/ajax/ventaAjax.php", {
+    fetch(urlPathNewPath + "app/ajax/ventaAjax.php", {
       method: "POST",
       body: datos,
     })
@@ -161,7 +183,7 @@ function agregar_cliente(id) {
   datos.append("id_cliente", id);
   datos.append("modulo_venta", "agregar_cliente");
 
-  fetch(url + "app/ajax/ventaAjax.php", {
+  fetch(urlPathNew + "app/ajax/ventaAjax.php", {
     method: "POST",
     body: datos,
   })
@@ -188,7 +210,7 @@ function remover_cliente(id) {
       datos.append("id_cliente", id);
       datos.append("modulo_venta", "remover_cliente");
 
-      fetch(url + "app/ajax/ventaAjax.php", {
+      fetch(urlPathNew + "app/ajax/ventaAjax.php", {
         method: "POST",
         body: datos,
       })
@@ -251,7 +273,7 @@ function actualizarEstatus(tabla, id, estatus, estatus_pago) {
   datos.append("estatus_pago", estatus_pago);
   datos.append("modulo_venta", "actualizar_estatus");
 
-  fetch(url + "app/ajax/ventaAjax.php", {
+  fetch(urlPathNew + "app/ajax/ventaAjax.php", {
     method: "POST",
     body: datos,
   })
@@ -328,7 +350,7 @@ function confirmacionPago() {
       datos.append("referencia_venta", "");
       datos.append("modulo_venta", "generar_pago_venta");
 
-      fetch(url + "app/ajax/ventaAjax.php", {
+      fetch(urlPathNew + "app/ajax/ventaAjax.php", {
         method: "POST",
         body: datos,
       })
@@ -347,7 +369,7 @@ function confirmacionPago() {
     datos.append("referencia_venta", referencia_venta);
     datos.append("modulo_venta", "generar_pago_venta");
 
-    fetch(url + "app/ajax/ventaAjax.php", {
+    fetch(urlPathNew + "app/ajax/ventaAjax.php", {
       method: "POST",
       body: datos,
     })

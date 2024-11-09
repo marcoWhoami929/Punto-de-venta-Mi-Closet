@@ -73,6 +73,14 @@ if (isset($_POST['modulo_venta'])) {
 	if ($_POST['modulo_venta'] == "generar_pago_venta") {
 		echo $insVenta->generarPagoVentaControlador();
 	}
+	/*--------- Cargar carrito ---------*/
+	if ($_POST['modulo_venta'] == "carrito_venta") {
+		echo $insVenta->cargarCarritoVentaControlador();
+	}
+	/*--------- totales carrito ---------*/
+	if ($_POST['modulo_venta'] == "totales_carrito_venta") {
+		echo $insVenta->cargarTotalesCarritoVentaControlador();
+	}
 } else {
 	session_destroy();
 	header("Location: " . APP_URL . "login/");
