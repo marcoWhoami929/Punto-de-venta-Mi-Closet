@@ -3,7 +3,7 @@
     <h2 class="subtitle"><i class="fas fa-search fa-fw"></i> &nbsp; Buscar clientes</h2>
 </div>
 
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
     <?php
 
     use app\controllers\clientController;

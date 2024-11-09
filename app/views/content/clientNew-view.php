@@ -3,7 +3,7 @@
 	<h2 class="subtitle"><i class="fas fa-male fa-fw"></i> &nbsp; Nuevo cliente</h2>
 </div>
 
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
 
 	<form class="FormularioAjax" action="<?php echo APP_URL; ?>app/ajax/clienteAjax.php" method="POST" autocomplete="off">
 

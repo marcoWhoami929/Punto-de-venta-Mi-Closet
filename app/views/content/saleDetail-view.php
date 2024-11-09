@@ -3,7 +3,7 @@
 	<h2 class="subtitle"><i class="fas fa-shopping-bag fa-fw"></i> &nbsp; Información de venta</h2>
 </div>
 
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
 	<?php
 
 	include "./app/views/inc/btn_back.php";
@@ -108,7 +108,7 @@
 			</div>
 		</div>
 
-		<div class="columns pb-6 pt-6">
+		<div class="columns pb-6">
 			<div class="column">
 
 				<div class="full-width sale-details text-condensedLight">
@@ -168,7 +168,7 @@
 
 		</div>
 
-		<div class="columns pb-6 pt-6">
+		<div class="columns pb-6">
 			<div class="column">
 				<div class="table-container">
 					<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
@@ -253,7 +253,7 @@
 			</div>
 		</div>
 
-		<div class="columns pb-6 pt-6">
+		<div class="columns pb-6">
 			<p class="has-text-centered full-width">
 				<?php
 				echo '<button type="button" class="button is-link is-light is-medium" onclick="print_invoice(\'' . APP_URL . 'app/pdf/invoice.php?code=' . $datos_venta['codigo'] . '\')" title="Imprimir nota Nro. ' . $datos_venta['id_venta'] . '" >

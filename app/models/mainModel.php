@@ -239,6 +239,61 @@ class mainModel
 		$tabla .= '</nav>';
 		return $tabla;
 	}
+	/*---------- Paginador de tablas ----------*/
+	public function paginadorTablasListado($pagina, $vista, $numeroPaginas, $botones)
+	{
+		$tabla = '<nav class="pagination is-centered is-rounded" role="navigation" aria-label="pagination">';
+
+		if ($pagina <= 1) {
+			$tabla .= '
+			<a class="pagination-previous is-disabled" disabled ><i class="fas fa-arrow-alt-circle-left"></i> &nbsp; Anterior</a>
+			<ul class="pagination-list">
+			';
+		} else {
+			$tabla .= '
+			<a class="pagination-previous" href="javascript:void(0);"  onclick="' . $vista . '(' . ($pagina - 1) . ' )"><i class="fas fa-arrow-alt-circle-left"></i> &nbsp; Anterior</a>
+			<ul class="pagination-list">
+				
+				<li><a class="pagination-link" href="javascript:void(0);"  onclick="' . $vista . '(1)">1</a></li>
+				<li><span class="pagination-ellipsis">&hellip;</span></li>
+			';
+		}
+
+
+		$ci = 0;
+		for ($i = $pagina; $i <= $numeroPaginas; $i++) {
+
+			if ($ci >= $botones) {
+				break;
+			}
+
+			if ($pagina == $i) {
+				$tabla .= '<li><a class="pagination-link is-current" href="javascript:void(0);"  onclick="' . $vista . '(' . $i . ' )">' . $i . '</a></li>';
+			} else {
+				$tabla .= '<li><a class="pagination-link" href="javascript:void(0);"  onclick="' . $vista . '(' . $i . ' )">' . $i . '</a></li>';
+			}
+
+			$ci++;
+		}
+
+
+		if ($pagina == $numeroPaginas) {
+			$tabla .= '
+			</ul>
+			<a class="pagination-next is-disabled" disabled ><i class="fas fa-arrow-alt-circle-right"></i> &nbsp; Siguiente</a>
+			';
+		} else {
+			$tabla .= '
+				<li><span class="pagination-ellipsis">&hellip;</span></li>
+				<li><a class="pagination-link" href="javascript:void(0);"  onclick="' . $vista . '(' . $numeroPaginas . ' )">' . $numeroPaginas . '</a></li>
+			</ul>
+			<a class="pagination-next" href="javascript:void(0);"  onclick="' . $vista . '(' . $numeroPaginas . ' )"><i class="fas fa-arrow-alt-circle-right"></i> &nbsp; Siguiente</a>
+			';
+		}
+
+		$tabla .= '</nav>';
+		return $tabla;
+	}
 
 
 	/*----------  Funcion generar select ----------*/

@@ -59,7 +59,7 @@ $total_ventas = $insLogin->seleccionarDatos("Normal", "venta", "id_venta", 0);
 	</div>
 </div>
 
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
 
 	<div class="columns pb-6">
 		<div class="column">

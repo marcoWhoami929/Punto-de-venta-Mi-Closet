@@ -12,7 +12,7 @@
 		<h2 class="subtitle"><i class="fas fa-camera"></i> &nbsp; Actualizar foto de perfil</h2>
 	<?php } ?>
 </div>
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
 	<?php
 
 	include "./app/views/inc/btn_back.php";

@@ -12,7 +12,7 @@
 		<h2 class="subtitle"><i class="fas fa-sync-alt"></i> &nbsp; Actualizar usuario</h2>
 	<?php } ?>
 </div>
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
 	<?php
 
 	include "./app/views/inc/btn_back.php";
@@ -46,7 +46,7 @@
 				<div class="column">
 					<div class="control">
 						<label>Nombre Completo <?php echo CAMPO_OBLIGATORIO; ?></label>
-						<input class="input" type="text" name="nombre" pattern="[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,40}" maxlength="40" value="<?php echo $datos['nombre']; ?>" required>
+						<input class="input" type="text" name="nombre" value="<?php echo $datos['nombre']; ?>" required>
 					</div>
 				</div>
 				<div class="column">
@@ -82,9 +82,6 @@
 						</select>
 					</div>
 				</div>
-
-			</div>
-			<div class="columns">
 				<div class="column">
 					<label>Perfil de usuario <?php echo CAMPO_OBLIGATORIO; ?></label><br>
 					<div class="select">
@@ -103,7 +100,9 @@
 						</select>
 					</div>
 				</div>
+
 			</div>
+
 			<br><br>
 			<p class="has-text-centered">
 				SI desea actualizar la clave de este usuario por favor llene los 2 campos. Si NO desea actualizar la clave deje los campos vacíos.

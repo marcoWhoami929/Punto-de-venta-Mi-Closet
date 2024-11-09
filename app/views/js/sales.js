@@ -55,6 +55,7 @@ function agregar_producto() {
 }
 
 /*----------  Buscar codigo  ----------*/
+/*
 function buscar_codigo() {
   let input_codigo = document.querySelector("#input_codigo").value;
 
@@ -83,6 +84,7 @@ function buscar_codigo() {
     });
   }
 }
+*/
 
 /*----------  Agregar codigo  ----------*/
 function agregar_codigo($codigo) {

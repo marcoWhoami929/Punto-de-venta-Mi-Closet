@@ -3,7 +3,7 @@
 	<h2 class="subtitle"><i class="fas fa-sync-alt"></i> &nbsp; Actualizar producto</h2>
 </div>
 
-<div class="container pb-6 pt-6">
+<div class="container  is-fluid pb-6">
 	<?php
 
 	include "./app/views/inc/btn_back.php";
@@ -17,6 +17,14 @@
 	?>
 
 		<div class="columns is-flex is-justify-content-center">
+			<svg id="barras">
+				<script>
+					JsBarcode("#barras", "<?= $datos['codigo'] ?>", {
+						format: "CODE128"
+					});
+				</script>
+			</svg>
+			<!--
 			<figure class="full-width mb-3" style="max-width: 170px;">
 				<?php
 				if (is_file("./app/views/productos/" . $datos['foto'])) {
@@ -26,6 +34,7 @@
 				}
 				?>
 			</figure>
+			-->
 		</div>
 
 		<h2 class="title has-text-centered"><?php echo $datos['nombre'] . " (Stock: " . $datos['stock_total'] . " " . $datos['tipo_unidad'] . ")"; ?></h2>
@@ -133,12 +142,19 @@
 
 
 			</div>
-			<p class="has-text-centered">
-				<button type="submit" class="button is-success is-rounded"><i class="fas fa-sync-alt"></i> &nbsp; Actualizar</button>
-			</p>
-			<p class="has-text-centered pt-6">
-				<small>Los campos marcados con <?php echo CAMPO_OBLIGATORIO; ?> son obligatorios</small>
-			</p>
+			<div class="columns  pt-6">
+				<div class="column">
+					<p class="has-text-centered">
+						<button type="submit" class="button is-success is-rounded"><i class="fas fa-sync-alt"></i> &nbsp; Actualizar</button>
+					</p>
+					<p class="has-text-centered pt-6">
+						<small>Los campos marcados con <?php echo CAMPO_OBLIGATORIO; ?> son obligatorios</small>
+					</p>
+				</div>
+
+
+			</div>
+
 		</form>
 	<?php
 	} else {
@@ -146,3 +162,11 @@
 	}
 	?>
 </div>
+<style>
+	#barras {
+
+		width: 300px;
+		border-radius: 10px;
+		margin: 10px 0px;
+	}
+</style>

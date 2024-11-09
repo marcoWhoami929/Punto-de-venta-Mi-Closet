@@ -33,17 +33,6 @@ class userController extends mainModel
 			exit();
 		}
 
-		# Verificando integridad de los datos #
-		if ($this->verificarDatos("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,40}", $nombre)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El NOMBRE no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
 
 		if ($this->verificarDatos("[a-zA-Z0-9]{4,20}", $usuario)) {
 			$alerta = [
@@ -581,17 +570,6 @@ class userController extends mainModel
 			exit();
 		}
 
-		# Verificando integridad de los datos #
-		if ($this->verificarDatos("[a-zA-ZáéíóúÁÉÍÓÚñÑ ]{3,40}", $nombre)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El NOMBRE no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
 
 		if ($this->verificarDatos("[a-zA-Z0-9]{4,20}", $usuario)) {
 			$alerta = [

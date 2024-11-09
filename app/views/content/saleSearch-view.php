@@ -3,7 +3,7 @@
     <h2 class="subtitle"><i class="fas fa-search-dollar fa-fw"></i> &nbsp; Buscar ventas por código</h2>
 </div>
 
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
     <?php
 
     use app\controllers\saleController;
@@ -13,7 +13,7 @@
     if (!isset($_SESSION[$url[0]]) && empty($_SESSION[$url[0]])) {
     ?>
         <div class="columns">
-            <div class="column">
+            <div class="column is-half">
                 <form class=FormularioAjaxNew action="<?php echo APP_URL; ?>app/ajax/buscadorAjax.php" method="POST" autocomplete="off">
                     <input type="hidden" name="modulo_buscador" value="buscar">
                     <input type="hidden" name="modulo_url" value="<?php echo $url[0]; ?>">
@@ -30,19 +30,17 @@
                 </form>
             </div>
             <div class="column">
-                <form class=FormularioAjaxNew action="<?php echo APP_URL; ?>app/ajax/buscadorAjax.php" method="POST" autocomplete="off">
-                    <input type="hidden" name="modulo_buscador" value="filtrar">
-                    <input type="hidden" name="modulo_url" value="<?php echo $url[0]; ?>">
-                    <div class="select">
-                        <label>Tipo Entrega</label>
-                        <select id="filtro-tipo-entrega" name="filtro-tipo-entrega">
-                            <option value="">Todos</option>
-                            <option value="recoleccion">Recolección</option>
-                            <option value="envio">Envio</option>
-                        </select>
-                    </div>
-                </form>
+
+                <label>Tipo Entrega</label><br>
+                <div class="select">
+                    <select id="filtro-tipo-entrega" name="filtro-tipo-entrega">
+                        <option value="">Todos</option>
+                        <option value="recoleccion">Recolección</option>
+                        <option value="envio">Envio</option>
+                    </select>
+                </div>
             </div>
+
         </div>
     <?php
 

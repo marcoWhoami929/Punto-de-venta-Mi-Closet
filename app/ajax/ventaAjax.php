@@ -11,8 +11,14 @@ if (isset($_POST['modulo_venta'])) {
 	$insVenta = new saleController();
 
 	/*--------- Buscar producto por codigo ---------*/
-	if ($_POST['modulo_venta'] == "buscar_codigo") {
-		echo $insVenta->buscarCodigoVentaControlador();
+	if ($_POST['modulo_venta'] == "listado_productos") {
+		$datos = array(
+			"busqueda" => $_POST["buscar_codigo"],
+			"page" => $_POST["page"],
+			"vista" => $_POST["vista"],
+		);
+
+		echo $insVenta->buscarCodigoVentaControlador($datos);
 	}
 
 	/*--------- Agregar producto a carrito ---------*/

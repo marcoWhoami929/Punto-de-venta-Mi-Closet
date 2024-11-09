@@ -1908,6 +1908,7 @@ fieldset[disabled] .button {
   margin: 0 auto;
   position: relative;
   width: auto;
+  
 }
 .container.is-fluid {
   max-width: none !important;

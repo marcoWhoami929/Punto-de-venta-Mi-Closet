@@ -98,24 +98,6 @@ html {
   justify-content: space-between;
 }
 
-/*  Scrolls */
-.scroll::-webkit-scrollbar {
-  width: 8px;
-}
-.scroll::-webkit-scrollbar-thumb {
-  background: rgba(102, 107, 122, 1);
-}
-.scroll::-webkit-scrollbar-thumb:active,
-.scroll::-webkit-scrollbar-thumb:hover {
-  background: rgba(102, 107, 122, 1);
-}
-.scroll::-webkit-scrollbar-track {
-  background: rgba(29, 30, 34, 1);
-}
-.scroll::-webkit-scrollbar-track:hover,
-.scroll::-webkit-scrollbar-track:active {
-  background: rgba(29, 30, 34, 1);
-}
 /*=============Estilos barra superior*/
 .navBar {
   background-color: #b99654;

@@ -3,7 +3,7 @@
     <h2 class="subtitle"><i class="fas fa-boxes fa-fw"></i> &nbsp; Productos por categoría</h2>
 </div>
 
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
     <?php
 
     use app\controllers\productController;

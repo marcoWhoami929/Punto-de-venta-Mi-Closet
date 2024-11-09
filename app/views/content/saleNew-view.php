@@ -3,7 +3,7 @@
     <h2 class="subtitle"><i class="fas fa-cart-plus fa-fw"></i> &nbsp; Nueva venta</h2>
 </div>
 
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
     <?php
     $check_empresa = $insLogin->seleccionarDatos("Normal", "empresa LIMIT 1", "*", 0);
 
@@ -17,10 +17,22 @@
                 <p class="has-text-centered pt-6 pb-6">
                     <small>Para agregar productos debe de digitar el código de barras en el campo "Código de producto" y luego presionar &nbsp; <strong class="is-uppercase"><i class="far fa-check-circle"></i> &nbsp; Agregar producto</strong>. También puede agregar el producto mediante la opción &nbsp; <strong class="is-uppercase"><i class="fas fa-search"></i> &nbsp; Buscar producto</strong>. Ademas puede escribir el código de barras y presionar la tecla <strong class="is-uppercase">enter</strong></small>
                 </p>
+                <div class="column">
+                    <div id="reader" width="600px"></div>
+                    <div class="mt-2 w-full">
+                        <div class="select">
+                            <select class="form-select" id="listaCamaras" onchange="camaraSeleccionada(this)">
+
+                            </select>
+                        </div>
+
+                        <button class="button is-link" onclick="detenerCamara()">Detener camara</button>
+                    </div>
+                </div>
                 <form class="pt-6 pb-6" id="sale-barcode-form" autocomplete="off">
                     <div class="columns">
                         <div class="column is-one-quarter">
-                            <button type="button" class="button is-link is-light js-modal-trigger" data-target="modal-js-product"><i class="fas fa-search"></i> &nbsp; Buscar producto</button>
+                            <button type="button" class="button is-link js-modal-trigger" data-target="modal-js-product"><i class="fas fa-search"></i> &nbsp; Buscar producto</button>
                         </div>
                         <div class="column">
                             <div class="field is-grouped">
@@ -29,6 +41,7 @@
                                     <input type="hidden" id="tipo_busqueda" value="venta">
                                 </p>
                                 <a class="control">
+
                                     <button type="submit" class="button is-info">
                                         <i class="far fa-check-circle"></i> &nbsp; Agregar producto
                                     </button>
@@ -84,123 +97,156 @@
                 }
                 ?>
                 <div class="table-container">
-                    <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-                        <thead style="background:#B99654;color:#ffffff;">
-                            <tr>
-                                <th class="has-text-centered" style="color:#ffffff">#</th>
-                                <th class="has-text-centered" style="color:#ffffff">Código de barras</th>
-                                <th class="has-text-centered" style="color:#ffffff">Producto</th>
-                                <th class="has-text-centered" style="color:#ffffff">Cant.</th>
-                                <th class="has-text-centered" style="color:#ffffff">Precio</th>
-                                <th class="has-text-centered" style="color:#ffffff">% Desc</th>
-                                <th class="has-text-centered" style="color:#ffffff">Desc</th>
-                                <th class="has-text-centered" style="color:#ffffff">Subtotal</th>
-                                <th class="has-text-centered" style="color:#ffffff">Total</th>
-                                <th class="has-text-centered" style="color:#ffffff">Actualizar</th>
-                                <th class="has-text-centered" style="color:#ffffff">Remover</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php
-                            if (isset($_SESSION['datos_producto_venta']) && count($_SESSION['datos_producto_venta']) >= 1) {
+                    <?php
+                    $tabla = "";
 
-                                $_SESSION['total'] = 0;
-                                $_SESSION['subtotal'] = 0;
-                                $_SESSION['descuento'] = 0;
-                                $cc = 1;
+                    foreach ($_SESSION['datos_producto_venta'] as $productos) {
 
-                                foreach ($_SESSION['datos_producto_venta'] as $productos) {
-                            ?>
-                                    <tr class="has-text-centered">
-                                        <td><?php echo $cc; ?></td>
-                                        <td><?php echo $productos['codigo']; ?></td>
-                                        <td><?php echo $productos['descripcion']; ?></td>
-                                        <td>
-                                            <div class="control">
-                                                <input class="input sale_input-cant has-text-centered" value="<?php echo $productos['cantidad']; ?>" id="sale_input_<?php echo str_replace(" ", "_", $productos['codigo']); ?>" onchange="actualizar_cantidad('#sale_input_<?php echo str_replace(" ", "_", $productos['codigo']); ?>','<?php echo $productos['codigo']; ?>')" type="number" style="max-width: 80px;">
+                        $_SESSION['total'] = 0;
+                        $_SESSION['subtotal'] = 0;
+                        $_SESSION['descuento'] = 0;
+                        $cc = 1;
+
+                        if (is_file("./app/views/productos/" . $productos['foto'])) {
+                            $foto = '<img src="' . APP_URL . 'app/views/productos/' . $productos['foto'] . '">';
+                        } else {
+                            $foto = '<img src="' . APP_URL . 'app/views/productos/default.png">';
+                        }
+
+
+                        $tabla .= '<div class="card pt-4">
+                                    <header class="card-header">
+                                        <div class="columns">
+                                            <div class="column">
+                                                 <p class="card-header-title"><strong>' . $productos['descripcion'] . '</strong></p>
                                             </div>
-                                        </td>
-                                        <td><?php echo MONEDA_SIMBOLO . number_format($productos['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
-                                        <td>
-                                            <div class="control">
-                                                <input class="input sale_input-cant has-text-centered" value="<?php echo $productos['porc_descuento']; ?>" id="porc_descuento<?php echo str_replace(" ", "_", $productos['codigo']); ?>" type="number" style="max-width: 80px;" readonly>
+                                            <div class="column">
+                                                     <p class="card-header-title"><strong>' . $productos['codigo'] . '</strong></p>
                                             </div>
-                                        </td>
-                                        <td><?php echo MONEDA_SIMBOLO . number_format($productos['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
-                                        <td><?php echo MONEDA_SIMBOLO . number_format($productos['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
-                                        <td><?php echo MONEDA_SIMBOLO . number_format($productos['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></td>
+                                            <div class="column">
+                                            <button type="submit" class="button is-danger is-rounded " title="Remover producto">
+                                                            <i class="fas fa-trash fa-fw"></i>
+                                                        </button>
+                                            </div>
+                                        </div>
+                                    </header>
+                                    <div class="card-content">
+                                        <div class="content">
+                                            <div class="columns">
+                                                <div class="column">
+                                                    <figure class="media-left">
+                                                        <p class="image is-64x64">
+                                                            ' . $foto . '
+                                                        </p>
+                                                        </figure>
+                                                </div>
+                                             
+                                                <div class="column is-two-fifths">
+                                                    <div class="columns ">
+                                                        <div class="column">
+                                                             <button type="button" class="button is-danger is-rounded">
+                                                                    <i class="fas fa-minus "></i>
+                                                             </button>
+                                                        </div>
+                                                        <div class="column ">
+                                                             <input class="input sale_input-cant has-text-centered" value="' . $productos['cantidad'] . '"  type="text"  >
+                                                        </div>
+                                                        <div class="column">
+                                                             <button type="button" class="button is-danger is-rounded">
+                                                                    <i class="fas fa-plus "></i>
+                                                             </button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                 <div class="column">
+                                                        <div class="columns">
+                                                        <label><strong>Precio:</strong></label>
+                                                        </div>
+                                                        <div class="columns">
+                                                        ' . MONEDA_SIMBOLO . " " . number_format($productos['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+                                                         </div>
+                                                </div>
+                                                <div class="column">
+                                                        <div class="columns">
+                                                        <label><strong>Descuento:</strong></label>
+                                                        </div>
+                                                        <div class="columns">
+                                                        ' . MONEDA_SIMBOLO . " " . number_format($productos['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+                                                        </div>
+                                                </div>
+                                                  
+                                            </div>
+                                            
+                                            
+                                        </div>
+                                    </div>
+                                    <footer class="card-footer">
+                                        
+                                        <a href="#" class="card-footer-item">
+                                            <div class="columns has-text-centered">
+                                            <label><strong>Subtotal:</strong></label>
+                                            </div>
+                                            <div class="columns pt-4">
+                                            ' . MONEDA_SIMBOLO . " " . number_format($productos['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+                                            </div>
+                                        </a>
+                                        <a href="#" class="card-footer-item">
+                                         <div class="columns has-text-centered">
+                                          <label><strong>Total:</strong></label>
+                                        </div>
+                                        <div class="columns pt-4">
+                                        ' . MONEDA_SIMBOLO . " " . number_format($productos['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+                                        </div>
+                                        </a>
+                                    </footer>
+                                    </div>';
+                        $cc++;
+                        $_SESSION['subtotal'] += $productos['subtotal'];
+                        $_SESSION['descuento'] += $productos['descuento'];
+                        $_SESSION['total'] += $productos['total'];
+                    }
+                    echo $tabla;
+                    ?>
 
-                                        <td>
-                                            <button type="button" class="button is-success is-rounded is-small" onclick="actualizar_cantidad('#sale_input_<?php echo str_replace(" ", "_", $productos['codigo']); ?>','<?php echo $productos['codigo']; ?>')">
-                                                <i class="fas fa-redo-alt fa-fw"></i>
-                                            </button>
-                                        </td>
-                                        <td>
-                                            <form class="FormularioAjax" action="<?php echo APP_URL; ?>app/ajax/ventaAjax.php" method="POST" autocomplete="off">
+                </div>
 
-                                                <input type="hidden" name="codigo" value="<?php echo $productos['codigo']; ?>">
-                                                <input type="hidden" name="modulo_venta" value="remover_producto">
+                <div class="container container-totales">
+                    <div class="columns">
+                        <div class="card">
+                            <header class="card-header">
+                                <div class="columns">
+                                    <div class="column is-two-fifths">
+                                        <p class="card-header-title">SUBTOTAL:</p>
+                                    </div>
+                                    <div class="column">
+                                        <P class="card-header-title"><?php echo MONEDA_SIMBOLO . " " . number_format($_SESSION['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></P>
+                                    </div>
+                                </div>
+                            </header>
+                            <header class="card-header">
+                                <div class="columns">
+                                    <div class="column is-two-fifths">
+                                        <p class="card-header-title">DESCUENTO:</p>
+                                    </div>
+                                    <div class="column">
+                                        <P class="card-header-title"><?php echo MONEDA_SIMBOLO . " " . number_format($_SESSION['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></P>
+                                    </div>
+                                </div>
 
-                                                <button type="submit" class="button is-danger is-rounded is-small" title="Remover producto">
-                                                    <i class="fas fa-trash-restore fa-fw"></i>
-                                                </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                <?php
-                                    $cc++;
-                                    /*
-                                    $_SESSION['subtotal'] += $productos['subtotal'];
-                                    $_SESSION['descuento'] += $productos['descuento'];
-                                    $_SESSION['total'] += $productos['total'];
-                                    */
-                                    $_SESSION['subtotal'] += $productos['subtotal'];
-                                    $_SESSION['descuento'] += $productos['descuento'];
-                                    $_SESSION['total'] += $productos['total'];
-                                }
-                                ?>
-                                <tr class="has-text-centered">
-                                    <td colspan="4"></td>
-                                    <td class="has-text-weight-bold">
-                                        SUBTOTAL
-                                    </td>
-                                    <td class="has-text-weight-bold">
-                                        <?php echo MONEDA_SIMBOLO . number_format($_SESSION['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?>
-                                    </td>
-                                    <td colspan="5"></td>
-                                </tr>
-                                <tr class="has-text-centered">
-                                    <td colspan="4"></td>
-                                    <td class="has-text-weight-bold">
-                                        DESCUENTO
-                                    </td>
-                                    <td class="has-text-weight-bold">
-                                        <?php echo MONEDA_SIMBOLO . number_format($_SESSION['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?>
-                                    </td>
-                                    <td colspan="5"></td>
-                                </tr>
-                                <tr class="has-text-centered">
-                                    <td colspan="4"></td>
-                                    <td class="has-text-weight-bold">
-                                        TOTAL
-                                    </td>
-                                    <td class="has-text-weight-bold">
-                                        <?php echo MONEDA_SIMBOLO . number_format($_SESSION['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?>
-                                    </td>
-                                    <td colspan="5"></td>
-                                </tr>
-                            <?php
-                            } else {
-                                $_SESSION['total'] = 0;
-                            ?>
-                                <tr class="has-text-centered">
-                                    <td colspan="13">
-                                        No hay productos agregados
-                                    </td>
-                                </tr>
-                            <?php } ?>
-                        </tbody>
-                    </table>
+                            </header>
+                            <header class="card-header">
+                                <div class="columns">
+                                    <div class="column is-two-fifths">
+                                        <p class="card-header-title">TOTAL:</p>
+                                    </div>
+                                    <div class="column">
+                                        <P class="card-header-title"><?php echo MONEDA_SIMBOLO . " " . number_format($_SESSION['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE; ?></P>
+                                    </div>
+                                </div>
+
+                            </header>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -337,22 +383,20 @@
 <!-- Modal buscar producto -->
 <div class="modal" id="modal-js-product">
     <div class="modal-background"></div>
-    <div class="modal-card">
-        <header class="modal-card-head">
-            <p class="modal-card-title is-uppercase"><i class="fas fa-search"></i> &nbsp; Buscar producto</p>
+    <div class="modal-card" style="width:80%">
+        <header class="modal-card-head" style="background:#B99654">
+            <p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-search"></i> &nbsp; Buscar producto</p>
             <button class="delete" aria-label="close"></button>
         </header>
         <section class="modal-card-body">
             <div class="field mt-6 mb-6">
                 <label class="label">Nombre, marca, modelo, código</label>
                 <div class="control">
-                    <input class="input" type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]{1,30}" placeholder="Ingresa el nombre del producto,marca o código del producto" name="input_codigo" autofocus="autofocus" onkeyup="buscar_codigo()" id="input_codigo" maxlength="30">
+                    <input class="input" type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]{1,30}" placeholder="Ingresa el nombre del producto,marca o código del producto" name="input_codigo" autofocus="autofocus" onkeyup="cargarCatalogoProductos(1)" id="input_codigo" maxlength="30">
                 </div>
             </div>
             <div class="container" id="tabla_productos"></div>
-            <p class="has-text-centered">
-                <button type="button" class="button is-link is-light" onclick="buscar_codigo()"><i class="fas fa-search"></i> &nbsp; Buscar</button>
-            </p>
+
         </section>
     </div>
 </div>

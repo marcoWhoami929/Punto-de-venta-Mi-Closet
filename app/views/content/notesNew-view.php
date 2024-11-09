@@ -12,7 +12,7 @@ $mainModel = new mainModel();
     <h2 class="subtitle"> <i class="fas fa-clipboard-list"></i> &nbsp; Nueva Nota</h2>
 </div>
 
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
     <?php
     if (isset($_SESSION["QrNota"])) {
         $folioNota = $_SESSION["QrNota"];

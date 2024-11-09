@@ -3,7 +3,7 @@
 	<h2 class="subtitle"><i class="fas fa-tag fa-fw"></i> &nbsp; Nueva categoría</h2>
 </div>
 
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
 
 	<form class="FormularioAjax" action="<?php echo APP_URL; ?>app/ajax/categoriaAjax.php" method="POST" autocomplete="off">
 

@@ -8,60 +8,101 @@ class saleController extends mainModel
 {
 
 	/*---------- Controlador buscar codigo de producto ----------*/
-	public function buscarCodigoVentaControlador()
+	public function buscarCodigoVentaControlador($datos)
 	{
 
 		/*== Recuperando codigo de busqueda ==*/
-		$producto = $this->limpiarCadena($_POST['buscar_codigo']);
+		$producto = $this->limpiarCadena($datos['busqueda']);
 
-		/*== Comprobando que no este vacio el campo ==*/
-		if ($producto == "") {
-			return '
-				<article class="message is-warning mt-4 mb-4">
-					 <div class="message-header">
-					    <p>¡Ocurrio un error inesperado!</p>
-					 </div>
-				    <div class="message-body has-text-centered">
-				    	<i class="fas fa-exclamation-triangle fa-2x"></i><br>
-						Debes de introducir el Nombre, Marca o Modelo del producto
-				    </div>
-				</article>';
-			exit();
+		$pagina = $this->limpiarCadena($datos["page"]);
+		$vista = $this->limpiarCadena($datos["vista"]);
+		$registros = "5";
+		$campoOrden = "codigo";
+		$orden = "Asc";
+		$tabla = "";
+
+		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+
+		if (isset($producto) && $producto != "") {
+
+			$consulta_datos = "SELECT * FROM producto WHERE (nombre LIKE '%$producto%' OR marca LIKE '%$producto%' OR modelo LIKE '%$producto%' OR codigo LIKE '%$producto%') ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+			$consulta_total = "SELECT COUNT(id_producto) FROM producto WHERE (nombre LIKE '%$producto%' OR marca LIKE '%$producto%' OR modelo LIKE '%$producto%' OR codigo LIKE '%$producto%')";
+		} else {
+
+			$consulta_datos = "SELECT * FROM producto ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+			$consulta_total = "SELECT COUNT(id_producto) FROM producto";
 		}
 
-		/*== Seleccionando productos en la DB ==*/
-		$datos_productos = $this->ejecutarConsulta("SELECT * FROM producto WHERE (nombre LIKE '%$producto%' OR marca LIKE '%$producto%' OR modelo LIKE '%$producto%' OR codigo LIKE '%$producto%') ORDER BY nombre ASC");
+		$datos = $this->ejecutarConsulta($consulta_datos);
+		$datos = $datos->fetchAll();
 
-		if ($datos_productos->rowCount() >= 1) {
+		$total = $this->ejecutarConsulta($consulta_total);
+		$total = (int) $total->fetchColumn();
 
-			$datos_productos = $datos_productos->fetchAll();
+		$numeroPaginas = ceil($total / $registros);
+
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
 
 			$tabla = '<div class="table-container mb-6"><table class="table is-striped is-narrow is-hoverable is-fullwidth"><tbody>';
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+			$tabla .= '<thead style="background:#B99654;color:#ffffff">
+			<th style="color:#ffffff"></th>
+			<th style="color:#ffffff">Código</th>
+			<th style="color:#ffffff">Producto</th>
+			<th style="color:#ffffff">Precio</th>
+			<th style="color:#ffffff">Stock</th>
+			<th style="color:#ffffff"></th>
+			</thead>';
+			foreach ($datos as $rows) {
 
-			foreach ($datos_productos as $rows) {
+				if (is_file('../views/productos/' . $rows['foto'])) {
+					$foto = '<img class="img-responsive" src="' . APP_URL . 'app/views/productos/' . $rows['foto'] . '">';
+				} else {
+					$foto = '<img class="img-responsive" src="' . APP_URL . 'app/views/productos/default.png">';
+				}
+
 				$tabla .= '
 					<tr class="has-text-left" >
+						<td><figure class="full-width mb-3" style="max-width: 70px;">
+							' . $foto . '
+				
+			</figure></td>
+					    <td><i class="fas fa-barcode fa-fw"></i> &nbsp; ' . $rows['codigo'] . '</td>
                         <td><i class="fas fa-box fa-fw"></i> &nbsp; ' . $rows['nombre'] . '</td>
+						<td><i class="fas fa-dollar-sign fa-fw"></i> &nbsp; ' . $rows['precio_venta'] . '</td>
+							<td><i class="fas fa-cubes fa-fw"></i> &nbsp; ' . $rows['stock_total'] . '</td>
                         <td class="has-text-centered">
-                            <button type="button" class="button is-link is-rounded is-small" onclick="agregar_codigo(\'' . $rows['codigo'] . '\')"><i class="fas fa-plus-circle"></i></button>
+                            <button type="button" class="button is-link is-rounded is-medium" onclick="agregar_codigo(\'' . $rows['codigo'] . '\')">Agregar&nbsp;<i class="fas fa-plus-circle"></i></button>
                         </td>
                     </tr>
                     ';
+				$contador++;
+			}
+			$pag_final = $contador - 1;
+			$tabla .= '</tbody></table></div>';
+			### Paginacion ###
+			if ($total > 0 && $pagina <= $numeroPaginas) {
+				$tabla .= '<p class="has-text-right">Mostrando productos <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+
+				$tabla .= $this->paginadorTablasListado($pagina, $vista, $numeroPaginas, 7);
 			}
 
-			$tabla .= '</tbody></table></div>';
 			return $tabla;
 		} else {
-			return '<article class="message is-warning mt-4 mb-4">
-					 <div class="message-header">
-					    <p>¡Ocurrio un error inesperado!</p>
-					 </div>
-				    <div class="message-body has-text-centered">
-				    	<i class="fas fa-exclamation-triangle fa-2x"></i><br>
-						No hemos encontrado ningún producto en el sistema que coincida con <strong>“' . $producto . '”
-				    </div>
-				</article>';
-
+			return '
+			<article class="message is-warning mt-4 mb-4">
+				 <div class="message-header">
+					<p>¡Ocurrio un error inesperado!</p>
+				 </div>
+				<div class="message-body has-text-centered">
+					<i class="fas fa-exclamation-triangle fa-2x"></i><br>
+					Debes de introducir el Nombre, Marca o Modelo del producto
+				</div>
+			</article>';
 			exit();
 		}
 	}
@@ -143,6 +184,7 @@ class saleController extends mainModel
 			$_SESSION['datos_producto_venta'][$codigo] = [
 				"id_producto" => $value['id_producto'],
 				"codigo" => $value['codigo'],
+				"foto" => $value['foto'],
 				"stock_total" => $stock_total,
 				"stock_total_old" => $value['stock_total'],
 				"precio_compra" => $value['precio_compra'],
@@ -183,6 +225,7 @@ class saleController extends mainModel
 			$_SESSION['datos_producto_venta'][$codigo] = [
 				"id_producto" => $value['id_producto'],
 				"codigo" => $value['codigo'],
+				"foto" => $value['foto'],
 				"stock_total" => $stock_total,
 				"stock_total_old" => $value['stock_total'],
 				"precio_compra" => $value['precio_compra'],
@@ -412,9 +455,11 @@ class saleController extends mainModel
 			$total = ($subtotal - $descuento);
 			$total = number_format($total, MONEDA_DECIMALES, '.', '');
 
+
 			$_SESSION['datos_producto_venta'][$codigo] = [
 				"id_producto" => $value['id_producto'],
 				"codigo" => $value['codigo'],
+				"foto" => $value['foto'],
 				"stock_total" => $stock_total,
 				"stock_total_old" => $value['stock_total'],
 				"precio_compra" => $value['precio_compra'],
@@ -424,7 +469,8 @@ class saleController extends mainModel
 				"cantidad" => $detalle_cantidad,
 				"subtotal" => $subtotal,
 				"total" => $total,
-				"descripcion" => $value['nombre']
+				"descripcion" => $value['nombre'],
+				"dsad" => 'sdsd'
 			];
 
 			$_SESSION['alerta_producto_agregado'] = "Se $diferencia_productos <strong>" . $value['nombre'] . "</strong> a la venta. Total en carrito <strong>$detalle_cantidad</strong>";
@@ -1298,6 +1344,7 @@ class saleController extends mainModel
 			$_SESSION['datos_producto_venta'][$value["codigo"]] = [
 				"id_producto" => $value['id_producto'],
 				"codigo" => $value['codigo'],
+				"foto" => $value['foto'],
 				"stock_total" => $value['stock_total'],
 				"stock_total_old" => $value['stock_total_old'],
 				"precio_compra" => $value['precio_compra'],

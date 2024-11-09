@@ -24,7 +24,7 @@ if ($_SESSION['perfil'] == 'Administrador') {
 			<figcaption class="navLateral-body-cr">
 				<span>
 					<?php echo $_SESSION['nombre']; ?><br>
-					<small><?php echo $_SESSION['usuario']; ?></small>
+
 				</span>
 			</figcaption>
 		</figure>

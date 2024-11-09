@@ -2,7 +2,7 @@
 	<h1 class="title">Productos</h1>
 	<h2 class="subtitle"><i class="far fa-image"></i> &nbsp; Actualizar foto de producto</h2>
 </div>
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
 	<?php
 
 	include "./app/views/inc/btn_back.php";

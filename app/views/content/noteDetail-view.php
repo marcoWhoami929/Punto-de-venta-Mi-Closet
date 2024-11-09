@@ -3,7 +3,7 @@
     <h2 class="subtitle"><i class="fas fa-shopping-bag fa-fw"></i> &nbsp; Información de nota</h2>
 </div>
 
-<div class="container pb-6 pt-6">
+<div class="container is-fluid pb-6">
     <?php
 
     include "./app/views/inc/btn_back.php";
@@ -43,7 +43,7 @@
         <form class="FormularioAjax" action="<?php echo APP_URL; ?>app/ajax/notasAjax.php" method="POST" autocomplete="off">
             <input type="hidden" name="modulo_notas" value="actualizar_nota">
             <input type="hidden" name="id_nota" value="<?php echo $datos_nota['id_nota']; ?>">
-            <div class="columns pb-6 pt-6">
+            <div class="columns pb-6">
                 <div class="column">
 
                     <div class="full-width sale-details text-condensedLight">
@@ -109,7 +109,7 @@
             </div>
         </form>
 
-        <div class="columns pb-6 pt-6">
+        <div class="columns pb-6">
             <div class="column">
                 <div class="table-container">
                     <?php

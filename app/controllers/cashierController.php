@@ -40,16 +40,7 @@ class cashierController extends mainModel
 			exit();
 		}
 
-		if ($this->verificarDatos("[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ:# ]{3,70}", $nombre)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El NOMBRE DE CAJA no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
+
 
 		if ($this->verificarDatos("[0-9.]{1,25}", $saldo_inicial)) {
 			$alerta = [
@@ -143,16 +134,18 @@ class cashierController extends mainModel
 
 
 	/*----------  Controlador listar cajas  ----------*/
-	public function listarCajaControlador($pagina, $registros, $url, $busqueda)
+	public function listarCajaControlador($datos)
 	{
 
-		$pagina = $this->limpiarCadena($pagina);
-		$registros = $this->limpiarCadena($registros);
+		$pagina = $this->limpiarCadena($datos["page"]);
+		$registros = $this->limpiarCadena($datos["per_page"]);
+		$campoOrden = $this->limpiarCadena($datos["campoOrden"]);
+		$orden = $this->limpiarCadena($datos["orden"]);
 
-		$url = $this->limpiarCadena($url);
+		$url = $this->limpiarCadena($datos["url"]);
 		$url = APP_URL . $url . "/";
 
-		$busqueda = $this->limpiarCadena($busqueda);
+		$busqueda = $this->limpiarCadena($datos["busqueda"]);
 		$tabla = "";
 
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
@@ -160,12 +153,12 @@ class cashierController extends mainModel
 
 		if (isset($busqueda) && $busqueda != "") {
 
-			$consulta_datos = "SELECT * FROM caja WHERE numero LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' ORDER BY numero ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT * FROM caja WHERE numero LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_caja) FROM caja WHERE numero LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%'";
 		} else {
 
-			$consulta_datos = "SELECT * FROM caja ORDER BY numero ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT * FROM caja ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_caja) FROM caja";
 		}
@@ -208,15 +201,11 @@ class cashierController extends mainModel
 			                    </a>
 			                </td>
 			                <td>
-			                	<form class="FormularioAjax" action="' . APP_URL . 'app/ajax/cajaAjax.php" method="POST" autocomplete="off" >
-
-			                		<input type="hidden" name="modulo_caja" value="eliminar">
-			                		<input type="hidden" name="id_caja" value="' . $rows['id_caja'] . '">
-
-			                    	<button type="submit" class="button is-danger is-rounded is-small">
+			                	
+			                    	<button type="submit" class="button is-danger is-rounded is-small" onclick="eliminarCaja(' . $rows['id_caja'] . ')">
 			                    		<i class="far fa-trash-alt fa-fw"></i>
 			                    	</button>
-			                    </form>
+			                   
 			                </td>
 						</tr>
 					';
@@ -388,16 +377,6 @@ class cashierController extends mainModel
 			exit();
 		}
 
-		if ($this->verificarDatos("[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ:# ]{3,70}", $nombre)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El NOMBRE DE CAJA no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
 
 		if ($this->verificarDatos("[0-9.]{1,25}", $saldo_inicial)) {
 			$alerta = [
