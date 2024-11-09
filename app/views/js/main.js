@@ -77,4 +77,4 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 });
-bulmaTagsinput.attach();
+

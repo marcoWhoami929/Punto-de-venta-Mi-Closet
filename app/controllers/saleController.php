@@ -27,8 +27,8 @@ class saleController extends mainModel
 {
 
 
-	/*---------- Controlador buscar codigo de producto ----------*/
-	public function buscarCodigoVentaControlador($datos)
+	/*---------- Catalogo de Productos ----------*/
+	public function catalogoProductosControlador($datos)
 	{
 
 		/*== Recuperando codigo de busqueda ==*/
@@ -123,6 +123,99 @@ class saleController extends mainModel
 					Debes de introducir el Nombre, Marca o Modelo del producto
 				</div>
 			</article>';
+			exit();
+		}
+	}
+	/*---------- Catalogo de Clientes ----------*/
+	public function catalogoClientesControlador($datos)
+	{
+
+		/*== Recuperando codigo de busqueda ==*/
+		$cliente = $this->limpiarCadena($datos['busqueda']);
+
+		$pagina = $this->limpiarCadena($datos["page"]);
+		$vista = $this->limpiarCadena($datos["vista"]);
+		$registros = "5";
+		$campoOrden = "nombre";
+		$orden = "Asc";
+		$tabla = "";
+
+		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+
+		if (isset($cliente) && $cliente != "") {
+
+			$consulta_datos = "SELECT * FROM cliente WHERE (id_cliente!='1') AND nombre LIKE '%$cliente%' OR apellidos LIKE '%$cliente%' OR celular LIKE '%$cliente%' ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+			$consulta_total = "SELECT COUNT(id_cliente) FROM cliente WHERE (id_cliente!='1') AND nombre LIKE '%$cliente%' OR apellidos LIKE '%$cliente%' OR celular LIKE '%$cliente%'";
+		} else {
+
+			$consulta_datos = "SELECT * FROM cliente WHERE (id_cliente!='1') ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+			$consulta_total = "SELECT COUNT(id_cliente) FROM cliente WHERE (id_cliente!='1')";
+		}
+
+		$datos = $this->ejecutarConsulta($consulta_datos);
+		$datos = $datos->fetchAll();
+
+		$total = $this->ejecutarConsulta($consulta_total);
+		$total = (int) $total->fetchColumn();
+
+		$numeroPaginas = ceil($total / $registros);
+
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
+
+			$tabla = '<div class="table-container mb-6"><table class="table is-striped is-narrow is-hoverable is-fullwidth"><tbody>';
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+			$tabla .= '<thead style="background:#B99654;color:#ffffff">
+			<th style="color:#ffffff">Usuario</th>
+			<th style="color:#ffffff">Nombre Completo</th>
+			<th style="color:#ffffff">Celular</th>
+			<th style="color:#ffffff">Credito</th>
+			<th style="color:#ffffff">Pagado</th>
+			<th style="color:#ffffff">Saldo Pendiente</th>
+			<th style="color:#ffffff"></th>
+			</thead>';
+			foreach ($datos as $rows) {
+
+				$tabla .= '
+					<tr class="has-text-left" >
+					
+					    <td>' . $rows['usuario'] . ' </td>
+                        <td>' . $rows['nombre'] . ' ' . $rows['apellidos'] . '</td>
+						<td>' . $rows['celular'] . '</td>
+						<td>' . MONEDA_SIMBOLO . number_format($rows['credito'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
+						<td>' . MONEDA_SIMBOLO . number_format($rows['pagado'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
+					    <td>' . MONEDA_SIMBOLO . number_format($rows['pendiente'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
+                        <td class="has-text-centered">
+                            <button type="button" class="button is-link is-rounded is-medium" onclick="agregar_cliente(' . $rows['id_cliente'] . ')"><i class="fas fa-user-plus"></i></button>
+                        </td>
+                    </tr>
+                    ';
+				$contador++;
+			}
+			$pag_final = $contador - 1;
+			$tabla .= '</tbody></table></div>';
+			### Paginacion ###
+			if ($total > 0 && $pagina <= $numeroPaginas) {
+				$tabla .= '<p class="has-text-right">Mostrando productos <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+
+				$tabla .= $this->paginadorTablasListado($pagina, $vista, $numeroPaginas, 7);
+			}
+
+			return $tabla;
+		} else {
+			return '
+				<article class="message is-warning mt-4 mb-4">
+					 <div class="message-header">
+					    <p></p>
+					 </div>
+				    <div class="message-body has-text-centered">
+				    	<i class="fas fa-exclamation-triangle fa-2x"></i><br>
+						No hay Clientes Registrados Actualmente
+				    </div>
+				</article>';
 			exit();
 		}
 	}
@@ -450,67 +543,6 @@ class saleController extends mainModel
 			return json_encode($alerta);
 		}
 	}
-
-
-	/*---------- Controlador buscar cliente ----------*/
-	public function buscarClienteVentaControlador()
-	{
-
-		/*== Recuperando termino de busqueda ==*/
-		$cliente = $this->limpiarCadena($_POST['buscar_cliente']);
-
-		/*== Comprobando que no este vacio el campo ==*/
-		if ($cliente == "") {
-			return '
-				<article class="message is-warning mt-4 mb-4">
-					 <div class="message-header">
-					    <p>¡Ocurrio un error inesperado!</p>
-					 </div>
-				    <div class="message-body has-text-centered">
-				    	<i class="fas fa-exclamation-triangle fa-2x"></i><br>
-						Debes de introducir el Nombre, Apellido o Celular del cliente
-				    </div>
-				</article>';
-			exit();
-		}
-
-		/*== Seleccionando clientes en la DB ==*/
-		$datos_cliente = $this->ejecutarConsulta("SELECT * FROM cliente WHERE (id_cliente!='1') AND nombre LIKE '%$cliente%' OR apellidos LIKE '%$cliente%' OR celular LIKE '%$cliente%' ORDER BY nombre ASC");
-
-		if ($datos_cliente->rowCount() >= 1) {
-
-			$datos_cliente = $datos_cliente->fetchAll();
-
-			$tabla = '<div class="table-container mb-6"><table class="table is-striped is-narrow is-hoverable is-fullwidth"><tbody>';
-
-			foreach ($datos_cliente as $rows) {
-				$tabla .= '
-					<tr>
-                        <td class="has-text-left" ><i class="fas fa-male fa-fw"></i> &nbsp; ' . $rows['nombre'] . ' ' . $rows['apellidos'] . '</td>
-                        <td class="has-text-centered" >
-                            <button type="button" class="button is-link is-rounded is-small" onclick="agregar_cliente(' . $rows['id_cliente'] . ')"><i class="fas fa-user-plus"></i></button>
-                        </td>
-                    </tr>
-                    ';
-			}
-
-			$tabla .= '</tbody></table></div>';
-			return $tabla;
-		} else {
-			return '
-				<article class="message is-warning mt-4 mb-4">
-					 <div class="message-header">
-					    <p>¡Ocurrio un error inesperado!</p>
-					 </div>
-				    <div class="message-body has-text-centered">
-				    	<i class="fas fa-exclamation-triangle fa-2x"></i><br>
-						No hemos encontrado ningún cliente en el sistema que coincida con <strong>“' . $cliente . '”</strong>
-				    </div>
-				</article>';
-			exit();
-		}
-	}
-
 
 	/*---------- Controlador agregar cliente ----------*/
 	public function agregarClienteVentaControlador()
@@ -1683,6 +1715,9 @@ class saleController extends mainModel
 					</div>
 
 				</header>
+				<input type="hidden" value="<?php echo number_format($_SESSION['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="total_hidden">
+				<input type="hidden" value="<?php echo number_format($_SESSION['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="subtotal_hidden">
+				<input type="hidden" value="<?php echo number_format($_SESSION['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="descuento_hidden">
 			</div>
 		</div>
 

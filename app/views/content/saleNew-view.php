@@ -199,19 +199,14 @@
                             <input class="input" type="text" id="cambio" value="0.00" readonly>
                         </div>
 
+                        <p class="has-text-centered">
+                            <button type="submit" class="button is-info is-rounded"><i class="far fa-save"></i> &nbsp; Guardar venta</button>
+                        </p>
 
-
-                        <?php if ($_SESSION['total'] > 0) { ?>
-                            <p class="has-text-centered">
-                                <button type="submit" class="button is-info is-rounded"><i class="far fa-save"></i> &nbsp; Guardar venta</button>
-                            </p>
-                        <?php } ?>
                         <p class="has-text-centered pt-6">
                             <small>Los campos marcados con <?php echo CAMPO_OBLIGATORIO; ?> son obligatorios</small>
                         </p>
-                        <input type="hidden" value="<?php echo number_format($_SESSION['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="total_hidden">
-                        <input type="hidden" value="<?php echo number_format($_SESSION['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="subtotal_hidden">
-                        <input type="hidden" value="<?php echo number_format($_SESSION['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="descuento_hidden">
+
                         </form>
             </div>
 
@@ -238,7 +233,7 @@
             <div class="field mt-6 mb-6">
                 <label class="label">Nombre, marca, modelo, código</label>
                 <div class="control">
-                    <input class="input" type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]{1,30}" placeholder="Ingresa el nombre del producto,marca o código del producto" name="input_codigo" autofocus="autofocus" onkeyup="cargarCatalogoProductos(1)" id="input_codigo" maxlength="30">
+                    <input class="input" type="text" placeholder="Ingresa el nombre del producto,marca o código del producto" name="input_codigo" autofocus="autofocus" onkeyup="cargarCatalogoProductos(1)" id="input_codigo" maxlength="30">
                 </div>
             </div>
             <div class="container" id="tabla_productos"></div>
@@ -260,13 +255,11 @@
             <div class="field mt-6 mb-6">
                 <label class="label">Nombre, Apellido, Celular</label>
                 <div class="control">
-                    <input class="input" type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]{1,30}" name="input_cliente" placeholder="Ingresa el nombre, apellidos o celular del cliente" id="input_cliente" autofocus="autofocus" onkeyup="buscar_cliente()" maxlength="30">
+                    <input class="input" type="text" name="input_cliente" placeholder="Ingresa el nombre, apellidos o celular del cliente" id="input_cliente" autofocus="autofocus" onkeyup="buscar_cliente()" maxlength="30">
                 </div>
             </div>
             <div class="container" id="tabla_clientes"></div>
-            <p class="has-text-centered">
-                <button type="button" class="button is-link is-light" onclick="buscar_cliente()"><i class="fas fa-search"></i> &nbsp; Buscar</button>
-            </p>
+
         </section>
     </div>
 </div>

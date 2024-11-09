@@ -1,4 +1,3 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.3/JsBarcode.all.min.js"></script>
 <script src="<?php echo APP_URL; ?>app/views/js/ajax.js"></script>
 <script src="<?php echo APP_URL; ?>app/views/js/main.js"></script>
 <script src="<?php echo APP_URL; ?>app/views/js/sales.js"></script>

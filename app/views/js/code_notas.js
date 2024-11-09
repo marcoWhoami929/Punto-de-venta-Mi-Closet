@@ -9,10 +9,16 @@ $(function () {
     case "saleNew":
       cargarListaCamaras();
       cargarCatalogoProductos(1);
+      cargarCatalogoClientes(1);
       cargarCarritoVenta();
      break;
     case "notesNew":
       generarQrNotas();
+      cargarListaCamaras();
+      cargarCatalogoProductos(1);
+      cargarCarritoNota();
+   
+  
       break;
    
  
@@ -157,7 +163,7 @@ let html5QrCode = null;
 
 function lecturaCorrecta(codigoTexto, codigoObjeto) {
   // handle the scanned code as you like, for example:
-  console.log(`Code matched = ${codigoTexto}`, codigoObjeto);
+  
   $("#sale-barcode-input").val(codigoTexto);
 }
 
@@ -238,6 +244,24 @@ function cargarCatalogoProductos(page){
         tabla_productos.innerHTML = respuesta;
       });
 }
+function cargarCatalogoClientes(page){
+  let datos = new FormData();
+    var busqueda = $("#input_cliente").val();
+    datos.append("buscar_cliente", busqueda);
+    datos.append("page", page);
+    datos.append("vista", "cargarCatalogoClientes");
+    datos.append("modulo_venta", "listado_clientes");
+
+    fetch(url + "app/ajax/ventaAjax.php", {
+      method: "POST",
+      body: datos,
+    })
+      .then((respuesta) => respuesta.text())
+      .then((respuesta) => {
+        let table_clientes = document.querySelector("#tabla_clientes");
+        table_clientes.innerHTML = respuesta;
+      });
+}
 function incrementarCarrito(codigo,token) {
   var actual = $("#cantidadCarrito" + token).val();
 
@@ -296,5 +320,19 @@ function cargarCarritoVenta() {
   }).then(function (result) {
     totalesCarritoVenta();
   });
+ 
+}
+function cargarCarritoNota() {
+  
+  $.ajax({
+    url: "../app/ajax/notasAjax.php",
+    type: "POST",
+    data: {
+      modulo_notas: "carrito_nota",
+    },
+    success: function (response) {
+      $(".container-carrito-notas").html(response);
+    },
+  })
  
 }

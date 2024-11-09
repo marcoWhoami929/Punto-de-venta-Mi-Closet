@@ -10,7 +10,7 @@ if (isset($_POST['modulo_venta'])) {
 
 	$insVenta = new saleController();
 
-	/*--------- Buscar producto por codigo ---------*/
+	/*--------- Listado Productos ---------*/
 	if ($_POST['modulo_venta'] == "listado_productos") {
 		$datos = array(
 			"busqueda" => $_POST["buscar_codigo"],
@@ -18,7 +18,17 @@ if (isset($_POST['modulo_venta'])) {
 			"vista" => $_POST["vista"],
 		);
 
-		echo $insVenta->buscarCodigoVentaControlador($datos);
+		echo $insVenta->catalogoProductosControlador($datos);
+	}
+	/*--------- Listado Clientes ---------*/
+	if ($_POST['modulo_venta'] == "listado_clientes") {
+		$datos = array(
+			"busqueda" => $_POST["buscar_cliente"],
+			"page" => $_POST["page"],
+			"vista" => $_POST["vista"],
+		);
+
+		echo $insVenta->catalogoClientesControlador($datos);
 	}
 
 	/*--------- Agregar producto a carrito ---------*/
@@ -35,11 +45,6 @@ if (isset($_POST['modulo_venta'])) {
 	/*--------- Actualizar producto de carrito ---------*/
 	if ($_POST['modulo_venta'] == "actualizar_producto") {
 		echo $insVenta->actualizarProductoCarritoControlador();
-	}
-
-	/*--------- Buscar cliente ---------*/
-	if ($_POST['modulo_venta'] == "buscar_cliente") {
-		echo $insVenta->buscarClienteVentaControlador();
 	}
 
 	/*--------- Agregar cliente a carrito ---------*/

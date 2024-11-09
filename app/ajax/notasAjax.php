@@ -17,7 +17,10 @@ if (isset($_POST['modulo_notas'])) {
     if ($_POST['modulo_notas'] == "generarQr") {
         generarQrNota();
     }
-
+    /*--------- Cargar carrito notas ---------*/
+    if ($_POST['modulo_notas'] == "carrito_nota") {
+        echo $insNotes->cargarCarritoNotaControlador();
+    }
     /*--------- Agregar producto a nota ---------*/
     if ($_POST['modulo_notas'] == "datos_nota") {
         guardarDatosNota();

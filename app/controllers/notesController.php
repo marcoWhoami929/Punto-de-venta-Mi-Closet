@@ -6,6 +6,112 @@ use app\models\mainModel;
 
 class notesController extends mainModel
 {
+    public function cargarCarritoNotaControlador()
+    {
+
+        $tabla = "";
+
+
+        $cc = 1;
+        if (isset($_SESSION['datos_producto_nota'])) {
+            if (empty($_SESSION['datos_producto_nota'])) {
+                $tabla = '
+			<article class="message is-warning mt-4 mb-4">
+				 <div class="message-header">
+					
+				 </div>
+				<div class="message-body has-text-centered">
+                        <p class="has-text-centered  pb-3">
+       
+                            <i class="fas fa-gifts  fa-8x"></i>
+                        </p>
+					<i class="fas fa-exclamation-triangle fa-2x"></i><br>
+					No hay productos agregados en el carrito
+				</div>
+			</article>';
+            } else {
+                foreach ($_SESSION['datos_producto_nota'] as $productos) {
+
+                    if (is_file("./app/views/productos/" . $productos['foto'])) {
+                        $foto = '<img src="' . APP_URL . 'app/views/productos/' . $productos['foto'] . '">';
+                    } else {
+                        $foto = '<img src="' . APP_URL . 'app/views/productos/default.png">';
+                    }
+
+
+                    $tabla .= '<article class="media pb-3 pt-3">
+		                <figure class="media-left">
+		                    <p class="image is-64x64">';
+                    if (is_file("./app/views/productos/" . $productos['foto'])) {
+                        $tabla .= '<img src="' . APP_URL . 'app/views/productos/' . $productos['foto'] . '">';
+                    } else {
+                        $tabla .= '<img src="' . APP_URL . 'app/views/productos/default.png">';
+                    }
+                    $tabla .= '</p>
+		                </figure>
+		                <div class="media-content">
+		                    <div class="content">
+		                        <p>
+		                            <strong>' . $cc . ' - ' . $productos['descripcion'] . '</strong><br>
+		                            <strong>CODIGO:</strong> ' . $productos['codigo'] . ', 
+		                            <strong>PRECIO:</strong> $' . $productos['precio_venta'] . ', 
+		                            <strong>LIMITE:</strong> ' . $productos['limite_nota'] . ', 
+		                    
+		                        </p>
+                                 <div class="columns">
+                                    <div class="column">
+                                    <strong>TALLAS:</strong>
+                  
+                                    <input class="input" type="tags" id="tallas" name="tallas" value="' . $productos['tallas'] . '" placeholder="...">
+                                    </div>
+                                     <div class="column">
+                                    <strong>COLORES:</strong>
+                                    <input class="input"  type="tags" id="colores" name="colores" value="' . $productos['colores'] . '" placeholder="...">
+                                    </div>
+                                    
+                                </div>
+		                    </div>
+                           
+		                    <div class="has-text-right">
+		                      
+		                        <form class="FormularioAjax" action="' . APP_URL . 'app/ajax/notasAjax.php" method="POST" autocomplete="off">
+
+                                                <input type="hidden" name="codigo" value="' . $productos['codigo'] . '">
+                                                <input type="hidden" name="modulo_notas" value="remover_producto">
+
+                                                <button type="submit" class="button is-danger is-rounded " title="Remover producto">
+                                                    <i class="fas fa-trash fa-fw"></i>
+                                                </button>
+                                            </form>
+		                    </div>
+		                </div>
+		            </article>
+
+
+		            <hr>';
+                    $cc++;
+                }
+            }
+        } else {
+            $tabla = '
+			<article class="message is-warning mt-4 mb-4">
+				 <div class="message-header">
+					
+				 </div>
+				<div class="message-body has-text-centered">
+                        <p class="has-text-centered  pb-3">
+       
+                            <i class="fas fa-gifts  fa-8x"></i>
+                        </p>
+					<i class="fas fa-exclamation-triangle fa-2x"></i><br>
+					No hay productos agregados en el carrito
+				</div>
+			</article>';
+        }
+
+
+        return $tabla;
+    }
     /*---------- Controlador agregar producto a nota de venta ----------*/
     public function agregarProductoNotaControlador()
     {

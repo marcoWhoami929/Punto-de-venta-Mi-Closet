@@ -97,6 +97,18 @@ $mainModel = new mainModel();
         </p>
 
     </form>
+    <div class="column">
+        <div id="reader" width="600px"></div>
+        <div class="mt-2 w-full">
+            <div class="select">
+                <select class="form-select" id="listaCamaras" onchange="camaraSeleccionada(this)">
+
+                </select>
+            </div>
+
+            <button class="button is-link " onclick="detenerCamara()">Detener camara</button>
+        </div>
+    </div>
     <?php
     if (isset($_SESSION['alerta_producto_agregado']) && $_SESSION['alerta_producto_agregado'] != "") {
         echo '
@@ -118,15 +130,16 @@ $mainModel = new mainModel();
     <form class="pt-6 pb-6" id="sale-barcode-form" autocomplete="off">
         <div class="columns">
             <div class="column is-one-quarter">
-                <button type="button" class="button is-link is-light js-modal-trigger" data-target="modal-js-product"><i class="fas fa-search"></i> &nbsp; Buscar producto</button>
+                <button type="button" class="button is-link js-modal-trigger" data-target="modal-js-product"><i class="fas fa-search"></i> &nbsp; Buscar producto</button>
             </div>
             <div class="column">
                 <div class="field is-grouped">
                     <p class="control is-expanded">
-                        <input class="input" type="text" pattern="[a-zA-Z0-9- ]{1,70}" maxlength="70" autofocus="autofocus" placeholder="Código de barras" id="sale-barcode-input">
+                        <input class="input" type="text" maxlength="70" autofocus="autofocus" placeholder="Código de barras" id="sale-barcode-input">
                         <input type="hidden" id="tipo_busqueda" value="nota">
                     </p>
                     <a class="control">
+
                         <button type="submit" class="button is-info">
                             <i class="far fa-check-circle"></i> &nbsp; Agregar producto
                         </button>
@@ -136,140 +149,27 @@ $mainModel = new mainModel();
         </div>
     </form>
 
-    <div class="table-container">
-        <?php
-
-        if (isset($_SESSION['datos_producto_nota'])) {
-
-
-            $total = count($_SESSION['datos_producto_nota']);
-            $registros = 5;
-
-            $pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
-            $inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
-            $pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
-            $numeroPaginas = ceil($total / $registros);
-
-            $url = $url[0];
-
-            if ($total >= 1 && $pagina <= $numeroPaginas) {
-                $tabla = "";
-                $contador = $inicio + 1;
-                $pag_inicio = $inicio + 1;
-                foreach ($_SESSION['datos_producto_nota'] as $productos) {
-                    $tabla .= '
-		            <article class="media pb-3 pt-3">
-		                <figure class="media-left">
-		                    <p class="image is-64x64">';
-                    if (is_file("./app/views/productos/" . $productos['foto'])) {
-                        $tabla .= '<img src="' . APP_URL . 'app/views/productos/' . $productos['foto'] . '">';
-                    } else {
-                        $tabla .= '<img src="' . APP_URL . 'app/views/productos/default.png">';
-                    }
-                    $tabla .= '</p>
-		                </figure>
-		                <div class="media-content">
-		                    <div class="content">
-		                        <p>
-		                            <strong>' . $contador . ' - ' . $productos['descripcion'] . '</strong><br>
-		                            <strong>CODIGO:</strong> ' . $productos['codigo'] . ', 
-		                            <strong>PRECIO:</strong> $' . $productos['precio_venta'] . ', 
-		                            <strong>LIMITE:</strong> ' . $productos['limite_nota'] . ', 
-		                    
-		                        </p>
-                                 <div class="columns">
-                                    <div class="column">
-                                    <strong>TALLAS:</strong>
-                                    <input class="input" type="tags" id="tallas" name="tallas" value="' . $productos['tallas'] . '" placeholder="...">
-                                    </div>
-                                     <div class="column">
-                                    <strong>COLORES:</strong>
-                                    <input class="input"  type="tags" id="colores" name="colores" value="' . $productos['colores'] . '" placeholder="...">
-                                    </div>
-                                    
-                                </div>
-		                    </div>
-                           
-		                    <div class="has-text-right">
-		                      
-		                        <form class="FormularioAjax" action="' . APP_URL . 'app/ajax/notasAjax.php" method="POST" autocomplete="off">
-
-                                                <input type="hidden" name="codigo" value="' . $productos['codigo'] . '">
-                                                <input type="hidden" name="modulo_notas" value="remover_producto">
-
-                                                <button type="submit" class="button is-danger is-rounded " title="Remover producto">
-                                                    <i class="fas fa-trash fa-fw"></i>
-                                                </button>
-                                            </form>
-		                    </div>
-		                </div>
-		            </article>
-
-
-		            <hr>
-		            ';
-                    $contador++;
-                }
-                $pag_final = $contador - 1;
-            } else {
-                $tabla = '
-            <section class="hero-body">
-                 <div class="hero-body">
-                     <p class="has-text-centered  pb-3">
-                        
-                            <i class="fas fa-gifts  fa-8x"></i>
-                     </p>
-                     <p class="title has-text-centered">Upps</p>
-                     <p class="subtitle has-text-centered">No hay productos agregados a la nota</p>
-                 </div>
-             </section>
-         ';
-            }
-            ### Paginacion ###
-            if ($total > 0 && $pagina <= $numeroPaginas) {
-                $tabla .= '<p class="has-text-right">Mostrando productos <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
-
-                $tabla .= $mainModel->paginadorTablas($pagina, $numeroPaginas, $url, 7);
-            }
-        } else {
-            $tabla = '
-               <section class="hero-body">
-                    <div class="hero-body">
-                        <p class="has-text-centered  pb-3">
-       
-                            <i class="fas fa-gifts  fa-8x"></i>
-                        </p>
-                        <p class="title has-text-centered">Upps</p>
-                        <p class="subtitle has-text-centered">No hay productos agregados a la nota</p>
-                    </div>
-                </section>
-            ';
-        }
-
-        echo $tabla;
-
-        ?>
+    <div class="table-container container-carrito-notas">
     </div>
+
 </div>
 <!-- Modal buscar producto -->
 <div class="modal" id="modal-js-product">
     <div class="modal-background"></div>
-    <div class="modal-card">
-        <header class="modal-card-head">
-            <p class="modal-card-title is-uppercase"><i class="fas fa-search"></i> &nbsp; Buscar producto</p>
+    <div class="modal-card" style="width:80%">
+        <header class="modal-card-head" style="background:#B99654">
+            <p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-search"></i> &nbsp; Buscar producto</p>
             <button class="delete" aria-label="close"></button>
         </header>
         <section class="modal-card-body">
             <div class="field mt-6 mb-6">
                 <label class="label">Nombre, marca, modelo, código</label>
                 <div class="control">
-                    <input class="input" type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]{1,30}" placeholder="Ingresa el nombre del producto,marca o código del producto" name="input_codigo" autofocus="autofocus" onkeyup="buscar_codigo()" id="input_codigo" maxlength="30">
+                    <input class="input" type="text" placeholder="Ingresa el nombre del producto,marca o código del producto" name="input_codigo" autofocus="autofocus" onkeyup="cargarCatalogoProductos(1)" id="input_codigo" maxlength="30">
                 </div>
             </div>
             <div class="container" id="tabla_productos"></div>
-            <p class="has-text-centered">
-                <button type="button" class="button is-link is-light" onclick="buscar_codigo()"><i class="fas fa-search"></i> &nbsp; Buscar</button>
-            </p>
+
         </section>
     </div>
 </div>
