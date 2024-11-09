@@ -357,7 +357,7 @@ class saleController extends mainModel
 
 		if (empty($_SESSION['datos_producto_venta'][$codigo])) {
 
-			$alerta = "El producto se ha removido de la venta";
+			$alerta = "El producto con el código " . $codigo . " se ha removido de la venta";
 		} else {
 			$alerta = "No hemos podido remover el producto, por favor intente nuevamente";
 		}

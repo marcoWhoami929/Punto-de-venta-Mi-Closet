@@ -158,7 +158,7 @@ function buscar_cliente() {
     datos.append("buscar_cliente", input_cliente);
     datos.append("modulo_venta", "buscar_cliente");
 
-    fetch(urlPathNewPath + "app/ajax/ventaAjax.php", {
+    fetch(urlPathNew + "app/ajax/ventaAjax.php", {
       method: "POST",
       body: datos,
     })

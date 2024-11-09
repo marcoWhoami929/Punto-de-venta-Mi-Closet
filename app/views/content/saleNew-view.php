@@ -251,8 +251,9 @@
 <div class="modal" id="modal-js-client">
     <div class="modal-background"></div>
     <div class="modal-card">
-        <header class="modal-card-head">
-            <p class="modal-card-title is-uppercase"><i class="fas fa-search"></i> &nbsp; Buscar y agregar cliente</p>
+        <header class="modal-card-head" style="background:#B99654">
+            <p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-search"></i> &nbsp; Buscar y agregar cliente</p>
+
             <button class="delete" aria-label="close"></button>
         </header>
         <section class="modal-card-body">
