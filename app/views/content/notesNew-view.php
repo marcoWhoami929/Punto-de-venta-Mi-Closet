@@ -110,22 +110,8 @@ $mainModel = new mainModel();
         </div>
     </div>
     <?php
-    if (isset($_SESSION['alerta_producto_agregado']) && $_SESSION['alerta_producto_agregado'] != "") {
-        echo '
-            <div class="notification is-success is-light">
-              ' . $_SESSION['alerta_producto_agregado'] . '
-            </div>
-            ';
-        unset($_SESSION['alerta_producto_agregado']);
-    }
-    if (isset($_SESSION['alerta_carrito_actualizado']) && $_SESSION['alerta_carrito_actualizado'] != "") {
-        echo '
-            <div class="notification is-success is-light">
-              ' . $_SESSION['alerta_carrito_actualizado'] . '
-            </div>
-            ';
-        unset($_SESSION['alerta_carrito_actualizado']);
-    }
+
+    echo '<div class="alerta_producto"></div>';
     ?>
     <form class="pt-6 pb-6" id="sale-barcode-form" autocomplete="off">
         <div class="columns">

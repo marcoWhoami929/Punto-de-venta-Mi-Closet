@@ -43,12 +43,18 @@ function agregar_producto() {
       })
         .then((respuesta) => respuesta.json())
       .then((respuesta) => {
+
         $(".alerta_producto").html('<div class="notification is-success is-light ">'+respuesta+'</div>');
       })
     );
   }).then(function (result) {
+    if (tipo_busqueda == "nota") {
+      cargarCarritoNota();
+
+    }else{
+      cargarCarritoVenta();
+    }
    
-    cargarCarritoVenta();
     setTimeout(function() {
       document.getElementById("sale-barcode-input").value = "";
       $(".alerta_producto").html('').fadeIn("slow");;
@@ -138,8 +144,14 @@ function removerProductoCarrito(codigo){
     })
   );
 }).then(function (result) {
+  if (tipo_busqueda == "nota") {
+   
+    cargarCarritoNota();
+  } else {
+    cargarCarritoVenta();
+  }
+  
  
-  cargarCarritoVenta();
   setTimeout(function() {
 
     $(".alerta_producto").html('').fadeIn("slow");;

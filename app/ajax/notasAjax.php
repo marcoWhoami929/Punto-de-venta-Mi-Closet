@@ -4,6 +4,7 @@ require_once "../../config/app.php";
 require_once "../views/inc/session_start.php";
 require_once "../../autoload.php";
 
+
 use app\controllers\notesController;
 
 if (isset($_POST['modulo_notas'])) {
@@ -30,7 +31,7 @@ if (isset($_POST['modulo_notas'])) {
         echo $insNotes->agregarProductoNotaControlador();
     }
     /*--------- Remover producto de de nota ---------*/
-    if ($_POST['modulo_notas'] == "remover_producto") {
+    if ($_POST['modulo_notas'] == "remover_producto_nota") {
         echo $insNotes->removerProductoNotaControlador();
     }
     /*--------- eliminar nota ---------*/

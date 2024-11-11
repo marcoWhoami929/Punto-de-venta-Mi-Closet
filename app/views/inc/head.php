@@ -14,6 +14,3 @@
 <script src="<?php echo APP_URL; ?>app/views/js/sweetalert2.all.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jsbarcode/3.11.3/JsBarcode.all.min.js"></script>
-<script>
-    bulmaTagsinput.attach();
-</script>

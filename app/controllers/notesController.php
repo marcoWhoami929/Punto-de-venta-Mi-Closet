@@ -11,7 +11,9 @@ class notesController extends mainModel
 
         $tabla = "";
 
-
+        echo '<script>
+    bulmaTagsinput.attach();
+</script>';
         $cc = 1;
         if (isset($_SESSION['datos_producto_nota'])) {
             if (empty($_SESSION['datos_producto_nota'])) {
@@ -32,63 +34,71 @@ class notesController extends mainModel
             } else {
                 foreach ($_SESSION['datos_producto_nota'] as $productos) {
 
-                    if (is_file("./app/views/productos/" . $productos['foto'])) {
+
+                    if (is_file("../views/productos/" . $productos['foto'])) {
                         $foto = '<img src="' . APP_URL . 'app/views/productos/' . $productos['foto'] . '">';
                     } else {
                         $foto = '<img src="' . APP_URL . 'app/views/productos/default.png">';
                     }
 
 
-                    $tabla .= '<article class="media pb-3 pt-3">
-		                <figure class="media-left">
-		                    <p class="image is-64x64">';
-                    if (is_file("./app/views/productos/" . $productos['foto'])) {
-                        $tabla .= '<img src="' . APP_URL . 'app/views/productos/' . $productos['foto'] . '">';
-                    } else {
-                        $tabla .= '<img src="' . APP_URL . 'app/views/productos/default.png">';
-                    }
-                    $tabla .= '</p>
-		                </figure>
-		                <div class="media-content">
-		                    <div class="content">
-		                        <p>
-		                            <strong>' . $cc . ' - ' . $productos['descripcion'] . '</strong><br>
-		                            <strong>CODIGO:</strong> ' . $productos['codigo'] . ', 
-		                            <strong>PRECIO:</strong> $' . $productos['precio_venta'] . ', 
-		                            <strong>LIMITE:</strong> ' . $productos['limite_nota'] . ', 
-		                    
-		                        </p>
-                                 <div class="columns">
-                                    <div class="column">
-                                    <strong>TALLAS:</strong>
+                    $tabla .= '<div class="card pt-4">
+								<header class="card-header" style="background:#B99654;color:#ffffff">
+								 <p class="card-header-title"><strong style="color:#ffffff">' . $cc . ' - ' . $productos['descripcion'] . '</strong></p>
+								   <p class="card-header-title"><strong style="color:#ffffff">' . $productos['codigo'] . '</strong></p>
+									<button type="submit" class="button is-danger is-rounded pt-4" onclick="removerProductoCarrito(\'' . $productos['codigo'] . '\')">
+														<i class="fas fa-trash fa-fw"></i>
+											</button>
+										
+								</header>
+								<div class="card-content">
+									<div class="content">
+										<div class="columns">
+											<div class="column is-one-fifth">
+												<figure class="media-left">
+													<p class="image is-64x64">
+														' . $foto . '
+													</p>
+												</figure>
+											</div>
+										 
+									
+											 <div class="column pt-6">
+													 <strong>TALLAS:</strong>
                   
-                                    <input class="input" type="tags" id="tallas" name="tallas" value="' . $productos['tallas'] . '" placeholder="...">
-                                    </div>
-                                     <div class="column">
-                                    <strong>COLORES:</strong>
-                                    <input class="input"  type="tags" id="colores" name="colores" value="' . $productos['colores'] . '" placeholder="...">
-                                    </div>
-                                    
-                                </div>
-		                    </div>
-                           
-		                    <div class="has-text-right">
-		                      
-		                        <form class="FormularioAjax" action="' . APP_URL . 'app/ajax/notasAjax.php" method="POST" autocomplete="off">
-
-                                                <input type="hidden" name="codigo" value="' . $productos['codigo'] . '">
-                                                <input type="hidden" name="modulo_notas" value="remover_producto">
-
-                                                <button type="submit" class="button is-danger is-rounded " title="Remover producto">
-                                                    <i class="fas fa-trash fa-fw"></i>
-                                                </button>
-                                            </form>
-		                    </div>
-		                </div>
-		            </article>
-
-
-		            <hr>';
+                                                    <input class="input" type="tags" id="tallas" name="tallas" value="' . $productos['tallas'] . '" placeholder="...">
+											</div>
+											 <div class="column pt-6">
+													 <strong>COLORES:</strong>
+                  
+                                                    <input class="input" type="tags" id="colores" name="colores" value="' . $productos['colores'] . '" placeholder="...">
+											</div>
+											  
+										</div>
+										
+										
+									</div>
+								</div>
+								<footer class="card-footer">
+									
+									<a href="#" class="card-footer-item">
+										<div class="columns has-text-centered">
+										<label><strong>Precio:</strong></label>
+										</div>
+										<div class="columns pt-4">
+										' . MONEDA_SIMBOLO . " " . number_format($productos['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+										</div>
+									</a>
+									<a href="#" class="card-footer-item">
+									 <div class="columns has-text-centered">
+									  <label><strong>Limite:</strong></label>
+									</div>
+									<div class="columns pt-4">
+									' . MONEDA_SIMBOLO . " " . number_format($productos['limite_nota'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+									</div>
+									</a>
+								</footer>
+								</div>';
                     $cc++;
                 }
             }
@@ -120,12 +130,7 @@ class notesController extends mainModel
         $codigo = $this->limpiarCadena($_POST['codigo']);
 
         if ($codigo == "") {
-            $alerta = [
-                "tipo" => "simple",
-                "titulo" => "Ocurrió un error inesperado",
-                "texto" => "Debes de introducir el código de barras del producto",
-                "icono" => "error"
-            ];
+            $alerta = "Debes de introducir el código de barras del producto";
             return json_encode($alerta);
             exit();
         }
@@ -135,12 +140,8 @@ class notesController extends mainModel
         /*== Comprobando producto en la DB ==*/
         $check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE codigo='$codigo'");
         if ($check_producto->rowCount() <= 0) {
-            $alerta = [
-                "tipo" => "simple",
-                "titulo" => "Ocurrió un error inesperado",
-                "texto" => "No hemos encontrado el producto con código de barras : '$codigo'",
-                "icono" => "error"
-            ];
+
+            $alerta = "No hemos encontrado el producto con código de barras : '$codigo'";
             return json_encode($alerta);
             exit();
         } else {
@@ -156,12 +157,8 @@ class notesController extends mainModel
             $stock_total = $value['stock_total'];
 
             if ($stock_total < 0) {
-                $alerta = [
-                    "tipo" => "simple",
-                    "titulo" => "Ocurrió un error inesperado",
-                    "texto" => "Lo sentimos, no hay existencias disponibles del producto seleccionado",
-                    "icono" => "error"
-                ];
+
+                $alerta = "Lo sentimos, no hay existencias disponibles del producto seleccionado";
                 return json_encode($alerta);
                 exit();
             }
@@ -179,14 +176,11 @@ class notesController extends mainModel
                 "descripcion" => $value['nombre']
             ];
 
-            $_SESSION['alerta_producto_agregado'] = "Se agrego <strong>" . $value['nombre'] . "</strong> a la nota actual";
-        } else {
-        }
 
-        $alerta = [
-            "tipo" => "redireccionar",
-            "url" => APP_URL . "notesNew/"
-        ];
+            $alerta = "Se agrego <strong>" . $value['nombre'] . "</strong> a la nota actual";
+        } else {
+            $alerta = "Ya se encuentra agregado el producto.";
+        }
 
         return json_encode($alerta);
     }
@@ -200,20 +194,12 @@ class notesController extends mainModel
         unset($_SESSION['datos_producto_nota'][$codigo]);
 
         if (empty($_SESSION['datos_producto_nota'][$codigo])) {
-            $alerta = [
-                "tipo" => "recargar",
-                "titulo" => "¡Producto removido!",
-                "texto" => "El producto se ha removido de la nota",
-                "icono" => "success"
-            ];
+
+            $alerta = "El producto se ha removido de la nota";
         } else {
-            $alerta = [
-                "tipo" => "simple",
-                "titulo" => "Ocurrió un error inesperado",
-                "texto" => "No hemos podido remover el producto, por favor intente nuevamente",
-                "icono" => "error"
-            ];
+            $alerta = "No hemos podido remover el producto, por favor intente nuevamente";
         }
+
         return json_encode($alerta);
     }
     /*----------  Controlador registrar nota  ----------*/
