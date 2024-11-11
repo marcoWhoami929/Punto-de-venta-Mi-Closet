@@ -94,7 +94,7 @@ class notesController extends mainModel
 									  <label><strong>Limite:</strong></label>
 									</div>
 									<div class="columns pt-4">
-									' . MONEDA_SIMBOLO . " " . number_format($productos['limite_nota'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+									' . number_format($productos['limite_nota'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . '
 									</div>
 									</a>
 								</footer>
