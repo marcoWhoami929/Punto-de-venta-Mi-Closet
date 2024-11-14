@@ -1143,7 +1143,7 @@ class saleController extends mainModel
 			} else {
 				$tabla .= '
 						<tr class="has-text-centered" >
-			                <td colspan="7">
+			                <td colspan="13">
 			                    No hay registros en el sistema
 			                </td>
 			            </tr>

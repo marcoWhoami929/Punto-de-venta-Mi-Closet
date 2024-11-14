@@ -31,6 +31,7 @@
         } else {
             $estatus = "Cancelada";
         }
+
     ?>
 
         <div class="columns ">
@@ -40,7 +41,7 @@
         </div>
         <h2 class="title has-text-centered">Datos de la nota <?php echo " (" . $code . ")"; ?></h2>
 
-        <form class="FormularioAjax" action="<?php echo APP_URL; ?>app/ajax/notasAjax.php" method="POST" autocomplete="off">
+        <form>
             <input type="hidden" name="modulo_notas" value="actualizar_nota">
             <input type="hidden" name="id_nota" value="<?php echo $datos_nota['id_nota']; ?>">
             <div class="columns pb-6">
@@ -104,7 +105,7 @@
             <div class="columns ">
                 <p class="has-text-centered full-width">
 
-                    <button type="submit" class="button is-info is-rounded"><i class="fas fa-sync-alt"></i> &nbsp; Actualizar</button>
+                    <button type="button" class="button is-info is-rounded" onclick="actualizarNota('<?= $datos_nota['id_nota']; ?>','<?= $datos_nota['fecha_publicacion']; ?>')"><i class="fas fa-sync-alt"></i> &nbsp; Actualizar</button>
                 </p>
             </div>
         </form>
@@ -160,7 +161,7 @@
                                          <div class="columns">
                                             <div class="column">
                                             <strong>TALLAS:</strong>
-                                            <input class="input" type="tags" id="tallas" name="tallas" value="' . $detalle['tallas'] . '" placeholder="...">
+                                            <input class="input" type="tags" id="tallas" name="tallas" value="' . $detalle['tallas'] . '" placeholder="..." disabled>
                                             </div>
                                              <div class="column">
                                             <strong>COLORES:</strong>
@@ -240,3 +241,6 @@
     }
     ?>
 </div>
+<script>
+    bulmaTagsinput.attach();
+</script>

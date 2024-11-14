@@ -170,3 +170,6 @@
 		margin: 10px 0px;
 	}
 </style>
+<script>
+	bulmaTagsinput.attach();
+</script>

@@ -336,3 +336,57 @@ function cargarCarritoNota() {
   })
  
 }
+function actualizarNota(id_nota,fecha_publicacion){
+ 
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "Quieres realizar la acción solicitada",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#3085d6",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Si, realizar",
+    cancelButtonText: "No, cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      var fecha = fecha_publicacion;
+      var publicacion = new Date(fecha).getTime();
+      var now = new Date();
+      var diferencia = publicacion - now;
+      if(diferencia<0){
+
+        var respuesta = {
+          tipo: "simple",
+          titulo: "La nota no puede ser actualizada porque se encuentra en circulación.",
+          text: "",
+          icono: "error",
+        };
+        return alertas_ajax(respuesta);
+
+      }else{
+        var titulo_nota = $("#titulo_nota").val();
+        var fecha_inicio = $("#fecha_publicacion").val();
+        var fecha_expiracion = $("#fecha_expiracion").val();
+        var porc_descuento_nota = $("#porc_descuento_nota").val();
+  
+        let datos = new FormData();
+        datos.append("id_nota", id_nota);
+        datos.append("titulo_nota",titulo_nota);
+        datos.append("fecha_publicacion",fecha_inicio);
+        datos.append("fecha_expiracion",fecha_expiracion);
+        datos.append("porc_descuento_nota",porc_descuento_nota);
+        datos.append("modulo_notas", "actualizar_nota");
+  
+        fetch(url + "app/ajax/cajaAjax.php", {
+          method: "POST",
+          body: datos,
+        })
+          .then((respuesta) => respuesta.json())
+          .then((respuesta) => {
+            return alertas_ajax(respuesta);
+          });
+
+      }
+    }
+  });
+}
