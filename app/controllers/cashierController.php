@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\mainModel;
 
+
 class cashierController extends mainModel
 {
 
@@ -14,10 +15,10 @@ class cashierController extends mainModel
 		# Almacenando datos#
 		$numero = $this->limpiarCadena($_POST['numero']);
 		$nombre = $this->limpiarCadena($_POST['nombre']);
-		$saldo_inicial = $this->limpiarCadena($_POST['saldo_inicial']);
+
 
 		# Verificando campos obligatorios #
-		if ($numero == "" || $nombre == "" || $saldo_inicial == "") {
+		if ($numero == "" || $nombre == "") {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -34,19 +35,6 @@ class cashierController extends mainModel
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
 				"texto" => "El NUMERO DE CAJA no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
-
-
-
-		if ($this->verificarDatos("[0-9.]{1,25}", $saldo_inicial)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El EFECTIVO DE CAJA no coincide con el formato solicitado",
 				"icono" => "error"
 			];
 			return json_encode($alerta);
@@ -80,17 +68,7 @@ class cashierController extends mainModel
 		}
 
 		# Comprobando que el efectivo sea mayor o igual a 0 #
-		$saldo_inicial = number_format($saldo_inicial, 2, '.', '');
-		if ($saldo_inicial < 0) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No puedes colocar una cantidad de efectivo menor a 0",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
+
 
 
 		$caja_datos_reg = [
@@ -103,11 +81,6 @@ class cashierController extends mainModel
 				"campo_nombre" => "nombre",
 				"campo_marcador" => ":Nombre",
 				"campo_valor" => $nombre
-			],
-			[
-				"campo_nombre" => "saldo_inicial",
-				"campo_marcador" => ":Saldo_inicial",
-				"campo_valor" => $saldo_inicial
 			]
 		];
 
@@ -132,7 +105,114 @@ class cashierController extends mainModel
 		return json_encode($alerta);
 	}
 
+	/*----------  Controlador registrar caja  ----------*/
+	public function aperturarCajaControlador()
+	{
 
+		# Almacenando datos#
+		$saldo_inicial = $this->limpiarCadena($_POST['saldo_inicial']);
+		$notas_apertura = $this->limpiarCadena($_POST['notas_apertura']);
+		$id_caja = $_SESSION["caja"];
+
+		# Verificando campos obligatorios #
+		if ($saldo_inicial == "") {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "El saldo inicial no puede estar vacio",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+
+		# Comprobando que el efectivo sea mayor o igual a 0 #
+		$saldo_inicial = number_format($saldo_inicial, 2, '.', '');
+		if ($saldo_inicial < 0) {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No puedes colocar una cantidad de efectivo menor a 0",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+
+		/*== consultar si hay sesion de caja abierta ==
+		$consulta_caja = $this->ejecutarConsulta("SELECT id_sesion,codigo_sesion FROM sesiones_caja WHERE id_caja ='" . $id_caja . "' and estado = 'abierta'");
+		$datos = $consulta_caja->fetch();
+
+		if ($consulta_caja->rowCount() == 1) {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Sesion Iniciada",
+				"texto" => "Existe una Sesión abierta con " . " #" . $datos["codigo_sesion"] . ", no se puede usar la misma caja.",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+			*/
+		#
+		/*== generando codigo de apertura de caja ==*/
+		$correlativo = $this->ejecutarConsulta("SELECT id_sesion FROM sesiones_caja");
+		$correlativo = ($correlativo->rowCount()) + 1;
+		$codigo_sesion = $this->generarCodigoAleatorio('POS', 10, $correlativo);
+
+		$caja_datos_reg = [
+			[
+				"campo_nombre" => "codigo_sesion",
+				"campo_marcador" => ":CodigoSesion",
+				"campo_valor" => $codigo_sesion
+			],
+			[
+				"campo_nombre" => "id_usuario",
+				"campo_marcador" => ":IdUsuario",
+				"campo_valor" => $_SESSION["id"]
+			],
+			[
+				"campo_nombre" => "id_caja",
+				"campo_marcador" => ":IdCaja",
+				"campo_valor" => $id_caja
+			],
+			[
+				"campo_nombre" => "notas_apertura",
+				"campo_marcador" => ":Notas",
+				"campo_valor" => $notas_apertura
+			],
+			[
+				"campo_nombre" => "saldo_inicial",
+				"campo_marcador" => ":SaldoInicial",
+				"campo_valor" => $saldo_inicial
+			],
+			[
+				"campo_nombre" => "estado",
+				"campo_marcador" => ":Estado",
+				"campo_valor" => 'abierta'
+			]
+		];
+
+		$registrar_caja = $this->guardarDatos("sesiones_caja", $caja_datos_reg);
+
+		if ($registrar_caja->rowCount() == 1) {
+			$alerta = [
+				"tipo" => "limpiar",
+				"titulo" => "Sesion Iniciada",
+				"texto" => "La Apertura de Caja Con " . " #" . $codigo_sesion . " se ha iniciado con exito",
+				"icono" => "success"
+			];
+		} else {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No se pudo registrar la sesion de apertura, por favor intente nuevamente",
+				"icono" => "error"
+			];
+		}
+
+		return json_encode($alerta);
+	}
 	/*----------  Controlador listar cajas  ----------*/
 	public function listarCajaControlador($datos)
 	{
@@ -280,12 +360,12 @@ class cashierController extends mainModel
 		}
 
 		# Verificando ventas #
-		$check_ventas = $this->ejecutarConsulta("SELECT id_caja FROM venta WHERE id_caja='$id' LIMIT 1");
+		$check_ventas = $this->ejecutarConsulta("SELECT id_caja FROM sesiones_caja WHERE id_caja='$id' LIMIT 1");
 		if ($check_ventas->rowCount() > 0) {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No podemos eliminar la caja del sistema ya que tiene ventas asociadas",
+				"texto" => "No podemos eliminar la caja del sistema ya que tiene sesiones asociadas",
 				"icono" => "error"
 			];
 			return json_encode($alerta);

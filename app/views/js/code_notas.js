@@ -3,6 +3,9 @@ $(function () {
   url = "http://localhost/pos/";
   ruta = urlPath.split("/");
   switch (ruta[2]) {
+    case "dashboard":
+      cargarAperturaCaja();
+    break;
     case "cashierList":
       listarCajas();
     break;
@@ -24,6 +27,15 @@ $(function () {
  
   }
 });
+function cargarAperturaCaja(){
+  var sesion_caja = localStorage.session_caja;
+  if(sesion_caja == null){
+    $('#btn-apertura-caja').click();
+  }else{
+    
+  }
+
+}
 function generarQrNotas() {
   var route = $("#route").val();
   var folio_nota = $("#folio_nota").val();
@@ -343,7 +355,7 @@ function actualizarNota(id_nota,fecha_publicacion){
     text: "Quieres realizar la acción solicitada",
     icon: "question",
     showCancelButton: true,
-    confirmButtonColor: "#3085d6",
+    confirmButtonColor: "#B99654",
     cancelButtonColor: "#d33",
     confirmButtonText: "Si, realizar",
     cancelButtonText: "No, cancelar",
@@ -377,7 +389,7 @@ function actualizarNota(id_nota,fecha_publicacion){
         datos.append("porc_descuento_nota",porc_descuento_nota);
         datos.append("modulo_notas", "actualizar_nota");
   
-        fetch(url + "app/ajax/cajaAjax.php", {
+        fetch(url + "app/ajax/notasAjax.php", {
           method: "POST",
           body: datos,
         })
@@ -389,4 +401,184 @@ function actualizarNota(id_nota,fecha_publicacion){
       }
     }
   });
+}
+function eliminarNota(id_nota,fecha_publicacion){
+ 
+  Swal.fire({
+    title: "¿Estás seguro?",
+    text: "Quieres realizar la acción solicitada",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#B99654",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Si, realizar",
+    cancelButtonText: "No, cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      var fecha = fecha_publicacion;
+      var publicacion = new Date(fecha).getTime();
+      var now = new Date();
+      var diferencia = publicacion - now;
+      if(diferencia<0){
+
+        var respuesta = {
+          tipo: "simple",
+          titulo: "La nota no puede ser eliminada porque se encuentra en circulación.",
+          text: "",
+          icono: "error",
+        };
+        return alertas_ajax(respuesta);
+
+      }else{
+  
+        let datos = new FormData();
+        datos.append("id_nota", id_nota);
+        datos.append("modulo_notas", "eliminar_nota");
+  
+        fetch(url + "app/ajax/notasAjax.php", {
+          method: "POST",
+          body: datos,
+        })
+          .then((respuesta) => respuesta.json())
+          .then((respuesta) => {
+            return alertas_ajax(respuesta);
+          });
+
+      }
+    }
+  });
+}
+function registrarVenta(){
+  var sesion_caja = localStorage.session_caja;
+  if(sesion_caja == undefined) {
+    
+    Swal.fire({
+      icon: "error",
+      title: "No se ha iniciado la sesión de caja",
+      text: "Para realizar una venta debe aperturar su sesión de caja",
+      confirmButtonText: "Aperturar Caja",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        window.location.href = url+"dashboard/";
+      }
+    });
+
+    
+  }else{
+    
+  }
+  
+  /*
+  Swal.fire({
+    title: "¿Desea Registrar La Venta?",
+    text: "",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#B99654",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Si, Registrar",
+    cancelButtonText: "No, cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      var forma_pago = $("#forma_pago_venta").val();
+      var total_pago = $("#total_pagar_venta").val();
+      var total_pagado = $("#total_pagado_venta").val();
+      var total_Cambio = $("#total_cambio_venta").val();
+      var referencia_venta = $("#referencia_venta").val();
+
+      if (forma_pago == "1") {
+        if (total_pagado < total_pago) {
+          Swal.fire({
+            icon: "error",
+            title: "Error de pago",
+            text: "El monto pagado no puede ser menor al total de la venta.",
+            confirmButtonText: "Aceptar",
+          });
+        } else {
+         
+          let datos = new FormData();
+          datos.append("id_venta", id_venta);
+          datos.append("forma_pago", forma_pago);
+          datos.append("total_pago", total_pago);
+          datos.append("total_pagado", total_pagado);
+          datos.append("total_cambio", total_Cambio);
+          datos.append("referencia_venta", "");
+          datos.append("modulo_venta", "generar_pago_venta");
+    
+          fetch(urlPathNew + "app/ajax/ventaAjax.php", {
+            method: "POST",
+            body: datos,
+          })
+            .then((respuesta) => respuesta.json())
+            .then((respuesta) => {
+              return alertas_ajax(respuesta);
+            });
+            
+        }
+      } else {
+        
+        let datos = new FormData();
+        datos.append("id_venta", id_venta);
+        datos.append("forma_pago", forma_pago);
+        datos.append("total_pago", total_pago);
+        datos.append("total_pagado", total_pago);
+        datos.append("total_cambio", "0.00");
+        datos.append("referencia_venta", referencia_venta);
+        datos.append("modulo_venta", "generar_pago_venta");
+    
+        fetch(urlPathNew + "app/ajax/ventaAjax.php", {
+          method: "POST",
+          body: datos,
+        })
+          .then((respuesta) => respuesta.json())
+          .then((respuesta) => {
+            return alertas_ajax(respuesta);
+          });
+         
+      }
+      
+      let datos = new FormData();
+        datos.append("id_nota", id_nota);
+        datos.append("modulo_notas", "eliminar_nota");
+  
+        fetch(url + "app/ajax/notasAjax.php", {
+          method: "POST",
+          body: datos,
+        })
+          .then((respuesta) => respuesta.json())
+          .then((respuesta) => {
+            return alertas_ajax(respuesta);
+          });
+          
+    }
+  });
+*/
+}
+function aperturarCaja(){
+  var saldo_inicial = $("#saldo_inicial").val();
+  var notas_apertura = $("#notas_apertura").val();
+  let datos = new FormData();
+        datos.append("saldo_inicial", saldo_inicial);
+        datos.append("notas_apertura", notas_apertura);
+        datos.append("modulo_caja", "aperturar_caja");
+
+          new Promise(function (resolve) {
+            resolve(
+              fetch(url + "app/ajax/cajaAjax.php", {
+                method: "POST",
+                body: datos,
+              })
+                .then((respuesta) => respuesta.json())
+                .then((respuesta) => {
+                  return alertas_ajax(respuesta);
+                })
+            );
+          }).then(function (result) {
+           
+              localStorage.setItem("session_caja","abierta");
+          
+              setTimeout(function() {
+                window.location.href = url+"saleNew/";
+              }, 2000);
+          });
 }

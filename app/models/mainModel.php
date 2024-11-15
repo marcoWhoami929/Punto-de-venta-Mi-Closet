@@ -320,7 +320,26 @@ class mainModel
 	}
 
 	/*----------  Funcion generar codigos aleatorios  ----------*/
-	protected function generarCodigoAleatorio($longitud, $correlativo)
+	protected function generarCodigoAleatorio($codigo, $longitud, $correlativo)
+	{
+		$prefijo = $codigo;
+		$codigo = "";
+		$caracter = "Letra";
+		for ($i = 1; $i <= $longitud; $i++) {
+			if ($caracter == "Letra") {
+				$letra_aleatoria = chr(rand(ord("a"), ord("z")));
+				$letra_aleatoria = strtoupper($letra_aleatoria);
+				$codigo .= $letra_aleatoria;
+				$caracter = "Numero";
+			} else {
+				$numero_aleatorio = rand(0, 9);
+				$codigo .= $numero_aleatorio;
+				$caracter = "Letra";
+			}
+		}
+		return $prefijo . "-" . $codigo . "-" . $correlativo;
+	}
+	protected function generarCodigoAleatorioProducto($longitud)
 	{
 		$codigo = "";
 		$caracter = "Letra";
@@ -336,9 +355,8 @@ class mainModel
 				$caracter = "Letra";
 			}
 		}
-		return $codigo . "-" . $correlativo;
+		return $codigo;
 	}
-
 
 	/*----------  Limitar cadenas de texto  ----------*/
 	public function limitarCadena($cadena, $limite, $sufijo)

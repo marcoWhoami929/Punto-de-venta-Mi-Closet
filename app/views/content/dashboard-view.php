@@ -112,3 +112,59 @@ $total_ventas = $insLogin->seleccionarDatos("Normal", "venta", "id_venta", 0);
 	</div>
 
 </div>
+<button class="js-modal-trigger" data-target="modal-apertura-caja" id="btn-apertura-caja" style="display:none">
+
+</button>
+<div class="modal fade is-large" id="modal-apertura-caja" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-background"></div>
+	<div class="modal-card">
+		<header class="modal-card-head" style="background:#B99654">
+			<p class="modal-card-title is-uppercase" style="color:#ffffff">
+				<i class="fas fa-cash-register"></i> &nbsp; Apertura de Caja
+			</p>
+			<button class="delete" aria-label="close"></button>
+		</header>
+		<section class="modal-card-body">
+
+			<div class="columns">
+				<div class="column">
+					<div class="field">
+						<label class="label">Efectivo de apertura:</label>
+						<div class="control has-icons-left has-icons-right">
+							<input class="input is-large" type="text" placeholder="0.00" style="font-size:50px;font-weight:bold" id="saldo_inicial" value="0.00" />
+							<span class="icon is-medium is-left " style="margin-top:20px">
+								<i class="fas fa-dollar-sign fa-3x"></i>
+							</span>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+
+			<div class="columns  mb-6">
+				<div class="column">
+					<div class="field">
+						<label class="label">Notas de apertura</label>
+						<div class="control has-icons-left has-icons-right">
+							<textarea class="textarea is-large" type="text" placeholder="Notas de apertura de caja" style="font-size:12px;font-weight:bold" id="notas_apertura"></textarea>
+
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="columns">
+				<div class="column">
+					<p class="has-text-centered">
+						<button type="button" class="button is-success button-lg" onclick="aperturarCaja()"><i class="fas fa-cash-register"></i> &nbsp; Abrir Caja</button>
+					</p>
+				</div>
+			</div>
+
+
+
+		</section>
+	</div>
+</div>

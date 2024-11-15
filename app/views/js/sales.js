@@ -212,7 +212,7 @@ function remover_cliente(id) {
     text: "Se va a quitar el cliente seleccionado de la venta",
     icon: "question",
     showCancelButton: true,
-    confirmButtonColor: "#3085d6",
+    confirmButtonColor: "#B99654",
     cancelButtonColor: "#d33",
     confirmButtonText: "Si, remover",
     cancelButtonText: "No, cancelar",
@@ -302,7 +302,7 @@ function establecerFormaPago(formaPago, total_pago, id_venta, estatus) {
   if (estatus == 0) {
     var respuesta = {
       tipo: "simple",
-      titulo: "La Nota se encuentra cancelada",
+      titulo: "La Venta se encuentra cancelada",
       text: "",
       icono: "error",
     };
@@ -333,8 +333,13 @@ function calcularCambio() {
 
   var total_pagado = $("#total_pagado_venta").val();
   var total_pagado = parseFloat(total_pagado);
+  if(isNaN(total_pagado)){
+    var cambio = 0;
+  }else{
+    var cambio = total_pagado - total_pago;
+  }
 
-  var cambio = total_pagado - total_pago;
+ 
   $("#total_cambio_venta").val(parseFloat(cambio).toFixed(2));
 }
 function confirmacionPago() {

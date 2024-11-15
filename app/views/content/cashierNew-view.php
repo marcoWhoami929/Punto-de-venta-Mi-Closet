@@ -22,12 +22,7 @@
 					<input class="input" type="text" name="nombre" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ:# ]{3,70}" maxlength="70" required>
 				</div>
 			</div>
-			<div class="column">
-				<div class="control">
-					<label>Saldo Inicial <?php echo CAMPO_OBLIGATORIO; ?></label>
-					<input class="input" type="text" name="saldo_inicial" pattern="[0-9.]{1,25}" maxlength="25" value="0.00" required>
-				</div>
-			</div>
+
 		</div>
 		<p class="has-text-centered">
 			<button type="reset" class="button is-link is-light is-rounded"><i class="fas fa-paint-roller"></i> &nbsp; Limpiar</button>

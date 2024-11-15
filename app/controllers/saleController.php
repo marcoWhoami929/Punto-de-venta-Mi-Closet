@@ -4,24 +4,7 @@ namespace app\controllers;
 
 use app\models\mainModel;
 
-function generarCodigoAleatorio($longitud)
-{
-	$codigo = "";
-	$caracter = "Letra";
-	for ($i = 1; $i <= $longitud; $i++) {
-		if ($caracter == "Letra") {
-			$letra_aleatoria = chr(rand(ord("a"), ord("z")));
-			$letra_aleatoria = strtoupper($letra_aleatoria);
-			$codigo .= $letra_aleatoria;
-			$caracter = "Numero";
-		} else {
-			$numero_aleatorio = rand(0, 9);
-			$codigo .= $numero_aleatorio;
-			$caracter = "Letra";
-		}
-	}
-	return $codigo;
-}
+
 
 class saleController extends mainModel
 {
@@ -227,7 +210,7 @@ class saleController extends mainModel
 
 		/*== Recuperando codigo del producto ==*/
 		$codigo = $this->limpiarCadena($_POST['codigo']);
-		$token = generarCodigoAleatorio(8);
+		$token = $this->generarCodigoAleatorioProducto(8);
 
 		if ($codigo == "") {
 			$alerta = [
@@ -710,10 +693,25 @@ class saleController extends mainModel
 		/*== generando codigo de venta ==*/
 		$correlativo = $this->ejecutarConsulta("SELECT id_venta FROM venta");
 		$correlativo = ($correlativo->rowCount()) + 1;
-		$codigo_venta = $this->generarCodigoAleatorio(10, $correlativo);
+		$codigo_venta = $this->generarCodigoAleatorio('SALE', 10, $correlativo);
 
 		/*== Preparando datos para enviarlos al modelo ==*/
 		$datos_venta_reg = [
+			[
+				"campo_nombre" => "tipo_venta",
+				"campo_marcador" => ":TipoVenta",
+				"campo_valor" => 'directa',
+			],
+			[
+				"campo_nombre" => "tipo_entrega",
+				"campo_marcador" => ":TipoEntrega",
+				"campo_valor" => 'recoleccion',
+			],
+			[
+				"campo_nombre" => "forma_pago",
+				"campo_marcador" => ":FormaPago",
+				"campo_valor" => '1',
+			],
 			[
 				"campo_nombre" => "codigo",
 				"campo_marcador" => ":Codigo",
@@ -1627,6 +1625,9 @@ class saleController extends mainModel
 				<input type="hidden" value="<?php echo number_format($_SESSION['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="total_hidden">
 				<input type="hidden" value="<?php echo number_format($_SESSION['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="subtotal_hidden">
 				<input type="hidden" value="<?php echo number_format($_SESSION['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, ""); ?>" id="descuento_hidden">
+				<script type="text/javascript">
+					$("#total_pagar_venta").val(parseFloat(<?php echo $_SESSION['total'] ?>).toFixed(2));
+				</script>
 			</div>
 		</div>
 

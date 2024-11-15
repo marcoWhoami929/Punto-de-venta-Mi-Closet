@@ -442,15 +442,11 @@ class notesController extends mainModel
 			                    	<i class="fas fa-shopping-bag fa-fw"></i>
 			                    </a>
 
-			                	<form class="FormularioAjax is-inline-block" action="' . APP_URL . 'app/ajax/notasAjax.php" method="POST" autocomplete="off" >
 
-			                		<input type="hidden" name="modulo_notas" value="eliminar_nota">
-			                		<input type="hidden" name="id_nota" value="' . $rows['id_nota'] . '">
-
-			                    	<button type="submit" class="button is-danger is-rounded is-small" title="Eliminar nota Nro. ' . $rows['id_nota'] . '" >
+			                    	<button type="button" class="button is-danger is-rounded is-small" title="Eliminar nota Nro. ' . $rows['id_nota'] . '" onclick="eliminarNota(\'' . $rows['id_nota'] . '\',\'' . $rows['fecha_publicacion'] . '\')">
 			                    		<i class="far fa-trash-alt fa-fw"></i>
 			                    	</button>
-			                    </form>
+			                    
 
 			                </td>
 						</tr>
@@ -472,7 +468,7 @@ class notesController extends mainModel
             } else {
                 $tabla .= '
 						<tr class="has-text-centered" >
-			                <td colspan="7">
+			                <td colspan="9">
 			                    No hay registros en el sistema
 			                </td>
 			            </tr>
