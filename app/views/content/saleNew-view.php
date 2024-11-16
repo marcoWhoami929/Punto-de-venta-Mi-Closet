@@ -123,7 +123,7 @@
 
                         <label>Caja de ventas <?php echo CAMPO_OBLIGATORIO; ?></label><br>
                         <div class="select mb-5">
-                            <select name="venta_caja">
+                            <select name="venta_caja" id="venta_caja">
                                 <?php
                                 $datos_cajas = $insLogin->seleccionarDatos("Normal", "caja", "*", 0);
 

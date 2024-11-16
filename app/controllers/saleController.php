@@ -513,10 +513,14 @@ class saleController extends mainModel
 	{
 
 		$caja = $this->limpiarCadena($_POST['venta_caja']);
-		$pagado = $this->limpiarCadena($_POST['venta_abono']);
+		$forma_pago = $this->limpiarCadena($_POST['forma_pago']);
+		$total_pago = $this->limpiarCadena($_POST['total_pago']);
+		$total_pagado = $this->limpiarCadena($_POST['total_pagado']);
+		$total_Cambio = $this->limpiarCadena($_POST['total_Cambio']);
+		$referencia_venta = $this->limpiarCadena($_POST['referencia_venta']);
 
 		/*== Comprobando integridad de los datos ==*/
-		if ($this->verificarDatos("[0-9.]{1,25}", $pagado)) {
+		if ($this->verificarDatos("[0-9.]{1,25}", $total_pagado)) {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -565,7 +569,7 @@ class saleController extends mainModel
 
 
 		/*== Comprobando caja en la DB ==*/
-		$check_caja = $this->ejecutarConsulta("SELECT * FROM caja WHERE id_caja='$caja'");
+		$check_caja = $this->ejecutarConsulta("SELECT * FROM sesiones_caja WHERE id_caja='$caja'");
 		if ($check_caja->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -581,7 +585,7 @@ class saleController extends mainModel
 
 
 		/*== Formateando variables ==*/
-		$pagado = number_format($pagado, MONEDA_DECIMALES, '.', '');
+		$pagado = number_format($total_pagado, MONEDA_DECIMALES, '.', '');
 		$total = number_format($_SESSION['total'], MONEDA_DECIMALES, '.', '');
 		$subtotal = number_format($_SESSION['subtotal'], MONEDA_DECIMALES, '.', '');
 		$descuento = number_format($_SESSION['descuento'], MONEDA_DECIMALES, '.', '');
