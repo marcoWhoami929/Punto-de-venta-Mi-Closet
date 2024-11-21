@@ -25,6 +25,8 @@ class productController extends mainModel
 		$categoria = $this->limpiarCadena($_POST['producto_categoria']);
 		$colores = $this->limpiarCadena($_POST['colores']);
 		$tallas = $this->limpiarCadena($_POST['tallas']);
+		$stock_minimo = $this->limpiarCadena($_POST['producto_stock_minimo']);
+		$stock_maximo = $this->limpiarCadena($_POST['producto_stock_maximo']);
 
 		# Verificando campos obligatorios #
 		if ($codigo == "" || $nombre == "" || $precio_venta == "" || $stock == "") {
@@ -250,6 +252,8 @@ class productController extends mainModel
 		} else {
 			$foto = "";
 		}
+		$cid_producto = $this->ejecutarConsulta("SELECT MAX(id_producto)+1 as IdProducto FROM producto");
+		$cid_producto = $cid_producto->fetch();
 
 		$producto_datos_reg = [
 			[
@@ -258,14 +262,19 @@ class productController extends mainModel
 				"campo_valor" => $codigo
 			],
 			[
+				"campo_nombre" => "cid_producto",
+				"campo_marcador" => ":CidProducto",
+				"campo_valor" => $cid_producto['IdProducto']
+			],
+			[
 				"campo_nombre" => "nombre",
 				"campo_marcador" => ":Nombre",
 				"campo_valor" => $nombre
 			],
 			[
-				"campo_nombre" => "stock_total",
-				"campo_marcador" => ":Stock",
-				"campo_valor" => $stock
+				"campo_nombre" => "out_stock",
+				"campo_marcador" => ":OutStock",
+				"campo_valor" => 0
 			],
 			[
 				"campo_nombre" => "tipo_unidad",
@@ -318,8 +327,48 @@ class productController extends mainModel
 				"campo_valor" => $categoria
 			]
 		];
+		$inventario_datos_reg = [
+
+			[
+				"campo_nombre" => "id_producto",
+				"campo_marcador" => ":IdProducto",
+				"campo_valor" => $cid_producto['IdProducto']
+			],
+			[
+				"campo_nombre" => "stock_total",
+				"campo_marcador" => ":StockTotal",
+				"campo_valor" => $stock
+			],
+			[
+				"campo_nombre" => "stock_minimo",
+				"campo_marcador" => ":StockMinimo",
+				"campo_valor" => $stock_minimo
+			],
+			[
+				"campo_nombre" => "stock_maximo",
+				"campo_marcador" => ":StockMaximo",
+				"campo_valor" => $stock_maximo
+			]
+		];
+
+		$movimiento_datos_reg = [
+
+			[
+				"campo_nombre" => "id_producto",
+				"campo_marcador" => ":IdProducto",
+				"campo_valor" => $cid_producto['IdProducto']
+			],
+			[
+				"campo_nombre" => "id_producto",
+				"campo_marcador" => ":Categoria",
+				"campo_valor" => $categoria
+			]
+		];
 
 		$registrar_producto = $this->guardarDatos("producto", $producto_datos_reg);
+		$registrar_inventario = $this->guardarDatos("inventario", $inventario_datos_reg);
+		$registrar_movimiento = $this->guardarDatos("movimiento_inventario", $movimiento_datos_reg);
+
 
 		if ($registrar_producto->rowCount() == 1) {
 			$alerta = [
@@ -368,21 +417,21 @@ class productController extends mainModel
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
 		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
 
-		$campos = "prod.id_producto,prod.codigo,prod.nombre as 'producto',prod.stock_total,prod.precio_venta,prod.foto,cat.nombre as 'categoria'";
+		$campos = "prod.id_producto,prod.codigo,prod.nombre as 'producto',prod.precio_venta,prod.foto,cat.nombre as 'categoria',inven.stock_total";
 
 		if (isset($busqueda) && $busqueda != "") {
 
-			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria WHERE prod.codigo LIKE '%$busqueda%' OR prod.nombre LIKE '%$busqueda%' OR prod.marca LIKE '%$busqueda%' OR prod.modelo LIKE '%$busqueda%' ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.id_producto=inven.id_producto WHERE prod.codigo LIKE '%$busqueda%' OR prod.nombre LIKE '%$busqueda%' OR prod.marca LIKE '%$busqueda%' OR prod.modelo LIKE '%$busqueda%' ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_producto) FROM producto WHERE codigo LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' OR marca LIKE '%$busqueda%' OR modelo LIKE '%$busqueda%'";
 		} elseif ($categoria > 0) {
 
-			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria WHERE prod.id_categoria='$categoria' ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.id_producto=inven.id_producto WHERE prod.id_categoria='$categoria' ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_producto) FROM producto WHERE id_categoria='$categoria'";
 		} else {
 
-			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.id_producto=inven.id_producto ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
 
 			$consulta_total = "SELECT COUNT(id_producto) FROM producto";
 		}
@@ -575,6 +624,13 @@ class productController extends mainModel
 		$colores = $this->limpiarCadena($_POST['colores']);
 		$tallas = $this->limpiarCadena($_POST['tallas']);
 
+
+		if (isset($_POST['out_stock'])) {
+			$out_stock = 1;
+		} else {
+			$out_stock = 0;
+		}
+
 		# Verificando campos obligatorios #
 		if ($codigo == "" || $nombre == ""  || $precio_venta == "" || $stock == "") {
 			$alerta = [
@@ -729,6 +785,11 @@ class productController extends mainModel
 				"campo_nombre" => "codigo",
 				"campo_marcador" => ":Codigo",
 				"campo_valor" => $codigo
+			],
+			[
+				"campo_nombre" => "out_Stock",
+				"campo_marcador" => ":OutStock",
+				"campo_valor" => $out_stock
 			],
 			[
 				"campo_nombre" => "nombre",

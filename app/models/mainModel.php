@@ -123,6 +123,25 @@ class mainModel
 
 		return $sql;
 	}
+	public function seleccionarDatosMultiples($union, $campos, $tipo, $tabla, $campo, $id)
+	{
+		$tipo = $this->limpiarCadena($tipo);
+		$tabla = $this->limpiarCadena($tabla);
+		$campo = $this->limpiarCadena($campo);
+		$campos = $campos;
+		$union = $union;
+		$id = $this->limpiarCadena($id);
+
+		if ($tipo == "Unico") {
+			$sql = $this->conectar()->prepare("SELECT $campos FROM $tabla $union WHERE $campo=:ID");
+			$sql->bindParam(":ID", $id);
+		} elseif ($tipo == "Normal") {
+			$sql = $this->conectar()->prepare("SELECT $campo FROM $tabla");
+		}
+		$sql->execute();
+
+		return $sql;
+	}
 
 
 	/*----------  Funcion para ejecutar una consulta UPDATE preparada  ----------*/

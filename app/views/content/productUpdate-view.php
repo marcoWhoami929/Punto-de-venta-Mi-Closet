@@ -9,8 +9,11 @@
 	include "./app/views/inc/btn_back.php";
 
 	$id = $insLogin->limpiarCadena($url[1]);
+	$union = " as prod INNER JOIN inventario as inven ON prod.id_producto = inven.id_producto";
+	$campos = " prod.*,inven.stock_total";
 
-	$datos = $insLogin->seleccionarDatos("Unico", "producto", "id_producto", $id);
+	$datos = $insLogin->seleccionarDatosMultiples($union, $campos, "Unico", "producto", "prod.id_producto", $id);
+
 
 	if ($datos->rowCount() == 1) {
 		$datos = $datos->fetch();
@@ -121,6 +124,25 @@
 							}
 							?>
 						</select>
+					</div>
+				</div>
+				<div class="column">
+					<div class="control">
+						<label>*Permitir Venta Sin Inventario</label><br>
+						<div class="checkboxes ">
+							<label class="checkbox">
+								<?php
+								if ($datos['out_stock'] == 0) {
+									$checked = '';
+								} else {
+									$checked = 'checked';
+								}
+								?>
+								<input type="checkbox" name="out_stock" id="out_stock" <?= $checked ?> />
+
+							</label>
+						</div>
+
 					</div>
 				</div>
 			</div>

@@ -254,13 +254,12 @@ class cashierController extends mainModel
 		$tabla .= '
 		        <div class="table-container">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-		            <thead style="background:#B99654;color:#ffffff;">
+		            <thead>
 		                <tr>
-		                    <th class="has-text-centered is-primary">Numero</th>
-		                    <th class="has-text-centered is-primary">Nombre</th>
-		                    <th class="has-text-centered is-primary">Saldo Inicial</th>
-		                    <th class="has-text-centered is-primary">Actualizar</th>
-		                    <th class="has-text-centered is-primary">Eliminar</th>
+		                    <th class="has-text-centered is-info">Numero</th>
+		                    <th class="has-text-centered is-info">Nombre</th>
+		                    <th class="has-text-centered is-info">Actualizar</th>
+		                    <th class="has-text-centered is-info">Eliminar</th>
 		                </tr>
 		            </thead>
 		            <tbody>
@@ -274,7 +273,7 @@ class cashierController extends mainModel
 						<tr class="has-text-centered" >
 							<td>' . $rows['numero'] . '</td>
 							<td>' . $rows['nombre'] . '</td>
-							<td>' . $rows['saldo_inicial'] . '</td>
+
 			                <td>
 			                    <a href="' . APP_URL . 'cashierUpdate/' . $rows['id_caja'] . '/" class="button is-success is-rounded is-small">
 			                    	<i class="fas fa-sync fa-fw"></i>

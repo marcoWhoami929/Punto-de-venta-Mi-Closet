@@ -516,7 +516,7 @@ class saleController extends mainModel
 		$forma_pago = $this->limpiarCadena($_POST['forma_pago']);
 		$total_pago = $this->limpiarCadena($_POST['total_pago']);
 		$total_pagado = $this->limpiarCadena($_POST['total_pagado']);
-		$total_Cambio = $this->limpiarCadena($_POST['total_Cambio']);
+		$total_Cambio = $this->limpiarCadena($_POST['total_cambio']);
 		$referencia_venta = $this->limpiarCadena($_POST['referencia_venta']);
 
 		/*== Comprobando integridad de los datos ==*/
@@ -1025,31 +1025,32 @@ class saleController extends mainModel
 		$total = (int) $total->fetchColumn();
 
 		$numeroPaginas = ceil($total / $registros);
-
-		$tabla .= '
-		        <div class="table-container" style="margin-top:50px">
-		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-		            <thead style="background:#B99654;color:#ffffff;">
-		                <tr>
-							<th class="has-text-centered" style="color:#ffffff">Tipo Entrega</th>		
-							<th class="has-text-centered" style="color:#ffffff">Estatus Pago</th>
-							<th class="has-text-centered" style="color:#ffffff">Estatus Venta</th>
-		                    <th class="has-text-centered" style="color:#ffffff">NRO.</th>
-							<th class="has-text-centered" style="color:#ffffff">Tipo</th>
-		                    <th class="has-text-centered" style="color:#ffffff">Codigo</th>
-		                    <th class="has-text-centered" style="color:#ffffff">Fecha</th>
-		                    <th class="has-text-centered" style="color:#ffffff">Cliente</th>
-		                    <th class="has-text-centered" style="color:#ffffff">Vendedor</th>
-							<th class="has-text-centered" style="color:#ffffff">Subtotal</th>
-							<th class="has-text-centered" style="color:#ffffff">Descuento</th>
-		                    <th class="has-text-centered" style="color:#ffffff">Total</th>
-		                    <th class="has-text-centered" style="color:#ffffff">Opciones</th>
-		                </tr>
-		            </thead>
-		            <tbody>
-		    ';
+		$tabla = "";
 
 		if ($total >= 1 && $pagina <= $numeroPaginas) {
+			$tabla .= '
+			<div class="table-container" style="margin-top:50px">
+			<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+				<thead style="background:#B99654;color:#ffffff;">
+					<tr>
+						<th class="has-text-centered" style="color:#ffffff">Tipo Entrega</th>		
+						<th class="has-text-centered" style="color:#ffffff">Estatus Pago</th>
+						<th class="has-text-centered" style="color:#ffffff">Estatus Venta</th>
+						<th class="has-text-centered" style="color:#ffffff">NRO.</th>
+						<th class="has-text-centered" style="color:#ffffff">Tipo</th>
+						<th class="has-text-centered" style="color:#ffffff">Codigo</th>
+						<th class="has-text-centered" style="color:#ffffff">Fecha</th>
+						<th class="has-text-centered" style="color:#ffffff">Cliente</th>
+						<th class="has-text-centered" style="color:#ffffff">Vendedor</th>
+						<th class="has-text-centered" style="color:#ffffff">Subtotal</th>
+						<th class="has-text-centered" style="color:#ffffff">Descuento</th>
+						<th class="has-text-centered" style="color:#ffffff">Total</th>
+						<th class="has-text-centered" style="color:#ffffff">Opciones</th>
+					</tr>
+				</thead>
+				<tbody>
+		';
+
 			$contador = $inicio + 1;
 			$pag_inicio = $inicio + 1;
 			foreach ($datos as $rows) {
@@ -1144,11 +1145,15 @@ class saleController extends mainModel
 					';
 			} else {
 				$tabla .= '
-						<tr class="has-text-centered" >
-			                <td colspan="13">
-			                    No hay registros en el sistema
-			                </td>
-			            </tr>
+						<article class="message is-warning mt-4 mb-4">
+				 <div class="message-header">
+					
+				 </div>
+				<div class="message-body has-text-centered">
+					<i class="fas fa-exclamation-triangle fa-2x"></i><br>
+					No hay ventas realizadas por el momento!
+				</div>
+			</article>
 					';
 			}
 		}

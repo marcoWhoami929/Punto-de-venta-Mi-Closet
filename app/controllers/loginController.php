@@ -53,6 +53,7 @@ class loginController extends mainModel
 
 						if ($check_usuario['usuario'] == $usuario && password_verify($clave, $check_usuario['password'])) {
 
+
 							$_SESSION['id'] = $check_usuario['id_usuario'];
 							$_SESSION['nombre'] = $check_usuario['nombreUsuario'];
 							$_SESSION['usuario'] = $check_usuario['usuario'];

@@ -45,7 +45,19 @@
 			<div class="column">
 				<div class="control">
 					<label>Stock Inicial<?php echo CAMPO_OBLIGATORIO; ?></label>
-					<input class="input" type="text" name="producto_stock" pattern="[0-9]{1,22}" maxlength="22" required value="0">
+					<input class="input" type="text" name="producto_stock" pattern="[0-9]{1,22}" maxlength="22" required value="1">
+				</div>
+			</div>
+			<div class="column">
+				<div class="control">
+					<label>Stock Minimo<?php echo CAMPO_OBLIGATORIO; ?></label>
+					<input class="input" type="text" name="producto_stock_minimo" pattern="[0-9]{1,22}" maxlength="22" required value="3">
+				</div>
+			</div>
+			<div class="column">
+				<div class="control">
+					<label>Stock Máximo<?php echo CAMPO_OBLIGATORIO; ?></label>
+					<input class="input" type="text" name="producto_stock_maximo" pattern="[0-9]{1,22}" maxlength="22" required value="20">
 				</div>
 			</div>
 		</div>

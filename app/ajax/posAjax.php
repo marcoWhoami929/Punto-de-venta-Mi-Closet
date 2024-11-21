@@ -12,7 +12,7 @@ use app\controllers\productController;
 use app\controllers\saleController;
 
 if (isset($_POST['modulo_pos'])) {
-    if ($_POST['modulo_pos'] == "listarNotas") {
+    if ($_POST['modulo_pos'] == "listarCajas") {
 
         $datos = array(
             "busqueda" => $_POST["busqueda"],

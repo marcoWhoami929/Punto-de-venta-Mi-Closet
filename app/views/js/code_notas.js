@@ -131,7 +131,7 @@ function listarCajas() {
       per_page:per_page,
       page:page,
       url:url,
-      modulo_pos: "listarNotas",
+      modulo_pos: "listarCajas",
     },
     success: function (response) {
       $(".div-cashier").html(response);
