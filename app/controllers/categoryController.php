@@ -124,8 +124,12 @@ class categoryController extends mainModel
 		$total = (int) $total->fetchColumn();
 
 		$numeroPaginas = ceil($total / $registros);
+		$tabla = "";
 
-		$tabla .= '
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+			$tabla .= '
 		        <div class="table-container">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 		            <thead style="background:#B99654;color:#ffffff;">
@@ -141,9 +145,6 @@ class categoryController extends mainModel
 		            <tbody>
 		    ';
 
-		if ($total >= 1 && $pagina <= $numeroPaginas) {
-			$contador = $inicio + 1;
-			$pag_inicio = $inicio + 1;
 			foreach ($datos as $rows) {
 				$tabla .= '
 						<tr class="has-text-centered" >
@@ -189,12 +190,16 @@ class categoryController extends mainModel
 					';
 			} else {
 				$tabla .= '
-						<tr class="has-text-centered" >
-			                <td colspan="6">
-			                    No hay registros en el sistema
-			                </td>
-			            </tr>
-					';
+						
+				<article class="message is-warning mt-4 mb-4">
+					 <div class="message-header">
+					    <p></p>
+					 </div>
+				    <div class="message-body has-text-centered">
+				    	<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+						No hay Categorias Registradas Actualmente
+				    </div>
+				</article>';
 			}
 		}
 

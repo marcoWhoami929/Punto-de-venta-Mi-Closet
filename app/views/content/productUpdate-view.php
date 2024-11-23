@@ -9,10 +9,10 @@
 	include "./app/views/inc/btn_back.php";
 
 	$id = $insLogin->limpiarCadena($url[1]);
-	$union = " as prod INNER JOIN inventario as inven ON prod.id_producto = inven.id_producto";
+	$union = " as prod INNER JOIN inventario as inven ON prod.cid_producto = inven.id_producto";
 	$campos = " prod.*,inven.stock_total";
 
-	$datos = $insLogin->seleccionarDatosMultiples($union, $campos, "Unico", "producto", "prod.id_producto", $id);
+	$datos = $insLogin->seleccionarDatosMultiples($union, $campos, "Unico", "producto", "prod.cid_producto", $id);
 
 
 	if ($datos->rowCount() == 1) {
@@ -45,7 +45,7 @@
 		<form class="FormularioAjax" action="<?php echo APP_URL; ?>app/ajax/productoAjax.php" method="POST" autocomplete="off">
 
 			<input type="hidden" name="modulo_producto" value="actualizar">
-			<input type="hidden" name="id_producto" value="<?php echo $datos['id_producto']; ?>">
+			<input type="hidden" name="id_producto" value="<?php echo $datos['cid_producto']; ?>">
 
 			<div class="columns">
 				<div class="column">
@@ -98,7 +98,7 @@
 					<div class="control">
 						<label>Presentación del producto <?php echo CAMPO_OBLIGATORIO; ?></label><br>
 						<div class="select">
-							<select name="producto_unidad">
+							<select name="producto_unidad" disabled>
 								<?php
 								echo $insLogin->generarSelect(PRODUCTO_UNIDAD, $datos['tipo_unidad']);
 								?>
@@ -109,7 +109,7 @@
 				<div class="column">
 					<label>Categoría <?php echo CAMPO_OBLIGATORIO; ?></label><br>
 					<div class="select">
-						<select name="producto_categoria">
+						<select name="producto_categoria" disabled>
 							<?php
 							$datos_categorias = $insLogin->seleccionarDatos("Normal", "categoria", "*", 0);
 

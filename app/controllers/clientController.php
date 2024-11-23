@@ -202,8 +202,12 @@ class clientController extends mainModel
 		$total = (int) $total->fetchColumn();
 
 		$numeroPaginas = ceil($total / $registros);
+		$tabla = "";
 
-		$tabla .= '
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+			$tabla .= '
 		        <div class="table-container">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 		            <thead style="background:#B99654;color:#ffffff;">
@@ -211,32 +215,34 @@ class clientController extends mainModel
 		                    <th class="has-text-centered" style="color:#ffffff">#</th>
 		                    <th class="has-text-centered" style="color:#ffffff">Tipo Cliente</th>
 		                    <th class="has-text-centered" style="color:#ffffff">Nombre</th>
-		                    <th class="has-text-centered" style="color:#ffffff">Email</th>
+		            
 							<th class="has-text-centered" style="color:#ffffff">Celular</th>
 							<th class="has-text-centered" style="color:#ffffff">Crédito</th>
 							<th class="has-text-centered" style="color:#ffffff">Pagado</th>
 							<th class="has-text-centered" style="color:#ffffff">Pendiente</th>
-		                    <th class="has-text-centered" style="color:#ffffff">Actualizar</th>
+							<th class="has-text-centered" style="color:#ffffff">Historial</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Editar</th>
 		                    <th class="has-text-centered" style="color:#ffffff">Eliminar</th>
 		                </tr>
 		            </thead>
 		            <tbody>
 		    ';
 
-		if ($total >= 1 && $pagina <= $numeroPaginas) {
-			$contador = $inicio + 1;
-			$pag_inicio = $inicio + 1;
 			foreach ($datos as $rows) {
 				$tabla .= '
 						<tr class="has-text-centered" >
 							<td>' . $contador . '</td>
 							<td>' . $rows['tipo_cliente'] . '</td>
 							<td>' . $rows['nombre'] . ' ' . $rows['apellidos'] . '</td>
-							<td>' . $rows['email'] . '</td>
 							<td>' . $rows['celular'] . '</td>
 							<td>' . $rows['credito'] . '</td>
 							<td>' . $rows['pagado'] . '</td>
 							<td>' . $rows['pendiente'] . '</td>
+							 <td>
+			                    <a href="' . APP_URL . 'clientUpdate/' . $rows['id_cliente'] . '/" class="button is-info is-rounded is-small">
+			                    	<i class="fas fa-history fa-fw"></i>
+			                    </a>
+			                </td>
 			                <td>
 			                    <a href="' . APP_URL . 'clientUpdate/' . $rows['id_cliente'] . '/" class="button is-success is-rounded is-small">
 			                    	<i class="fas fa-sync fa-fw"></i>
@@ -271,12 +277,16 @@ class clientController extends mainModel
 					';
 			} else {
 				$tabla .= '
-						<tr class="has-text-centered" >
-			                <td colspan="6">
-			                    No hay registros en el sistema
-			                </td>
-			            </tr>
-					';
+						
+				<article class="message is-warning mt-4 mb-4">
+					 <div class="message-header">
+					    <p></p>
+					 </div>
+				    <div class="message-body has-text-centered">
+				    	<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+						No hay Clientes Registrados Actualmente
+				    </div>
+				</article>';
 			}
 		}
 

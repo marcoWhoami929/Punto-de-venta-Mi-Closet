@@ -146,3 +146,6 @@
 		</p>
 	</form>
 </div>
+<script>
+	bulmaTagsinput.attach();
+</script>

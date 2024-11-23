@@ -9,7 +9,7 @@
 
 	$id = $insLogin->limpiarCadena($url[1]);
 
-	$datos = $insLogin->seleccionarDatos("Unico", "producto", "id_producto", $id);
+	$datos = $insLogin->seleccionarDatos("Unico", "producto", "cid_producto", $id);
 
 	if ($datos->rowCount() == 1) {
 		$datos = $datos->fetch();
@@ -28,7 +28,7 @@
 					<form class="FormularioAjax" action="<?php echo APP_URL; ?>app/ajax/productoAjax.php" method="POST" autocomplete="off">
 
 						<input type="hidden" name="modulo_producto" value="eliminarFoto">
-						<input type="hidden" name="id_producto" value="<?php echo $datos['id_producto']; ?>">
+						<input type="hidden" name="id_producto" value="<?php echo $datos['cid_producto']; ?>">
 
 						<p class="has-text-centered">
 							<button type="submit" class="button is-danger is-rounded"><i class="far fa-trash-alt"></i> &nbsp; Eliminar foto</button>
@@ -47,7 +47,7 @@
 				<form class="mb-6 has-text-centered FormularioAjax" action="<?php echo APP_URL; ?>app/ajax/productoAjax.php" method="POST" enctype="multipart/form-data" autocomplete="off">
 
 					<input type="hidden" name="modulo_producto" value="actualizarFoto">
-					<input type="hidden" name="id_producto" value="<?php echo $datos['id_producto']; ?>">
+					<input type="hidden" name="id_producto" value="<?php echo $datos['cid_producto']; ?>">
 
 					<label>Foto o imagen del producto</label><br>
 

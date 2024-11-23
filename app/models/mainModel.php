@@ -174,7 +174,34 @@ class mainModel
 		return $sql;
 	}
 
+	protected function actualizarDatosInventario($tabla, $datos, $condicion)
+	{
 
+		$query = "UPDATE $tabla SET ";
+
+		$C = 0;
+		foreach ($datos as $clave) {
+			if ($C >= 1) {
+				$query .= ",";
+			}
+			$query .= "stock_total=stock_total-" .  $clave["campo_marcador"];
+			$C++;
+		}
+
+		$query .= " WHERE " . $condicion["condicion_campo"] . "=" . $condicion["condicion_marcador"];
+
+		$sql = $this->conectar()->prepare($query);
+
+		foreach ($datos as $clave) {
+			$sql->bindParam($clave["campo_marcador"], $clave["campo_valor"]);
+		}
+
+		$sql->bindParam($condicion["condicion_marcador"], $condicion["condicion_valor"]);
+
+		$sql->execute();
+
+		return $sql;
+	}
 	/*---------- Funcion eliminar registro ----------*/
 	protected function eliminarRegistro($tabla, $campo, $id)
 	{

@@ -4,3 +4,4 @@
 <script src="<?php echo APP_URL; ?>app/views/js/dashboard.js"></script>
 <script src="<?php echo APP_URL; ?>app/views/plugins/scanapp/js/scanapp.js"></script>
 <script src="<?php echo APP_URL; ?>app/views/js/code_notas.js"></script>
+<script src="<?php echo APP_URL; ?>app/views/js/pos.js"></script>

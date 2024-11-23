@@ -252,7 +252,7 @@ class productController extends mainModel
 		} else {
 			$foto = "";
 		}
-		$cid_producto = $this->ejecutarConsulta("SELECT MAX(id_producto)+1 as IdProducto FROM producto");
+		$cid_producto = $this->ejecutarConsulta("SELECT IF(MAX(cid_producto)+1 IS NULL,1,MAX(cid_producto)+1) as IdProducto FROM producto");
 		$cid_producto = $cid_producto->fetch();
 
 		$producto_datos_reg = [
@@ -359,9 +359,19 @@ class productController extends mainModel
 				"campo_valor" => $cid_producto['IdProducto']
 			],
 			[
-				"campo_nombre" => "id_producto",
-				"campo_marcador" => ":Categoria",
-				"campo_valor" => $categoria
+				"campo_nombre" => "tipo_movimiento",
+				"campo_marcador" => ":TipoMovimiento",
+				"campo_valor" => 'entrada'
+			],
+			[
+				"campo_nombre" => "cantidad",
+				"campo_marcador" => ":Cantidad",
+				"campo_valor" => $stock
+			],
+			[
+				"campo_nombre" => "descripcion",
+				"campo_marcador" => ":Descripcion",
+				"campo_valor" => 'inventario inicial'
 			]
 		];
 
@@ -370,9 +380,9 @@ class productController extends mainModel
 		$registrar_movimiento = $this->guardarDatos("movimiento_inventario", $movimiento_datos_reg);
 
 
-		if ($registrar_producto->rowCount() == 1) {
+		if ($registrar_movimiento->rowCount() == 1) {
 			$alerta = [
-				"tipo" => "limpiar",
+				"tipo" => "recargar",
 				"titulo" => "Producto registrado",
 				"texto" => "El producto " . $nombre . " se registro con exito",
 				"icono" => "success"
@@ -417,23 +427,23 @@ class productController extends mainModel
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
 		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
 
-		$campos = "prod.id_producto,prod.codigo,prod.nombre as 'producto',prod.precio_venta,prod.foto,cat.nombre as 'categoria',inven.stock_total";
+		$campos = "prod.cid_producto,prod.codigo,prod.nombre as 'producto',prod.precio_venta,prod.foto,cat.nombre as 'categoria',inven.stock_total";
 
 		if (isset($busqueda) && $busqueda != "") {
 
-			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.id_producto=inven.id_producto WHERE prod.codigo LIKE '%$busqueda%' OR prod.nombre LIKE '%$busqueda%' OR prod.marca LIKE '%$busqueda%' OR prod.modelo LIKE '%$busqueda%' ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.cid_producto=inven.id_producto WHERE prod.codigo LIKE '%$busqueda%' OR prod.nombre LIKE '%$busqueda%' OR prod.marca LIKE '%$busqueda%' OR prod.modelo LIKE '%$busqueda%' ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
 
-			$consulta_total = "SELECT COUNT(id_producto) FROM producto WHERE codigo LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' OR marca LIKE '%$busqueda%' OR modelo LIKE '%$busqueda%'";
+			$consulta_total = "SELECT COUNT(cid_producto) FROM producto WHERE codigo LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' OR marca LIKE '%$busqueda%' OR modelo LIKE '%$busqueda%'";
 		} elseif ($categoria > 0) {
 
-			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.id_producto=inven.id_producto WHERE prod.id_categoria='$categoria' ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.cid_producto=inven.id_producto WHERE prod.id_categoria='$categoria' ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
 
-			$consulta_total = "SELECT COUNT(id_producto) FROM producto WHERE id_categoria='$categoria'";
+			$consulta_total = "SELECT COUNT(cid_producto) FROM producto WHERE id_categoria='$categoria'";
 		} else {
 
-			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.id_producto=inven.id_producto ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.cid_producto=inven.id_producto ORDER BY prod.nombre ASC LIMIT $inicio,$registros";
 
-			$consulta_total = "SELECT COUNT(id_producto) FROM producto";
+			$consulta_total = "SELECT COUNT(cid_producto) FROM producto";
 		}
 
 		$datos = $this->ejecutarConsulta($consulta_datos);
@@ -448,52 +458,90 @@ class productController extends mainModel
 			$contador = $inicio + 1;
 			$pag_inicio = $inicio + 1;
 			foreach ($datos as $rows) {
-				$tabla .= '
-		            <article class="media pb-3 pt-3">
-		                <figure class="media-left">
-		                    <p class="image is-64x64">';
+
+
 				if (is_file("./app/views/productos/" . $rows['foto'])) {
-					$tabla .= '<img src="' . APP_URL . 'app/views/productos/' . $rows['foto'] . '">';
+					$foto = '<img src="' . APP_URL . 'app/views/productos/' . $rows['foto'] . '">';
 				} else {
-					$tabla .= '<img src="' . APP_URL . 'app/views/productos/default.png">';
+					$foto = '<img src="' . APP_URL . 'app/views/productos/default.png">';
 				}
-				$tabla .= '</p>
-		                </figure>
-		                <div class="media-content">
-		                    <div class="content">
-		                        <p>
-		                            <strong>' . $contador . ' - ' . $rows['producto'] . '</strong><br>
-		                            <strong>CODIGO:</strong> ' . $rows['codigo'] . ', 
-		                            <strong>PRECIO:</strong> $' . $rows['precio_venta'] . ', 
-		                            <strong>STOCK:</strong> ' . $rows['stock_total'] . ', 
-		                            <strong>CATEGORIA:</strong> ' . $rows['categoria'] . '
-		                        </p>
-		                    </div>
-		                    <div class="has-text-right">
-		                        <a href="' . APP_URL . 'productPhoto/' . $rows['id_producto'] . '/" class="button is-info is-rounded is-small">
-			                    	<i class="far fa-image fa-fw"></i>
-			                    </a>
 
-		                        <a href="' . APP_URL . 'productUpdate/' . $rows['id_producto'] . '/" class="button is-success is-rounded is-small">
-		                        	<i class="fas fa-sync fa-fw"></i>
-		                        </a>
+				$tabla .= '<div class="card  pb-4">
+								<header class="card-header" style="background:#B99654;color:#ffffff">
+								 <p class="card-header-title"><strong style="color:#ffffff">' . $rows['producto'] . '</strong></p>
+								   <p class="card-header-title"><strong style="color:#ffffff">' . $rows['codigo'] . '</strong></p>
+									<button type="submit" class="button is-danger is-rounded pt-4" onclick="eliminarProducto(\'' . $rows['cid_producto'] . '\')">
+														<i class="fas fa-trash fa-fw"></i>
+											</button>
+										
+								</header>
+								<div class="card-content">
+									<div class="content">
+										<div class="columns">
+											<div class="column">
+												<figure class="media-left">
+													<p class="image is-64x64">
+														' . $foto . '
+													</p>
+													</figure>
+											</div>
+										 
+										
+											 <div class="column">
+													<div class="columns">
+													<label><strong>Precio:</strong></label>
+													</div>
+													<div class="columns">
+													' . MONEDA_SIMBOLO . " " . number_format($rows['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+													 </div>
+											</div>
+											<div class="column">
+													<div class="columns">
+													<label><strong>Existencia:</strong></label>
+													</div>
+													<div class="columns">
+													' . $rows['stock_total'] . '
+													</div>
+											</div>
+												<div class="column">
+													<div class="columns">
+													<label><strong>Categoria:</strong></label>
+													</div>
+													<div class="columns">
+													' . $rows['categoria'] . '
+													</div>
+											</div>
+											  
+										</div>
+										
+										
+									</div>
+								</div>
+								<footer class="card-footer">
+									
+										<div class=" card-footer-item">
+										
+												<a href="' . APP_URL . 'productPhoto/' . $rows['cid_producto'] . '/" class="button is-info is-rounded is-small">
+														<i class="far fa-image fa-fw"></i>
+													</a>
+												
+										</div>
+										<div class=" card-footer-item">
+											
+													<a href="' . APP_URL . 'productUpdate/' . $rows['cid_producto'] . '/" class="button is-success is-rounded is-small">
+														<i class="fas fa-sync fa-fw"></i>
+													</a>
+												
+										</div>
+								
+									
+									
+								</footer>
+								</div>
+									<hr>';
 
-		                        <form class="FormularioAjax is-inline-block" action="' . APP_URL . 'app/ajax/productoAjax.php" method="POST" autocomplete="off" >
-
-			                		<input type="hidden" name="modulo_producto" value="eliminar">
-			                		<input type="hidden" name="id_producto" value="' . $rows['id_producto'] . '">
-
-			                    	<button type="submit" class="button is-danger is-rounded is-small">
-			                    		<i class="far fa-trash-alt fa-fw"></i>
-			                    	</button>
-			                    </form>
-		                    </div>
-		                </div>
-		            </article>
 
 
-		            <hr>
-		            ';
 				$contador++;
 			}
 			$pag_final = $contador - 1;
@@ -509,9 +557,16 @@ class productController extends mainModel
 					';
 			} else {
 				$tabla .= '
-						<p class="has-text-centered pb-6"><i class="far fa-grin-beam-sweat fa-5x"></i></p>
-						<p class="has-text-centered">No hay productos registrados en esta categoría</p>
-					';
+						
+				<article class="message is-warning mt-4 mb-4">
+					 <div class="message-header">
+					    <p></p>
+					 </div>
+				    <div class="message-body has-text-centered">
+				    	<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+						No hay Productos Registrados Actualmente
+				    </div>
+				</article>';
 			}
 		}
 
@@ -533,7 +588,7 @@ class productController extends mainModel
 		$id = $this->limpiarCadena($_POST['id_producto']);
 
 		# Verificando producto #
-		$datos = $this->ejecutarConsulta("SELECT * FROM producto WHERE id_producto='$id'");
+		$datos = $this->ejecutarConsulta("SELECT * FROM producto WHERE cid_producto='$id'");
 		if ($datos->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -560,9 +615,11 @@ class productController extends mainModel
 			exit();
 		}
 
-		$eliminarProducto = $this->eliminarRegistro("producto", "id_producto", $id);
+		$eliminarProducto = $this->eliminarRegistro("producto", "cid_producto", $id);
+		$eliminarInventario = $this->eliminarRegistro("inventario", "id_producto", $id);
+		$eliminarMovimiento = $this->eliminarRegistro("movimiento_inventario", "id_producto", $id);
 
-		if ($eliminarProducto->rowCount() == 1) {
+		if ($eliminarMovimiento->rowCount() == 1) {
 
 			if (is_file("../views/productos/" . $datos['foto'])) {
 				chmod("../views/productos/" . $datos['foto'], 0777);
@@ -595,7 +652,7 @@ class productController extends mainModel
 		$id = $this->limpiarCadena($_POST['id_producto']);
 
 		# Verificando producto #
-		$datos = $this->ejecutarConsulta("SELECT * FROM producto WHERE id_producto='$id'");
+		$datos = $this->ejecutarConsulta("SELECT * FROM producto WHERE cid_producto='$id'");
 		if ($datos->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -844,7 +901,7 @@ class productController extends mainModel
 		];
 
 		$condicion = [
-			"condicion_campo" => "id_producto",
+			"condicion_campo" => "cid_producto",
 			"condicion_marcador" => ":ID",
 			"condicion_valor" => $id
 		];
@@ -876,7 +933,7 @@ class productController extends mainModel
 		$id = $this->limpiarCadena($_POST['id_producto']);
 
 		# Verificando producto #
-		$datos = $this->ejecutarConsulta("SELECT * FROM producto WHERE id_producto='$id'");
+		$datos = $this->ejecutarConsulta("SELECT * FROM producto WHERE cid_producto='$id'");
 		if ($datos->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -929,7 +986,7 @@ class productController extends mainModel
 		];
 
 		$condicion = [
-			"condicion_campo" => "id_producto",
+			"condicion_campo" => "cid_producto",
 			"condicion_marcador" => ":ID",
 			"condicion_valor" => $id
 		];
@@ -961,7 +1018,7 @@ class productController extends mainModel
 		$id = $this->limpiarCadena($_POST['id_producto']);
 
 		# Verificando producto #
-		$datos = $this->ejecutarConsulta("SELECT * FROM producto WHERE id_producto='$id'");
+		$datos = $this->ejecutarConsulta("SELECT * FROM producto WHERE cid_producto='$id'");
 		if ($datos->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -1076,7 +1133,7 @@ class productController extends mainModel
 		];
 
 		$condicion = [
-			"condicion_campo" => "id_producto",
+			"condicion_campo" => "cid_producto",
 			"condicion_marcador" => ":ID",
 			"condicion_valor" => $id
 		];

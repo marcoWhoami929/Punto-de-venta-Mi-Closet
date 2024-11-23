@@ -29,14 +29,14 @@ class saleController extends mainModel
 
 		if (isset($producto) && $producto != "") {
 
-			$consulta_datos = "SELECT * FROM producto WHERE (nombre LIKE '%$producto%' OR marca LIKE '%$producto%' OR modelo LIKE '%$producto%' OR codigo LIKE '%$producto%') ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT prod.*,inven.stock_total FROM producto as prod INNER JOIN inventario as inven ON prod.cid_producto = inven.id_producto WHERE (prod.nombre LIKE '%$producto%' OR prod.marca LIKE '%$producto%' OR prod.modelo LIKE '%$producto%' OR prod.codigo LIKE '%$producto%') ORDER BY prod.$campoOrden $orden LIMIT $inicio,$registros";
 
-			$consulta_total = "SELECT COUNT(id_producto) FROM producto WHERE (nombre LIKE '%$producto%' OR marca LIKE '%$producto%' OR modelo LIKE '%$producto%' OR codigo LIKE '%$producto%')";
+			$consulta_total = "SELECT COUNT(cid_producto) FROM producto WHERE (nombre LIKE '%$producto%' OR marca LIKE '%$producto%' OR modelo LIKE '%$producto%' OR codigo LIKE '%$producto%')";
 		} else {
 
-			$consulta_datos = "SELECT * FROM producto ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+			$consulta_datos = "SELECT prod.*,inven.stock_total FROM producto as prod INNER JOIN inventario as inven ON prod.cid_producto = inven.id_producto ORDER BY prod.$campoOrden $orden LIMIT $inicio,$registros";
 
-			$consulta_total = "SELECT COUNT(id_producto) FROM producto";
+			$consulta_total = "SELECT COUNT(cid_producto) FROM producto";
 		}
 
 		$datos = $this->ejecutarConsulta($consulta_datos);
@@ -213,19 +213,15 @@ class saleController extends mainModel
 		$token = $this->generarCodigoAleatorioProducto(8);
 
 		if ($codigo == "") {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "Debes de introducir el código de barras del producto",
-				"icono" => "error"
-			];
+
+			$alerta = "Debes de introducir el código de barras del producto";
 			return json_encode($alerta);
 			exit();
 		}
 
 
 		/*== Comprobando producto en la DB ==*/
-		$check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE codigo='$codigo'");
+		$check_producto = $this->ejecutarConsulta("SELECT prod.*,inven.stock_total FROM producto as prod INNER JOIN inventario as inven ON prod.cid_producto = inven.id_producto WHERE prod.codigo='$codigo'");
 		if ($check_producto->rowCount() <= 0) {
 
 			$alerta = "No hemos encontrado el producto con código de barras : '$codigo'";
@@ -245,12 +241,8 @@ class saleController extends mainModel
 			$stock_total = $value['stock_total'] - $detalle_cantidad;
 
 			if ($stock_total < 0) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "Lo sentimos, no hay existencias disponibles del producto seleccionado",
-					"icono" => "error"
-				];
+
+				$alerta =  "Lo sentimos, no hay existencias disponibles del producto seleccionado";
 				return json_encode($alerta);
 				exit();
 			}
@@ -264,9 +256,10 @@ class saleController extends mainModel
 			$total = number_format($total, MONEDA_DECIMALES, '.', '');
 
 			$_SESSION['datos_producto_venta'][$codigo] = [
-				"id_producto" => $value['id_producto'],
+				"id_producto" => $value['cid_producto'],
 				"codigo" => $value['codigo'],
 				"foto" => $value['foto'],
+				"out_stock" => $value['out_stock'],
 				"token" => $token,
 				"stock_total" => $stock_total,
 				"stock_total_old" => $value['stock_total'],
@@ -277,6 +270,7 @@ class saleController extends mainModel
 				"cantidad" => $detalle_cantidad,
 				"subtotal" => $subtotal,
 				"total" => $total,
+				"error_stock" => "",
 				"descripcion" => $value['nombre']
 			];
 
@@ -287,13 +281,9 @@ class saleController extends mainModel
 			$stock_total = $value['stock_total'] - $detalle_cantidad;
 
 			if ($stock_total < 0) {
-				$alerta = [
-					"tipo" => "simple",
-					"titulo" => "Ocurrió un error inesperado",
-					"texto" => "Lo sentimos, no hay existencias disponibles del producto seleccionado",
-					"icono" => "error"
-				];
+				$alerta =  "Lo sentimos, no hay existencias disponibles del producto seleccionado";
 				return json_encode($alerta);
+
 				exit();
 			}
 
@@ -306,10 +296,11 @@ class saleController extends mainModel
 
 
 			$_SESSION['datos_producto_venta'][$codigo] = [
-				"id_producto" => $value['id_producto'],
+				"id_producto" => $value['cid_producto'],
 				"codigo" => $value['codigo'],
 				"foto" => $value['foto'],
 				"token" => $token,
+				"out_stock" => $value['out_stock'],
 				"stock_total" => $stock_total,
 				"stock_total_old" => $value['stock_total'],
 				"precio_compra" => $value['precio_compra'],
@@ -319,6 +310,7 @@ class saleController extends mainModel
 				"cantidad" => $detalle_cantidad,
 				"subtotal" => $subtotal,
 				"total" => $total,
+				"error_stock" => "",
 				"descripcion" => $value['nombre']
 			];
 
@@ -376,7 +368,7 @@ class saleController extends mainModel
 		}
 
 		/*== Comprobando producto en la DB ==*/
-		$check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE codigo='$codigo'");
+		$check_producto = $this->ejecutarConsulta("SELECT prod.*,inven.stock_total FROM producto as prod INNER JOIN inventario as inven ON prod.cid_producto = inven.id_producto WHERE prod.codigo='$codigo'");
 		if ($check_producto->rowCount() <= 0) {
 
 			$alerta = "No hemos encontrado el producto con código de barras : '$codigo'";
@@ -405,9 +397,12 @@ class saleController extends mainModel
 			$detalle_cantidad = $cantidad;
 
 			$stock_total = $value['stock_total'] - $detalle_cantidad;
+			$_SESSION['datos_producto_venta'][$codigo]["error_stock"] = "";
+			$_SESSION['datos_producto_venta'][$codigo]["stock_total"] = $stock_total;
+			$_SESSION['datos_producto_venta'][$codigo]["stock_total_old"] = $value['stock_total'];
 
 			if ($stock_total < 0) {
-
+				$_SESSION['datos_producto_venta'][$codigo]["error_stock"] = "error";
 				$alerta = "Lo sentimos, no hay existencias suficientes del producto seleccionado. Existencias disponibles: " . ($stock_total + $detalle_cantidad) . "";
 				return json_encode($alerta);
 				exit();
@@ -420,7 +415,8 @@ class saleController extends mainModel
 			$total = ($subtotal - $descuento);
 			$total = number_format($total, MONEDA_DECIMALES, '.', '');
 
-
+			$_SESSION['datos_producto_venta'][$codigo]["stock_total"] = $stock_total;
+			$_SESSION['datos_producto_venta'][$codigo]["stock_total_old"] = $value['stock_total'];
 			$_SESSION['datos_producto_venta'][$codigo]["cantidad"] = $detalle_cantidad;
 			$_SESSION['datos_producto_venta'][$codigo]["subtotal"] = $subtotal;
 			$_SESSION['datos_producto_venta'][$codigo]["descuento"] = $descuento;
@@ -516,7 +512,7 @@ class saleController extends mainModel
 		$forma_pago = $this->limpiarCadena($_POST['forma_pago']);
 		$total_pago = $this->limpiarCadena($_POST['total_pago']);
 		$total_pagado = $this->limpiarCadena($_POST['total_pagado']);
-		$total_Cambio = $this->limpiarCadena($_POST['total_cambio']);
+		$total_cambio = $this->limpiarCadena($_POST['total_cambio']);
 		$referencia_venta = $this->limpiarCadena($_POST['referencia_venta']);
 
 		/*== Comprobando integridad de los datos ==*/
@@ -624,10 +620,11 @@ class saleController extends mainModel
 
 		/*== Actualizando productos ==*/
 		$errores_productos = 0;
+
 		foreach ($_SESSION['datos_producto_venta'] as $productos) {
 
 			/*== Obteniendo datos del producto ==*/
-			$check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE id_producto='" . $productos['id_producto'] . "' AND codigo='" . $productos['codigo'] . "'");
+			$check_producto = $this->ejecutarConsulta("SELECT prod.*,inven.stock_total FROM producto as prod INNER JOIN inventario as inven ON prod.cid_producto = inven.id_producto WHERE prod.cid_producto='" . $productos['id_producto'] . "' AND prod.codigo='" . $productos['codigo'] . "'");
 			if ($check_producto->rowCount() < 1) {
 				$errores_productos = 1;
 				break;
@@ -639,8 +636,10 @@ class saleController extends mainModel
 			$_SESSION['datos_producto_venta'][$productos['codigo']]['stock_total'] = $datos_producto['stock_total'] - $_SESSION['datos_producto_venta'][$productos['codigo']]['cantidad'];
 
 			$_SESSION['datos_producto_venta'][$productos['codigo']]['stock_total_old'] = $datos_producto['stock_total'];
+			$_SESSION['datos_producto_venta'][$productos['codigo']]["error_stock"] = "error";
 
 			/*== Preparando datos para enviarlos al modelo ==*/
+			/*
 			$datos_producto_up = [
 				[
 					"campo_nombre" => "stock_total",
@@ -654,12 +653,22 @@ class saleController extends mainModel
 				"condicion_marcador" => ":ID",
 				"condicion_valor" => $productos['id_producto']
 			];
-
+			*/
 			/*== Actualizando producto ==*/
-			if (!$this->actualizarDatos("producto", $datos_producto_up, $condicion)) {
+			/*
+			if (!$this->actualizarDatos("inventario", $datos_producto_up, $condicion)) {
 				$errores_productos = 1;
 				break;
 			}
+				*/
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "Algunos productos no cuentan con existencias suficientes",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
 		}
 
 		/*== Reestableciendo DB debido a errores ==*/
@@ -693,296 +702,6 @@ class saleController extends mainModel
 			return json_encode($alerta);
 			exit();
 		}
-
-		/*== generando codigo de venta ==*/
-		$correlativo = $this->ejecutarConsulta("SELECT id_venta FROM venta");
-		$correlativo = ($correlativo->rowCount()) + 1;
-		$codigo_venta = $this->generarCodigoAleatorio('SALE', 10, $correlativo);
-
-		/*== Preparando datos para enviarlos al modelo ==*/
-		$datos_venta_reg = [
-			[
-				"campo_nombre" => "tipo_venta",
-				"campo_marcador" => ":TipoVenta",
-				"campo_valor" => 'directa',
-			],
-			[
-				"campo_nombre" => "tipo_entrega",
-				"campo_marcador" => ":TipoEntrega",
-				"campo_valor" => 'recoleccion',
-			],
-			[
-				"campo_nombre" => "forma_pago",
-				"campo_marcador" => ":FormaPago",
-				"campo_valor" => '1',
-			],
-			[
-				"campo_nombre" => "codigo",
-				"campo_marcador" => ":Codigo",
-				"campo_valor" => $codigo_venta
-			],
-			[
-				"campo_nombre" => "fecha_venta",
-				"campo_marcador" => ":Fecha",
-				"campo_valor" => $fecha_venta
-			],
-			[
-				"campo_nombre" => "hora_venta",
-				"campo_marcador" => ":Hora",
-				"campo_valor" => $hora_venta
-			],
-			[
-				"campo_nombre" => "total",
-				"campo_marcador" => ":Total",
-				"campo_valor" => $total_final
-			],
-			[
-				"campo_nombre" => "subtotal",
-				"campo_marcador" => ":Subtotal",
-				"campo_valor" => $subtotal
-			],
-			[
-				"campo_nombre" => "descuento",
-				"campo_marcador" => ":Descuento",
-				"campo_valor" => $descuento
-			],
-			[
-				"campo_nombre" => "porc_descuento",
-				"campo_marcador" => ":PorcDescuento",
-				"campo_valor" => $porc_descuento
-			],
-			[
-				"campo_nombre" => "pagado",
-				"campo_marcador" => ":Pagado",
-				"campo_valor" => $pagado
-			],
-			[
-				"campo_nombre" => "cambio",
-				"campo_marcador" => ":Cambio",
-				"campo_valor" => $cambio
-			],
-			[
-				"campo_nombre" => "id_usuario",
-				"campo_marcador" => ":Usuario",
-				"campo_valor" => $_SESSION['id']
-			],
-			[
-				"campo_nombre" => "id_cliente",
-				"campo_marcador" => ":Cliente",
-				"campo_valor" => $_SESSION['datos_cliente_venta']['id_cliente']
-			],
-			[
-				"campo_nombre" => "id_caja",
-				"campo_marcador" => ":Caja",
-				"campo_valor" => $caja
-			],
-			[
-				"campo_nombre" => "estatus",
-				"campo_marcador" => ":Estatus",
-				"campo_valor" => '1'
-			]
-		];
-
-		/*== Agregando venta ==*/
-		$agregar_venta = $this->guardarDatos("venta", $datos_venta_reg);
-
-		if ($agregar_venta->rowCount() != 1) {
-			foreach ($_SESSION['datos_producto_venta'] as $producto) {
-
-				$datos_producto_rs = [
-					[
-						"campo_nombre" => "stock_total",
-						"campo_marcador" => ":Stock",
-						"campo_valor" => $producto['stock_total_old']
-					]
-				];
-
-				$condicion = [
-					"condicion_campo" => "id_producto",
-					"condicion_marcador" => ":ID",
-					"condicion_valor" => $producto['id_producto']
-				];
-
-				$this->actualizarDatos("producto", $datos_producto_rs, $condicion);
-			}
-
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos podido registrar la venta, por favor intente nuevamente. Código de error: 001",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
-
-		/*== Agregando detalles de la venta ==*/
-		$errores_venta_detalle = 0;
-		foreach ($_SESSION['datos_producto_venta'] as $venta_detalle) {
-
-			/*== Preparando datos para enviarlos al modelo ==*/
-			$datos_venta_detalle_reg = [
-				[
-					"campo_nombre" => "cantidad",
-					"campo_marcador" => ":Cantidad",
-					"campo_valor" => $venta_detalle['cantidad']
-				],
-				[
-					"campo_nombre" => "precio_compra",
-					"campo_marcador" => ":PrecioCompra",
-					"campo_valor" => $venta_detalle['precio_compra']
-				],
-				[
-					"campo_nombre" => "precio_venta",
-					"campo_marcador" => ":PrecioVenta",
-					"campo_valor" => $venta_detalle['precio_venta']
-				],
-				[
-					"campo_nombre" => "total",
-					"campo_marcador" => ":Total",
-					"campo_valor" => $venta_detalle['total']
-				],
-				[
-					"campo_nombre" => "subtotal",
-					"campo_marcador" => ":Subtotal",
-					"campo_valor" => $venta_detalle['subtotal']
-				],
-				[
-					"campo_nombre" => "descuento",
-					"campo_marcador" => ":Descuento",
-					"campo_valor" => $venta_detalle['descuento']
-				],
-				[
-					"campo_nombre" => "porc_descuento",
-					"campo_marcador" => ":PorcDescuento",
-					"campo_valor" => $venta_detalle['porc_descuento']
-				],
-				[
-					"campo_nombre" => "descripcion",
-					"campo_marcador" => ":Descripcion",
-					"campo_valor" => $venta_detalle['descripcion']
-				],
-				[
-					"campo_nombre" => "codigo",
-					"campo_marcador" => ":Codigo",
-					"campo_valor" => $codigo_venta
-				],
-				[
-					"campo_nombre" => "id_producto",
-					"campo_marcador" => ":Producto",
-					"campo_valor" => $venta_detalle['id_producto']
-				]
-			];
-
-			$agregar_detalle_venta = $this->guardarDatos("venta_detalle", $datos_venta_detalle_reg);
-
-			if ($agregar_detalle_venta->rowCount() != 1) {
-				$errores_venta_detalle = 1;
-				break;
-			} else {
-				$_SESSION["porc_descuento"] = "0.00";
-			}
-		}
-
-		/*== Reestableciendo DB debido a errores ==*/
-		if ($errores_venta_detalle == 1) {
-
-			$this->eliminarRegistro("venta_detalle", "codigo", $codigo_venta);
-			$this->eliminarRegistro("venta", "codigo", $codigo_venta);
-
-			foreach ($_SESSION['datos_producto_venta'] as $producto) {
-
-				$datos_producto_rs = [
-					[
-						"campo_nombre" => "stock_total",
-						"campo_marcador" => ":Stock",
-						"campo_valor" => $producto['stock_total_old']
-					]
-				];
-
-				$condicion = [
-					"condicion_campo" => "id_producto",
-					"condicion_marcador" => ":ID",
-					"condicion_valor" => $producto['id_producto']
-				];
-
-				$this->actualizarDatos("producto", $datos_producto_rs, $condicion);
-			}
-
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos podido registrar la venta, por favor intente nuevamente. Código de error: 002",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
-
-		/*== Actualizando efectivo en caja ==*/
-		$datos_caja_up = [
-			[
-				"campo_nombre" => "efectivo",
-				"campo_marcador" => ":Efectivo",
-				"campo_valor" => $total_caja
-			]
-		];
-
-		$condicion_caja = [
-			"condicion_campo" => "id_caja",
-			"condicion_marcador" => ":ID",
-			"condicion_valor" => $caja
-		];
-
-		if (!$this->actualizarDatos("caja", $datos_caja_up, $condicion_caja)) {
-
-			$this->eliminarRegistro("venta_detalle", "codigo", $codigo_venta);
-			$this->eliminarRegistro("venta", "codigo", $codigo_venta);
-
-			foreach ($_SESSION['datos_producto_venta'] as $producto) {
-
-				$datos_producto_rs = [
-					[
-						"campo_nombre" => "stock_total",
-						"campo_marcador" => ":Stock",
-						"campo_valor" => $producto['stock_total_old']
-					]
-				];
-
-				$condicion = [
-					"condicion_campo" => "id_producto",
-					"condicion_marcador" => ":ID",
-					"condicion_valor" => $producto['id_producto']
-				];
-
-				$this->actualizarDatos("producto", $datos_producto_rs, $condicion);
-			}
-
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos podido registrar la venta, por favor intente nuevamente. Código de error: 003",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
-
-		/*== Vaciando variables de sesion ==*/
-		unset($_SESSION['total']);
-		unset($_SESSION['datos_cliente_venta']);
-		unset($_SESSION['datos_producto_venta']);
-
-		$_SESSION['codigo_factura'] = $codigo_venta;
-
-		$alerta = [
-			"tipo" => "recargar",
-			"titulo" => "¡Venta registrada!",
-			"texto" => "La venta se registró con éxito en el sistema",
-			"icono" => "success"
-		];
-		return json_encode($alerta);
-		exit();
 	}
 
 
@@ -1150,8 +869,8 @@ class saleController extends mainModel
 					
 				 </div>
 				<div class="message-body has-text-centered">
-					<i class="fas fa-exclamation-triangle fa-2x"></i><br>
-					No hay ventas realizadas por el momento!
+					<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+					No Hay Ventas Registradas Actualmente
 				</div>
 			</article>
 					';
@@ -1477,15 +1196,20 @@ class saleController extends mainModel
 			} else {
 				foreach ($_SESSION['datos_producto_venta'] as $productos) {
 
-					if (is_file("./app/views/productos/" . $productos['foto'])) {
+					if (is_file("../views/productos/" . $productos['foto'])) {
 						$foto = '<img src="' . APP_URL . 'app/views/productos/' . $productos['foto'] . '">';
 					} else {
 						$foto = '<img src="' . APP_URL . 'app/views/productos/default.png">';
 					}
 
+					if ($productos['error_stock'] == "") {
+						$flag = "#B99654";
+					} else {
+						$flag = "#ff6565";
+					}
 
 					$tabla .= '<div class="card pt-4">
-								<header class="card-header" style="background:#B99654;color:#ffffff">
+								<header class="card-header" style="background:' . $flag . ';color:#ffffff">
 								 <p class="card-header-title"><strong style="color:#ffffff">' . $productos['descripcion'] . '</strong></p>
 								   <p class="card-header-title"><strong style="color:#ffffff">' . $productos['codigo'] . '</strong></p>
 									<button type="submit" class="button is-danger is-rounded pt-4" onclick="removerProductoCarrito(\'' . $productos['codigo'] . '\')">
@@ -1555,13 +1279,22 @@ class saleController extends mainModel
 									
 									<a href="#" class="card-footer-item">
 										<div class="columns has-text-centered">
-										<label><strong>Subtotal:</strong></label>
+										<label><strong>Existencias:</strong></label>
 										</div>
 										<div class="columns pt-4">
-										' . MONEDA_SIMBOLO . " " . number_format($productos['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+										' . $productos['stock_total'] . '
+										' . $productos['stock_total_old'] . '
 										</div>
 									</a>
 									<a href="#" class="card-footer-item">
+									 <div class="columns has-text-centered">
+									  <label><strong>Total:</strong></label>
+									</div>
+									<div class="columns pt-4">
+									' . MONEDA_SIMBOLO . " " . number_format($productos['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+									</div>
+									</a>
+										<a href="#" class="card-footer-item">
 									 <div class="columns has-text-centered">
 									  <label><strong>Total:</strong></label>
 									</div>

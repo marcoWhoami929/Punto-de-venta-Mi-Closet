@@ -138,7 +138,7 @@ class notesController extends mainModel
 
 
         /*== Comprobando producto en la DB ==*/
-        $check_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE codigo='$codigo'");
+        $check_producto = $this->ejecutarConsulta("SELECT prod.*,inven.stock_total FROM producto as prod INNER JOIN inventario as inven ON prod.cid_producto = inven.id_producto WHERE prod.codigo='$codigo'");
         if ($check_producto->rowCount() <= 0) {
 
             $alerta = "No hemos encontrado el producto con código de barras : '$codigo'";
@@ -166,7 +166,7 @@ class notesController extends mainModel
 
 
             $_SESSION['datos_producto_nota'][$codigo] = [
-                "id_producto" => $value['id_producto'],
+                "id_producto" => $value['cid_producto'],
                 "codigo" => $value['codigo'],
                 "foto" => $value['foto'],
                 "colores" => $value['colores'],
@@ -389,8 +389,12 @@ class notesController extends mainModel
         $total = (int) $total->fetchColumn();
 
         $numeroPaginas = ceil($total / $registros);
+        $tabla = "";
 
-        $tabla .= '
+        if ($total >= 1 && $pagina <= $numeroPaginas) {
+            $contador = $inicio + 1;
+            $pag_inicio = $inicio + 1;
+            $tabla .= '
 		        <div class="table-container">
 		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 		            <thead style="background:#B99654">
@@ -409,9 +413,6 @@ class notesController extends mainModel
 		            <tbody>
 		    ';
 
-        if ($total >= 1 && $pagina <= $numeroPaginas) {
-            $contador = $inicio + 1;
-            $pag_inicio = $inicio + 1;
             foreach ($datos as $rows) {
                 switch ($rows['estatus']) {
                     case '0':
@@ -467,11 +468,15 @@ class notesController extends mainModel
 					';
             } else {
                 $tabla .= '
-						<tr class="has-text-centered" >
-			                <td colspan="9">
-			                    No hay registros en el sistema
-			                </td>
-			            </tr>
+						<article class="message is-warning mt-4 mb-4">
+				 <div class="message-header">
+					
+				 </div>
+				<div class="message-body has-text-centered">
+					<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+					No Hay Notas Registradas Actualmente
+				</div>
+			</article>
 					';
             }
         }

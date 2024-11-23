@@ -115,7 +115,7 @@
                 <div class="table-container">
                     <?php
 
-                    $detalle_nota = $insLogin->seleccionarDatos("Normal", "productos_notas as prod_not INNER JOIN producto as prod ON prod_not.id_producto = prod.id_producto WHERE codigo_nota ='" . $datos_nota['codigo'] . "'", "prod_not.*,prod.foto", 0);
+                    $detalle_nota = $insLogin->seleccionarDatos("Normal", "productos_notas as prod_not INNER JOIN producto as prod ON prod_not.id_producto = prod.cid_producto WHERE codigo_nota ='" . $datos_nota['codigo'] . "'", "prod_not.*,prod.foto", 0);
 
 
                     $total = $detalle_nota->rowCount();

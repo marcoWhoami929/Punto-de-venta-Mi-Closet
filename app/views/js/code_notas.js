@@ -505,6 +505,7 @@ function registrarVenta(){
           body: datos,
         }).then((respuesta) => respuesta.json())
         .then((respuesta) => {
+          cargarCarritoVenta();
           return alertas_ajax(respuesta);
         })
             

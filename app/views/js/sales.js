@@ -79,7 +79,7 @@ function agregar_codigo($codigo) {
   setTimeout("agregar_producto()", 100);
 }
 
-function actualizarProductoCarrito(codigo,cantidad){
+function actualizarProductoCarrito(codigo,cantidad,token){
   var tipo_busqueda = $("#tipo_busqueda").val();
   let datos = new FormData();
   var actual = cantidad
