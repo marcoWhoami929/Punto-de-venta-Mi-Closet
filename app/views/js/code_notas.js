@@ -506,6 +506,7 @@ function registrarVenta(){
         }).then((respuesta) => respuesta.json())
         .then((respuesta) => {
           cargarCarritoVenta();
+          $("#btn-close-pago").click();
           return alertas_ajax(respuesta);
         })
             

@@ -265,7 +265,7 @@
     <div class="modal-card">
         <header class="modal-card-head" style="background:#B99654">
             <p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-cash-register"></i> &nbsp; Confirmar Pago</p>
-            <button class="delete" aria-label="close"></button>
+            <button class="delete" aria-label="close" id="btn-close-pago"></button>
         </header>
         <section class="modal-card-body">
             <div class="columns">

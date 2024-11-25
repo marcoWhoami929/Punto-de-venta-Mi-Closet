@@ -386,24 +386,32 @@ class saleController extends mainModel
 				return json_encode($alerta);
 				exit();
 			}
+			$detalle_cantidad = floatval($cantidad);
+			$stock = $value['stock_total'];
 
-			if ($cantidad > $_SESSION['datos_producto_venta'][$codigo]["cantidad"]) {
-				$diferencia_productos = "agrego +" . ($cantidad - $_SESSION['datos_producto_venta'][$codigo]["cantidad"]);
+			if ($detalle_cantidad > $stock) {
+				$stock_total = $value['stock_total'] - $_SESSION['datos_producto_venta'][$codigo]["cantidad"];
+				$_SESSION['datos_producto_venta'][$codigo]["stock_total"] = $stock_total;
+				$_SESSION['datos_producto_venta'][$codigo]["cantidad"] =  $_SESSION['datos_producto_venta'][$codigo]["cantidad"];
 			} else {
-				$diferencia_productos = "quito -" . ($_SESSION['datos_producto_venta'][$codigo]["cantidad"] - $cantidad);
+				$stock_total = $value['stock_total'] - $detalle_cantidad;
+				$_SESSION['datos_producto_venta'][$codigo]["stock_total"] = $stock_total;
+
+
+				if ($detalle_cantidad > $_SESSION['datos_producto_venta'][$codigo]["cantidad"]) {
+					$diferencia_productos = "agrego + 1";
+				} else {
+					$diferencia_productos = "quito - 1";
+				}
+				$_SESSION['datos_producto_venta'][$codigo]["cantidad"] = $detalle_cantidad;
 			}
-
-
-			$detalle_cantidad = $cantidad;
-
-			$stock_total = $value['stock_total'] - $detalle_cantidad;
 			$_SESSION['datos_producto_venta'][$codigo]["error_stock"] = "";
-			$_SESSION['datos_producto_venta'][$codigo]["stock_total"] = $stock_total;
+
 			$_SESSION['datos_producto_venta'][$codigo]["stock_total_old"] = $value['stock_total'];
 
-			if ($stock_total < 0) {
-				$_SESSION['datos_producto_venta'][$codigo]["error_stock"] = "error";
-				$alerta = "Lo sentimos, no hay existencias suficientes del producto seleccionado. Existencias disponibles: " . ($stock_total + $detalle_cantidad) . "";
+			if ($detalle_cantidad > $stock) {
+
+				$alerta = "Lo sentimos, no podemos agregar mas unidades al carrito. Existencias disponibles: " . ($stock) . "";
 				return json_encode($alerta);
 				exit();
 			}
@@ -417,7 +425,6 @@ class saleController extends mainModel
 
 			$_SESSION['datos_producto_venta'][$codigo]["stock_total"] = $stock_total;
 			$_SESSION['datos_producto_venta'][$codigo]["stock_total_old"] = $value['stock_total'];
-			$_SESSION['datos_producto_venta'][$codigo]["cantidad"] = $detalle_cantidad;
 			$_SESSION['datos_producto_venta'][$codigo]["subtotal"] = $subtotal;
 			$_SESSION['datos_producto_venta'][$codigo]["descuento"] = $descuento;
 			$_SESSION['datos_producto_venta'][$codigo]["total"] = $total;
@@ -620,7 +627,7 @@ class saleController extends mainModel
 
 		/*== Actualizando productos ==*/
 		$errores_productos = 0;
-
+		$contador = 0;
 		foreach ($_SESSION['datos_producto_venta'] as $productos) {
 
 			/*== Obteniendo datos del producto ==*/
@@ -633,38 +640,40 @@ class saleController extends mainModel
 			}
 
 			/*== Respaldando datos de BD para poder restaurar en caso de errores ==*/
-			$_SESSION['datos_producto_venta'][$productos['codigo']]['stock_total'] = $datos_producto['stock_total'] - $_SESSION['datos_producto_venta'][$productos['codigo']]['cantidad'];
-
-			$_SESSION['datos_producto_venta'][$productos['codigo']]['stock_total_old'] = $datos_producto['stock_total'];
-			$_SESSION['datos_producto_venta'][$productos['codigo']]["error_stock"] = "error";
+			$stockActual = $datos_producto['stock_total'] - $_SESSION['datos_producto_venta'][$productos['codigo']]['cantidad'];
 
 			/*== Preparando datos para enviarlos al modelo ==*/
-			/*
-			$datos_producto_up = [
-				[
-					"campo_nombre" => "stock_total",
-					"campo_marcador" => ":Stock",
-					"campo_valor" => $_SESSION['datos_producto_venta'][$productos['codigo']]['stock_total']
-				]
-			];
 
-			$condicion = [
-				"condicion_campo" => "id_producto",
-				"condicion_marcador" => ":ID",
-				"condicion_valor" => $productos['id_producto']
-			];
-			*/
-			/*== Actualizando producto ==*/
-			/*
-			if (!$this->actualizarDatos("inventario", $datos_producto_up, $condicion)) {
-				$errores_productos = 1;
-				break;
+			if ($stockActual < 0) {
+				$contador++;
+				$precio_venta = $_SESSION['datos_producto_venta'][$productos['codigo']]['precio_venta'];
+
+				$_SESSION['datos_producto_venta'][$productos['codigo']]["error_stock"] = "error";
+				$descuento = (($precio_venta * $datos_producto['stock_total']) * $porc_descuento) / 100;
+				$descuento = number_format($descuento, MONEDA_DECIMALES, '.', '');
+				$subtotal = ($precio_venta * $datos_producto['stock_total']);
+				$subtotal = number_format($subtotal, MONEDA_DECIMALES, '.', '');
+				$total = ($subtotal - $descuento);
+				$total = number_format($total, MONEDA_DECIMALES, '.', '');
+
+
+				$_SESSION['datos_producto_venta'][$productos['codigo']]["cantidad"] = $datos_producto['stock_total'];
+				$_SESSION['datos_producto_venta'][$productos['codigo']]["stock_total"] = $datos_producto['stock_total'] - $datos_producto['stock_total'];
+				$_SESSION['datos_producto_venta'][$productos['codigo']]["stock_total_old"] = $datos_producto['stock_total'];
+				$_SESSION['datos_producto_venta'][$productos['codigo']]["subtotal"] = $subtotal;
+				$_SESSION['datos_producto_venta'][$productos['codigo']]["descuento"] = $descuento;
+				$_SESSION['datos_producto_venta'][$productos['codigo']]["total"] = $total;
+			} else {
+
+				$_SESSION['datos_producto_venta'][$productos['codigo']]["error_stock"] = "";
 			}
-				*/
+		}
+
+		if ($contador > 0) {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "Algunos productos no cuentan con existencias suficientes",
+				"texto" => "Algunos productos marcados en rojo no cuentan con existencias suficientes, se actualizará el carrito a las existencias actuales.",
 				"icono" => "error"
 			];
 			return json_encode($alerta);
@@ -702,6 +711,14 @@ class saleController extends mainModel
 			return json_encode($alerta);
 			exit();
 		}
+		$alerta = [
+			"tipo" => "recargar",
+			"titulo" => "¡Venta registrada!",
+			"texto" => "La venta se registró con éxito en el sistema",
+			"icono" => "success"
+		];
+		return json_encode($alerta);
+		exit();
 	}
 
 
