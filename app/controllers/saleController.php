@@ -680,37 +680,6 @@ class saleController extends mainModel
 			exit();
 		}
 
-		/*== Reestableciendo DB debido a errores ==*/
-		if ($errores_productos == 1) {
-
-			foreach ($_SESSION['datos_producto_venta'] as $producto) {
-
-				$datos_producto_rs = [
-					[
-						"campo_nombre" => "stock_total",
-						"campo_marcador" => ":Stock",
-						"campo_valor" => $producto['stock_total_old']
-					]
-				];
-
-				$condicion = [
-					"condicion_campo" => "id_producto",
-					"condicion_marcador" => ":ID",
-					"condicion_valor" => $producto['id_producto']
-				];
-
-				$this->actualizarDatos("producto", $datos_producto_rs, $condicion);
-			}
-
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No hemos podido actualizar los productos en el sistema",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
 		$alerta = [
 			"tipo" => "recargar",
 			"titulo" => "¡Venta registrada!",
