@@ -642,6 +642,7 @@ class saleController extends mainModel
 			/*== Respaldando datos de BD para poder restaurar en caso de errores ==*/
 			$stockActual = $datos_producto['stock_total'] - $_SESSION['datos_producto_venta'][$productos['codigo']]['cantidad'];
 
+
 			/*== Preparando datos para enviarlos al modelo ==*/
 
 			if ($stockActual < 0) {
@@ -687,7 +688,7 @@ class saleController extends mainModel
 		/*== generando codigo de venta ==*/
 		$correlativo = $this->ejecutarConsulta("SELECT id_venta FROM venta");
 		$correlativo = ($correlativo->rowCount()) + 1;
-		$codigo_venta = $this->generarCodigoAleatorio('SALE', 10, $correlativo);
+		$codigo_venta = $this->generarCodigoAleatorio('SALE', 22, $correlativo);
 
 		/*== Preparando datos para enviarlos al modelo ==*/
 		$datos_venta_reg = [
@@ -770,11 +771,18 @@ class saleController extends mainModel
 				"campo_nombre" => "estatus",
 				"campo_marcador" => ":Estatus",
 				"campo_valor" => '1'
+			],
+			[
+				"campo_nombre" => "estatus_pago",
+				"campo_marcador" => ":EstatusPago",
+				"campo_valor" => '1'
 			]
 		];
 		$agregar_venta = $this->guardarDatos("venta", $datos_venta_reg);
 
+
 		if ($agregar_venta->rowCount() == 1) {
+
 
 			/****
 			 * SESSIONES CAJA
@@ -783,7 +791,68 @@ class saleController extends mainModel
 			$check_caja = $this->ejecutarConsulta("SELECT * FROM sesiones_caja  WHERE codigo_sesion = '" . $_SESSION["sesion_caja"] . "' and estado = 'abierta'");
 
 			if ($check_caja->rowCount() < 1) {
+
+				$alerta = [
+					"tipo" => "simple",
+					"titulo" => "La sesion de la caja no ha sido encontrada.",
+					"texto" => "",
+					"icono" => "error"
+				];
+				return json_encode($alerta);
+				exit();
 			} else {
+
+				/*== generando codigo de pago ==*/
+				$correlativo = $this->ejecutarConsulta("SELECT id_pago FROM pago");
+				$correlativo = ($correlativo->rowCount()) + 1;
+				$caracteres_permitidos = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+				$longitud = 22;
+				$prefijo = 'PAY';
+				$codigo_pago =  strtoupper($prefijo . "-" . substr(str_shuffle($caracteres_permitidos), 0, $longitud) . "-" . $correlativo);
+
+
+				$datos_pago_reg = [
+					[
+						"campo_nombre" => "codigo_pago",
+						"campo_marcador" => ":CodigoPago",
+						"campo_valor" => $codigo_pago
+					],
+					[
+						"campo_nombre" => "codigo_venta",
+						"campo_marcador" => ":CodigoVenta",
+						"campo_valor" => $codigo_venta
+					],
+					[
+						"campo_nombre" => "id_metodo_pago",
+						"campo_marcador" => ":MetodoPago",
+						"campo_valor" => $forma_pago
+					],
+					[
+						"campo_nombre" => "total_pago",
+						"campo_marcador" => ":TotalPago",
+						"campo_valor" => $total_pago
+					],
+					[
+						"campo_nombre" => "total_pagado",
+						"campo_marcador" => ":TotalPagado",
+						"campo_valor" => $total_pagado
+					],
+					[
+						"campo_nombre" => "total_cambio",
+						"campo_marcador" => ":TotalCambio",
+						"campo_valor" => $total_cambio
+					],
+					[
+						"campo_nombre" => "referencia",
+						"campo_marcador" => ":Referencia",
+						"campo_valor" => $referencia_venta
+					],
+
+				];
+
+				/*== Agregando venta ==*/
+				$generar_pago = $this->guardarDatos("pago", $datos_pago_reg);
+
 				$datos_caja = $check_caja->fetch();
 				switch ($forma_pago) {
 					case '1':
@@ -836,21 +905,158 @@ class saleController extends mainModel
 						"campo_nombre" => "monto",
 						"campo_marcador" => ":Monto",
 						"campo_valor" => $total_final
+					],
+					[
+						"campo_nombre" => "descripcion",
+						"campo_marcador" => ":Descripcion",
+						"campo_valor" => $codigo_pago
 					]
 
 
 				];
 				$movimiento_caja = $this->guardarDatos("movimiento_caja", $datos_movimiento_caja_reg);
-			}
 
-			$alerta = [
-				"tipo" => "recargar",
-				"titulo" => "¡Venta registrada!",
-				"texto" => "La venta se registró con éxito en el sistema",
-				"icono" => "success"
-			];
-			return json_encode($alerta);
-			exit();
+				/***
+				 * Registrar Productos Venta
+				 */
+				/*== Agregando detalles de la venta ==*/
+				$errores_venta_detalle = 0;
+				foreach ($_SESSION['datos_producto_venta'] as $venta_detalle) {
+
+					/*== Preparando datos para enviarlos al modelo ==*/
+					$datos_venta_detalle_reg = [
+						[
+							"campo_nombre" => "cantidad",
+							"campo_marcador" => ":Cantidad",
+							"campo_valor" => $venta_detalle['cantidad']
+						],
+						[
+							"campo_nombre" => "precio_compra",
+							"campo_marcador" => ":PrecioCompra",
+							"campo_valor" => $venta_detalle['precio_compra']
+						],
+						[
+							"campo_nombre" => "precio_venta",
+							"campo_marcador" => ":PrecioVenta",
+							"campo_valor" => $venta_detalle['precio_venta']
+						],
+						[
+							"campo_nombre" => "total",
+							"campo_marcador" => ":Total",
+							"campo_valor" => $venta_detalle['total']
+						],
+						[
+							"campo_nombre" => "subtotal",
+							"campo_marcador" => ":Subtotal",
+							"campo_valor" => $venta_detalle['subtotal']
+						],
+						[
+							"campo_nombre" => "descuento",
+							"campo_marcador" => ":Descuento",
+							"campo_valor" => $venta_detalle['descuento']
+						],
+						[
+							"campo_nombre" => "porc_descuento",
+							"campo_marcador" => ":PorcDescuento",
+							"campo_valor" => $venta_detalle['porc_descuento']
+						],
+						[
+							"campo_nombre" => "descripcion",
+							"campo_marcador" => ":Descripcion",
+							"campo_valor" => $venta_detalle['descripcion']
+						],
+						[
+							"campo_nombre" => "codigo",
+							"campo_marcador" => ":Codigo",
+							"campo_valor" => $codigo_venta
+						],
+						[
+							"campo_nombre" => "token",
+							"campo_marcador" => ":Token",
+							"campo_valor" => $venta_detalle['token']
+						],
+						[
+							"campo_nombre" => "id_producto",
+							"campo_marcador" => ":IdProducto",
+							"campo_valor" => $venta_detalle['id_producto']
+						]
+					];
+
+					if ($venta_detalle['cantidad'] != 0) {
+
+						$agregar_detalle_venta = $this->guardarDatos("venta_detalle", $datos_venta_detalle_reg);
+
+						$stock_producto = $this->ejecutarConsulta("SELECT prod.*,inven.stock_total FROM producto as prod INNER JOIN inventario as inven ON prod.cid_producto = inven.id_producto WHERE prod.cid_producto='" . $venta_detalle['id_producto'] . "' AND prod.codigo='" . $venta_detalle['codigo'] . "'");
+						$stock_producto = $stock_producto->fetch();
+
+						/*== Respaldando datos de BD para poder restaurar en caso de errores ==*/
+						$stock = $stock_producto['stock_total'] - $venta_detalle['cantidad'];
+
+						$inventario_rs = [
+							[
+								"campo_nombre" => "stock_total",
+								"campo_marcador" => ":StockTotal",
+								"campo_valor" => $stock
+							]
+						];
+
+						$condicion = [
+							"condicion_campo" => "id_producto",
+							"condicion_marcador" => ":IdProducto",
+							"condicion_valor" => $venta_detalle['id_producto']
+						];
+
+						$inventario = $this->actualizarDatos("inventario", $inventario_rs, $condicion);
+
+						$movimiento_inventario_reg = [
+							[
+								"campo_nombre" => "id_producto",
+								"campo_marcador" => ":Producto",
+								"campo_valor" => $venta_detalle['id_producto']
+							],
+							[
+								"campo_nombre" => "tipo_movimiento",
+								"campo_marcador" => ":TipoMovimiento",
+								"campo_valor" => 'salida'
+							],
+							[
+								"campo_nombre" => "documento",
+								"campo_marcador" => ":Documento",
+								"campo_valor" => $codigo_venta
+							],
+							[
+								"campo_nombre" => "cantidad",
+								"campo_marcador" => ":Cantidad",
+								"campo_valor" =>  $venta_detalle['cantidad']
+							],
+							[
+								"campo_nombre" => "descripcion",
+								"campo_marcador" => ":Descripcion",
+								"campo_valor" =>  'Venta de producto'
+							]
+						];
+
+						$movimiento_inventario = $this->guardarDatos("movimiento_inventario", $movimiento_inventario_reg);
+					}
+				}
+				unset($_SESSION['total']);
+				unset($_SESSION['subtotal']);
+				unset($_SESSION['descuento']);
+				unset($_SESSION['porc_descuento']);
+				unset($_SESSION['datos_cliente_venta']);
+				unset($_SESSION['datos_producto_venta']);
+
+				$_SESSION['codigo_factura'] = $codigo_venta;
+
+				$alerta = [
+					"tipo" => "recargar",
+					"titulo" => "¡Venta registrada!",
+					"texto" => "La venta se registró con éxito en el sistema",
+					"icono" => "success"
+				];
+				return json_encode($alerta);
+				exit();
+			}
 		} else {
 			$alerta = [
 				"tipo" => "simple",
@@ -938,7 +1144,7 @@ class saleController extends mainModel
 					$modalPago = 'data-target="modal-pago-venta"';
 				}
 				if ($rows['estatus_pago'] == 0) {
-					$estatus_pago = '<button class="button is-danger is-light js-modal-trigger" ' . $modalPago . ' onclick="establecerFormaPago(' . $rows['forma_pago'] . ',' . $rows['total'] . ',' . $rows['id_venta'] . ',' . $rows['estatus'] . ')">Sin Pagar</button>';
+					$estatus_pago = '<button class="button is-danger is-light js-modal-trigger" ' . $modalPago . ' onclick="establecerFormaPago(' . $rows['forma_pago'] . ',' . $rows['total'] . ',' . $rows['codigo'] . ',' . $rows['estatus'] . ')">Sin Pagar</button>';
 					$disabled = "";
 				} else {
 					$estatus_pago = '<button class="button is-success">Pagado</button>';
@@ -1199,14 +1405,14 @@ class saleController extends mainModel
 	public function generarPagoVentaControlador()
 	{
 
-		$id_venta = $this->limpiarCadena($_POST['id_venta']);
+		$codigo_venta = $this->limpiarCadena($_POST['codigo_venta']);
 		$id_metodo_pago = $this->limpiarCadena($_POST['forma_pago']);
 		$total_pago = $this->limpiarCadena($_POST['total_pago']);
 		$total_pagado = $this->limpiarCadena($_POST['total_pagado']);
 		$total_cambio = $this->limpiarCadena($_POST['total_cambio']);
 		$referencia = $this->limpiarCadena($_POST['referencia_venta']);
 		# Verificando venta #
-		$datos = $this->ejecutarConsulta("SELECT * FROM venta WHERE id_venta='$id_venta'");
+		$datos = $this->ejecutarConsulta("SELECT * FROM venta WHERE codigo='$codigo_venta'");
 		if ($datos->rowCount() <= 0) {
 			$alerta = [
 				"tipo" => "simple",
@@ -1221,7 +1427,7 @@ class saleController extends mainModel
 		}
 
 
-
+		$fecha_pago = date("Y-m-d H:i:s");
 		$datos_venta = [
 			[
 				"campo_nombre" => "forma_pago",
@@ -1233,6 +1439,7 @@ class saleController extends mainModel
 				"campo_marcador" => ":EstatusPago",
 				"campo_valor" => 1,
 			],
+
 			[
 				"campo_nombre" => "pagado",
 				"campo_marcador" => ":Pagado",
@@ -1246,9 +1453,9 @@ class saleController extends mainModel
 		];
 
 		$condicion = [
-			"condicion_campo" => "id_venta",
-			"condicion_marcador" => ":ID",
-			"condicion_valor" => $id_venta
+			"condicion_campo" => "codigo",
+			"condicion_marcador" => ":Codigo",
+			"condicion_valor" => $codigo_venta
 		];
 		$actualizarEstatus = $this->actualizarDatos("venta", $datos_venta, $condicion);
 		/*== generando codigo de pago ==*/
@@ -1268,9 +1475,9 @@ class saleController extends mainModel
 					"campo_valor" => $codigo_pago
 				],
 				[
-					"campo_nombre" => "id_venta",
-					"campo_marcador" => ":IdVenta",
-					"campo_valor" => $id_venta
+					"campo_nombre" => "codigo_venta",
+					"campo_marcador" => ":CodigoVenta",
+					"campo_valor" => $codigo_venta
 				],
 				[
 					"campo_nombre" => "id_metodo_pago",
@@ -1441,7 +1648,7 @@ class saleController extends mainModel
 										<label><strong>Existencias:</strong></label>
 										</div>
 										<div class="columns pt-4">
-										' . $productos['stock_total'] . '
+										
 										' . $productos['stock_total_old'] . '
 										</div>
 									</a>

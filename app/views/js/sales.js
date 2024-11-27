@@ -43,7 +43,7 @@ function agregar_producto() {
       })
         .then((respuesta) => respuesta.json())
       .then((respuesta) => {
-
+        $("#btn-close-productos").click();
         $(".alerta_producto").html('<div class="notification is-success is-light ">'+respuesta+'</div>');
       })
     );
@@ -201,6 +201,7 @@ function agregar_cliente(id) {
   })
     .then((respuesta) => respuesta.json())
     .then((respuesta) => {
+      $("#btn-close-clientes").click();
       return alertas_ajax(respuesta);
     });
 }
@@ -295,8 +296,8 @@ function actualizarEstatus(tabla, id, estatus, estatus_pago) {
     });
 }
 
-function establecerFormaPago(formaPago, total_pago, id_venta, estatus) {
-  localStorage.setItem("id_venta", id_venta);
+function establecerFormaPago(formaPago, total_pago, codigo_venta, estatus) {
+  localStorage.setItem("codigo_venta", codigo_venta);
   $("#forma_pago_venta").val(formaPago);
   $("#total_pagar_venta").val(parseFloat(total_pago).toFixed(2));
   if (estatus == 0) {
@@ -320,10 +321,12 @@ function eleccionFormaPago() {
   var forma_pago = $("#forma_pago_venta").val();
 
   if (forma_pago === "1") {
-    document.getElementById("div-payment-efectivo").style.display = "";
+    document.getElementById("div-payment-efectivo-1").style.display = "";
+    document.getElementById("div-payment-efectivo-2").style.display = "";
     document.getElementById("div-payment-transferencia").style.display = "none";
   } else {
-    document.getElementById("div-payment-efectivo").style.display = "none";
+    document.getElementById("div-payment-efectivo-1").style.display = "none";
+    document.getElementById("div-payment-efectivo-2").style.display = "none";
     document.getElementById("div-payment-transferencia").style.display = "";
   }
 }
@@ -348,7 +351,7 @@ function confirmacionPago() {
   var total_pagado = $("#total_pagado_venta").val();
   var total_Cambio = $("#total_cambio_venta").val();
   var referencia_venta = $("#referencia_venta").val();
-  var id_venta = localStorage.getItem("id_venta");
+  var codigo_venta = localStorage.getItem("codigo_venta");
   if (forma_pago == "1") {
     if (total_pagado < total_pago) {
       Swal.fire({
@@ -359,7 +362,7 @@ function confirmacionPago() {
       });
     } else {
       let datos = new FormData();
-      datos.append("id_venta", id_venta);
+      datos.append("codigo_venta", codigo_venta);
       datos.append("forma_pago", forma_pago);
       datos.append("total_pago", total_pago);
       datos.append("total_pagado", total_pagado);
@@ -378,7 +381,7 @@ function confirmacionPago() {
     }
   } else {
     let datos = new FormData();
-    datos.append("id_venta", id_venta);
+    datos.append("codigo_venta", codigo_venta);
     datos.append("forma_pago", forma_pago);
     datos.append("total_pago", total_pago);
     datos.append("total_pagado", total_pago);

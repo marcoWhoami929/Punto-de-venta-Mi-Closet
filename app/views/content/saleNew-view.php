@@ -9,6 +9,7 @@
 
     if ($check_empresa->rowCount() == 1) {
         $check_empresa = $check_empresa->fetch();
+
     ?>
         <div class="columns">
 
@@ -224,7 +225,7 @@
     <div class="modal-card" style="width:80%">
         <header class="modal-card-head" style="background:#B99654">
             <p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-search"></i> &nbsp; Buscar producto</p>
-            <button class="delete" aria-label="close"></button>
+            <button class="delete" aria-label="close" id="btn-close-productos"></button>
         </header>
         <section class="modal-card-body">
             <div class="field mt-6 mb-6">
@@ -246,7 +247,7 @@
         <header class="modal-card-head" style="background:#B99654">
             <p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-search"></i> &nbsp; Buscar y agregar cliente</p>
 
-            <button class="delete" aria-label="close"></button>
+            <button class="delete" aria-label="close" id="btn-close-clientes"></button>
         </header>
         <section class="modal-card-body">
             <div class="field mt-6 mb-6">
@@ -262,7 +263,7 @@
 </div>
 <div class="modal fade is-large" id="modal-pago-venta" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-background"></div>
-    <div class="modal-card">
+    <div class="modal-card ">
         <header class="modal-card-head" style="background:#B99654">
             <p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-cash-register"></i> &nbsp; Confirmar Pago</p>
             <button class="delete" aria-label="close" id="btn-close-pago"></button>
@@ -302,7 +303,7 @@
                 </div>
 
             </div>
-            <div class="columns  mb-6" id="div-payment-efectivo">
+            <div class="columns  mb-6" id="div-payment-efectivo-1">
                 <div class="column">
                     <div class="field">
                         <label class="label">Su Pago</label>
@@ -315,11 +316,15 @@
                         </div>
                     </div>
                 </div>
+
+            </div>
+            <div class="columns  mb-6" id="div-payment-efectivo-2">
+
                 <div class="column">
                     <div class="field">
                         <label class="label">Cambio</label>
                         <div class="control has-icons-left has-icons-right">
-                            <input class="input is-large" type="text" placeholder="0.00" style="font-size:40px;font-weight:bold" id="total_cambio_venta" readonly />
+                            <input class="input is-large" type="text" placeholder="0.00" style="font-size:40px;font-weight:bold" id="total_cambio_venta" disabled value="0.00" />
                             <span class="icon is-medium is-left " style="margin-top:20px">
                                 <i class="fas fa-dollar-sign fa-3x"></i>
                             </span>

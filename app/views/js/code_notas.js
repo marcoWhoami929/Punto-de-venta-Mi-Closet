@@ -36,6 +36,10 @@ function cargarAperturaCaja(){
   }
 
 }
+function cerrarCaja(){
+  alert("Desea cerrar la caja");
+  //localStorage.removeItem('sesion_caja');
+}
 function generarQrNotas() {
   var route = $("#route").val();
   var folio_nota = $("#folio_nota").val();
