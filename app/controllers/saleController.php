@@ -680,14 +680,187 @@ class saleController extends mainModel
 			exit();
 		}
 
-		$alerta = [
-			"tipo" => "recargar",
-			"titulo" => "¡Venta registrada!",
-			"texto" => "La venta se registró con éxito en el sistema",
-			"icono" => "success"
+		/******************************************************************************************************/
+		/****
+		 *Registrar Venta
+		 */
+		/*== generando codigo de venta ==*/
+		$correlativo = $this->ejecutarConsulta("SELECT id_venta FROM venta");
+		$correlativo = ($correlativo->rowCount()) + 1;
+		$codigo_venta = $this->generarCodigoAleatorio('SALE', 10, $correlativo);
+
+		/*== Preparando datos para enviarlos al modelo ==*/
+		$datos_venta_reg = [
+			[
+				"campo_nombre" => "tipo_venta",
+				"campo_marcador" => ":TipoVenta",
+				"campo_valor" => 'directa',
+			],
+			[
+				"campo_nombre" => "tipo_entrega",
+				"campo_marcador" => ":TipoEntrega",
+				"campo_valor" => 'recoleccion',
+			],
+			[
+				"campo_nombre" => "forma_pago",
+				"campo_marcador" => ":FormaPago",
+				"campo_valor" => $forma_pago,
+			],
+			[
+				"campo_nombre" => "codigo",
+				"campo_marcador" => ":Codigo",
+				"campo_valor" => $codigo_venta
+			],
+			[
+				"campo_nombre" => "fecha_venta",
+				"campo_marcador" => ":Fecha",
+				"campo_valor" => $fecha_venta
+			],
+			[
+				"campo_nombre" => "hora_venta",
+				"campo_marcador" => ":Hora",
+				"campo_valor" => $hora_venta
+			],
+			[
+				"campo_nombre" => "total",
+				"campo_marcador" => ":Total",
+				"campo_valor" => $total_final
+			],
+			[
+				"campo_nombre" => "subtotal",
+				"campo_marcador" => ":Subtotal",
+				"campo_valor" => $subtotal
+			],
+			[
+				"campo_nombre" => "descuento",
+				"campo_marcador" => ":Descuento",
+				"campo_valor" => $descuento
+			],
+			[
+				"campo_nombre" => "porc_descuento",
+				"campo_marcador" => ":PorcDescuento",
+				"campo_valor" => $porc_descuento
+			],
+			[
+				"campo_nombre" => "pagado",
+				"campo_marcador" => ":Pagado",
+				"campo_valor" => $pagado
+			],
+			[
+				"campo_nombre" => "cambio",
+				"campo_marcador" => ":Cambio",
+				"campo_valor" => $cambio
+			],
+			[
+				"campo_nombre" => "id_usuario",
+				"campo_marcador" => ":Usuario",
+				"campo_valor" => $_SESSION['id']
+			],
+			[
+				"campo_nombre" => "id_cliente",
+				"campo_marcador" => ":Cliente",
+				"campo_valor" => $_SESSION['datos_cliente_venta']['id_cliente']
+			],
+			[
+				"campo_nombre" => "id_caja",
+				"campo_marcador" => ":Caja",
+				"campo_valor" => $caja
+			],
+			[
+				"campo_nombre" => "estatus",
+				"campo_marcador" => ":Estatus",
+				"campo_valor" => '1'
+			]
 		];
-		return json_encode($alerta);
-		exit();
+		$agregar_venta = $this->guardarDatos("venta", $datos_venta_reg);
+
+		if ($agregar_venta->rowCount() == 1) {
+
+			/****
+			 * SESSIONES CAJA
+			 */
+
+			$check_caja = $this->ejecutarConsulta("SELECT * FROM sesiones_caja  WHERE codigo_sesion = '" . $_SESSION["sesion_caja"] . "' and estado = 'abierta'");
+
+			if ($check_caja->rowCount() < 1) {
+			} else {
+				$datos_caja = $check_caja->fetch();
+				switch ($forma_pago) {
+					case '1':
+						$campo_nombre = "efectivo";
+						$campo_marcador = ':Efectivo';
+						break;
+					case '2':
+						$campo_nombre = "transferencia";
+						$campo_marcador = ':Transferencia';
+						break;
+					case '3':
+						$campo_nombre = "tarjeta_credito";
+						$campo_marcador = ':TarjetaCredito';
+						break;
+					case '4':
+						$campo_nombre = "tarjeta_debito";
+						$campo_marcador = ':TarjetaDebito';
+						break;
+				}
+
+				$datos_caja_rs = [
+					[
+						"campo_nombre" => $campo_nombre,
+						"campo_marcador" => $campo_marcador,
+						"campo_valor" => $datos_caja[$campo_nombre] + $total_final
+					]
+				];
+
+				$condicion = [
+					"condicion_campo" => "codigo_sesion",
+					"condicion_marcador" => ":CodigoSesion",
+					"condicion_valor" => $_SESSION["sesion_caja"]
+				];
+
+				$saldo_caja = $this->actualizarDatos("sesiones_caja", $datos_caja_rs, $condicion);
+
+				/*== Preparando datos para enviarlos al modelo ==*/
+				$datos_movimiento_caja_reg = [
+					[
+						"campo_nombre" => "id_caja",
+						"campo_marcador" => ":Caja",
+						"campo_valor" => $caja
+					],
+					[
+						"campo_nombre" => "tipo_movimiento",
+						"campo_marcador" => ":TipoMovimiento",
+						"campo_valor" => 'ingreso'
+					],
+					[
+						"campo_nombre" => "monto",
+						"campo_marcador" => ":Monto",
+						"campo_valor" => $total_final
+					]
+
+
+				];
+				$movimiento_caja = $this->guardarDatos("movimiento_caja", $datos_movimiento_caja_reg);
+			}
+
+			$alerta = [
+				"tipo" => "recargar",
+				"titulo" => "¡Venta registrada!",
+				"texto" => "La venta se registró con éxito en el sistema",
+				"icono" => "success"
+			];
+			return json_encode($alerta);
+			exit();
+		} else {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "La venta no pudo registrarse, intente mas tarde.",
+				"texto" => "",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
 	}
 
 

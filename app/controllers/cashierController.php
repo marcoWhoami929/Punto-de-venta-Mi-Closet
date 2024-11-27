@@ -196,6 +196,7 @@ class cashierController extends mainModel
 		$registrar_caja = $this->guardarDatos("sesiones_caja", $caja_datos_reg);
 
 		if ($registrar_caja->rowCount() == 1) {
+			$_SESSION['sesion_caja'] = $codigo_sesion;
 			$alerta = [
 				"tipo" => "limpiar",
 				"titulo" => "Sesion Iniciada",

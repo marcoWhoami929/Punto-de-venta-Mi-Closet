@@ -61,6 +61,7 @@ class loginController extends mainModel
 							$_SESSION['caja'] = $check_usuario['id_caja'];
 							$_SESSION['nombre_caja'] = $check_usuario['nombreCaja'];
 							$_SESSION['perfil'] = $check_usuario['perfil'];
+							//$_SESSION["sesion_caja"] = 'POS-V1Y9L1L1F8-2';
 
 
 
