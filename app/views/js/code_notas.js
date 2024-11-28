@@ -36,10 +36,7 @@ function cargarAperturaCaja(){
   }
 
 }
-function cerrarCaja(){
-  alert("Desea cerrar la caja");
-  //localStorage.removeItem('sesion_caja');
-}
+
 function generarQrNotas() {
   var route = $("#route").val();
   var folio_nota = $("#folio_nota").val();
@@ -548,4 +545,39 @@ function aperturarCaja(){
                 window.location.href = url+"saleNew/";
               }, 2000);
           });
+}
+function obtenerDatosCorteCaja(sesion){
+  $.ajax({
+    url: "../app/ajax/cajaAjax.php",
+    type: "POST",
+    data: {
+      sesion_caja:sesion,
+      modulo_caja: "datos_corte_caja",
+    },
+    success: function (response) {
+      var datos = JSON.parse(response)
+     document.getElementById('field-ordenes').innerHTML = "<label class='label' style='color:#B99654'>"+datos.num_ventas+" Ventas: <span>$ "+datos.total_ventas+"</span></label>";
+     document.getElementById('field-saldo-inicial').innerHTML = "$ "+datos.saldo_inicial+"";
+     document.getElementById('field-efectivo').innerHTML = "$ "+datos.efectivo+"";
+     document.getElementById('field-transferencia').innerHTML = "$ "+datos.transferencia+"";
+     document.getElementById('field-td').innerHTML = "$ "+datos.tarjeta_debito+"";
+     document.getElementById('field-tc').innerHTML = "$ "+datos.tarjeta_credito+"";
+     document.getElementById('field-entrada-efectivo').innerHTML = "$ "+datos.entrada_efectivo+"";
+     document.getElementById('field-salida-efectivo').innerHTML = "$ "+datos.salida_efectivo+"";
+     var total_caja = (parseFloat(datos.saldo_inicial)+parseFloat(datos.efectivo)+parseFloat(datos.entrada_efectivo))-parseFloat(datos.salida_efectivo);
+     document.getElementById('field-total-caja').innerHTML = total_caja.toFixed(2);
+    },
+  })
+  
+}
+function calcularDiferenciaCaja(el) {
+  var efectivo = $(el).val();
+  var total_caja = $("#field-total-caja").text();
+  
+  var diferencia_caja = parseFloat(total_caja)-parseFloat(efectivo);
+  $("#field-diferencia-caja").val(diferencia_caja.toFixed(2));
+
+}
+function cerrarCaja(){
+
 }

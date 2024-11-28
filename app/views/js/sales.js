@@ -399,3 +399,29 @@ function confirmacionPago() {
       });
   }
 }
+function eleccionAccionCaja(sesion) {
+  var accion = $("#accion_caja").val();
+
+  switch (accion) {
+    case 'cierre':
+      document.getElementById("div-caja-cierre").style.display = "";
+      document.getElementById("div-caja-salida").style.display = "none";
+      document.getElementById("div-caja-entrada").style.display = "none";
+      obtenerDatosCorteCaja(sesion);
+      
+    break;
+    case 'entrada':
+      document.getElementById("div-caja-cierre").style.display = "none";
+      document.getElementById("div-caja-salida").style.display = "none";
+      document.getElementById("div-caja-entrada").style.display = "";
+    break;
+    case 'salida':
+      document.getElementById("div-caja-cierre").style.display = "none";
+      document.getElementById("div-caja-salida").style.display = "";
+      document.getElementById("div-caja-entrada").style.display = "none";
+    break;
+  
+  }
+
+
+}

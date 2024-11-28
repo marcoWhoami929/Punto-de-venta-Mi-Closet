@@ -24,6 +24,9 @@ if (isset($_POST['modulo_caja'])) {
 	if ($_POST['modulo_caja'] == "aperturar_caja") {
 		echo $insCaja->aperturarCajaControlador();
 	}
+	if ($_POST['modulo_caja'] == "datos_corte_caja") {
+		echo $insCaja->obtenerDatosCorteCaja();
+	}
 } else {
 	session_destroy();
 	header("Location: " . APP_URL . "login/");

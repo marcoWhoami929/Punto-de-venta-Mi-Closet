@@ -36,12 +36,7 @@
 						<input class="input" type="text" name="nombre" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ:# ]{3,70}" maxlength="70" value="<?php echo $datos['nombre']; ?>" required>
 					</div>
 				</div>
-				<div class="column">
-					<div class="control">
-						<label>Saldo inicial en caja <?php echo CAMPO_OBLIGATORIO; ?></label>
-						<input class="input" type="text" name="saldo_inicial" pattern="[0-9.]{1,25}" maxlength="25" value="<?php echo number_format($datos['saldo_inicial'], 2, '.', ''); ?>" required>
-					</div>
-				</div>
+
 			</div>
 			<p class="has-text-centered">
 				<button type="submit" class="button is-success is-rounded"><i class="fas fa-sync-alt"></i> &nbsp; Actualizar</button>

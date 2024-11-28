@@ -23,13 +23,21 @@ if ($_SESSION['perfil'] == 'Administrador') {
 			</div>
 			<figcaption class="navLateral-body-cr">
 				<span>
-					<?php echo $_SESSION['nombre']; ?><br>
+					<?php
+					echo $_SESSION["nombre_caja"];
+
+
+					?><br>
 
 				</span>
 			</figcaption>
 		</figure>
 		<div class="full-width tittles navLateral-body-tittle-menu has-text-centered is-uppercase">
-			<small><?php echo $_SESSION['nombre_caja']; ?></small>
+			<small><?php if (isset($_SESSION["sesion_caja"])) {
+						echo $_SESSION["sesion_caja"];
+					} else {
+						echo 'Sin Sesion Abierta';
+					} ?></small>
 		</div>
 		<nav class="full-width">
 			<ul class="full-width list-unstyle menu-principal">
@@ -100,6 +108,7 @@ if ($_SESSION['perfil'] == 'Administrador') {
 								</div>
 							</a>
 						</li>
+
 					</ul>
 				</li>
 

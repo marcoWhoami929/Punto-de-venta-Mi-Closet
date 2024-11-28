@@ -195,6 +195,22 @@ class cashierController extends mainModel
 
 		$registrar_caja = $this->guardarDatos("sesiones_caja", $caja_datos_reg);
 
+		$caja_datos_up = [
+			[
+				"campo_nombre" => "codigo_sesion",
+				"campo_marcador" => ":CodigoSesion",
+				"campo_valor" => $codigo_sesion
+			]
+		];
+
+		$condicion = [
+			"condicion_campo" => "id_usuario",
+			"condicion_marcador" => ":ID",
+			"condicion_valor" => $_SESSION["id"]
+		];
+
+		$actualizar_sesion = $this->actualizarDatos("usuario", $caja_datos_up, $condicion);
+
 		if ($registrar_caja->rowCount() == 1) {
 			$_SESSION['sesion_caja'] = $codigo_sesion;
 			$alerta = [
@@ -431,10 +447,10 @@ class cashierController extends mainModel
 		# Almacenando datos#
 		$numero = $this->limpiarCadena($_POST['numero']);
 		$nombre = $this->limpiarCadena($_POST['nombre']);
-		$saldo_inicial = $this->limpiarCadena($_POST['saldo_inicial']);
+
 
 		# Verificando campos obligatorios #
-		if ($numero == "" || $nombre == "" || $saldo_inicial == "") {
+		if ($numero == "" || $nombre == "") {
 			$alerta = [
 				"tipo" => "simple",
 				"titulo" => "Ocurrió un error inesperado",
@@ -458,16 +474,7 @@ class cashierController extends mainModel
 		}
 
 
-		if ($this->verificarDatos("[0-9.]{1,25}", $saldo_inicial)) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "El EFECTIVO DE CAJA no coincide con el formato solicitado",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
+
 
 		# Comprobando numero de caja #
 		if ($datos['numero'] != $numero) {
@@ -500,17 +507,6 @@ class cashierController extends mainModel
 		}
 
 		# Comprobando que el efectivo sea mayor o igual a 0 #
-		$saldo_inicial = number_format($saldo_inicial, 2, '.', '');
-		if ($saldo_inicial < 0) {
-			$alerta = [
-				"tipo" => "simple",
-				"titulo" => "Ocurrió un error inesperado",
-				"texto" => "No puedes colocar una cantidad de efectivo menor a 0",
-				"icono" => "error"
-			];
-			return json_encode($alerta);
-			exit();
-		}
 
 		$caja_datos_up = [
 			[
@@ -522,11 +518,6 @@ class cashierController extends mainModel
 				"campo_nombre" => "nombre",
 				"campo_marcador" => ":Nombre",
 				"campo_valor" => $nombre
-			],
-			[
-				"campo_nombre" => "saldo_inicial",
-				"campo_marcador" => ":Saldo_inicial",
-				"campo_valor" => $saldo_inicial
 			]
 		];
 
@@ -553,5 +544,13 @@ class cashierController extends mainModel
 		}
 
 		return json_encode($alerta);
+	}
+	public function obtenerDatosCorteCaja()
+	{
+		$sesion = $this->limpiarCadena($_POST['sesion_caja']);
+
+		$datos = $this->ejecutarConsulta("SELECT sesion.*,count(pay.codigo_venta) as 'num_ventas',(sesion.efectivo+sesion.transferencia+sesion.tarjeta_debito+sesion.tarjeta_credito) as 'total_ventas',sum(IF(mov.descripcion = 'ENTRADA',mov.monto,0)) as 'entrada_efectivo',sum(IF(mov.descripcion = 'SALIDA',mov.monto,0)) as 'salida_efectivo' FROM `sesiones_caja` as sesion LEFT OUTER JOIN movimiento_caja as mov ON sesion.codigo_sesion = mov.sesion_caja LEFT OUTER JOIN pago as pay ON mov.descripcion = pay.codigo_pago WHERE mov.sesion_caja = '" . $sesion . "'");
+		$datos = $datos->fetch();
+		return json_encode($datos);
 	}
 }

@@ -274,7 +274,7 @@ class saleController extends mainModel
 				"descripcion" => $value['nombre']
 			];
 
-			$alerta = "Se agrego <strong>" . $value['nombre'] . "</strong> a la venta";
+			$alerta = "Se agrego <strong>" . $value['nombre'] . "</strong> al carrito.";
 		} else {
 			$detalle_cantidad = ($_SESSION['datos_producto_venta'][$codigo]['cantidad']) + 1;
 
@@ -314,7 +314,7 @@ class saleController extends mainModel
 				"descripcion" => $value['nombre']
 			];
 
-			$alerta = "Se agrego +1 <strong>" . $value['nombre'] . "</strong> a la venta. Total en carrito: <strong>$detalle_cantidad</strong>";
+			$alerta = "Se agrego +1 <strong>" . $value['nombre'] . "</strong> al carrito. Total en carrito: <strong>$detalle_cantidad</strong>";
 		}
 
 
@@ -429,7 +429,7 @@ class saleController extends mainModel
 			$_SESSION['datos_producto_venta'][$codigo]["descuento"] = $descuento;
 			$_SESSION['datos_producto_venta'][$codigo]["total"] = $total;
 
-			$alerta = "Se $diferencia_productos <strong>" . $value['nombre'] . "</strong> a la venta. Total en carrito <strong>$detalle_cantidad</strong>";
+			$alerta = "Se $diferencia_productos <strong>" . $value['nombre'] . "</strong> al carrito. Total en carrito <strong>$detalle_cantidad</strong>";
 
 			return json_encode($alerta);
 		} else {
@@ -891,6 +891,11 @@ class saleController extends mainModel
 
 				/*== Preparando datos para enviarlos al modelo ==*/
 				$datos_movimiento_caja_reg = [
+					[
+						"campo_nombre" => "sesion_caja",
+						"campo_marcador" => ":SesionCaja",
+						"campo_valor" => $_SESSION["sesion_caja"]
+					],
 					[
 						"campo_nombre" => "id_caja",
 						"campo_marcador" => ":Caja",

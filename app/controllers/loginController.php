@@ -45,7 +45,7 @@ class loginController extends mainModel
 				} else {
 
 					# Verificando usuario #
-					$check_usuario = $this->ejecutarConsulta("SELECT usr.id_usuario,usr.perfil,usr.password,usr.nombre as 'nombreUsuario',usr.usuario,usr.foto,usr.id_caja,caja.nombre as 'nombreCaja' FROM usuario as usr INNER JOIN caja ON usr.id_caja = caja.id_caja WHERE usr.usuario='$usuario'");
+					$check_usuario = $this->ejecutarConsulta("SELECT usr.id_usuario,usr.perfil,usr.password,usr.nombre as 'nombreUsuario',usr.usuario,usr.foto,usr.id_caja,caja.nombre as 'nombreCaja',usr.codigo_sesion FROM usuario as usr INNER JOIN caja ON usr.id_caja = caja.id_caja WHERE usr.usuario='$usuario'");
 
 					if ($check_usuario->rowCount() == 1) {
 
@@ -61,9 +61,11 @@ class loginController extends mainModel
 							$_SESSION['caja'] = $check_usuario['id_caja'];
 							$_SESSION['nombre_caja'] = $check_usuario['nombreCaja'];
 							$_SESSION['perfil'] = $check_usuario['perfil'];
-							$_SESSION["sesion_caja"] = 'POS-V1Y9L1L1F8-2';
+							if ($check_usuario['codigo_sesion'] != NULL) {
+								echo '<script>document.write(setItem("session_caja", "abierta"));</script>';
 
-
+								$_SESSION["sesion_caja"] = $check_usuario['codigo_sesion'];
+							}
 
 							if (headers_sent()) {
 								echo "<script> window.location.href='" . APP_URL . "dashboard/'; </script>";
@@ -96,6 +98,7 @@ class loginController extends mainModel
 	public function cerrarSesionControlador()
 	{
 
+		echo '<script>localStorage.removeItem("session_caja")</script>';
 		session_destroy();
 
 		if (headers_sent()) {
