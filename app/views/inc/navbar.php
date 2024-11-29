@@ -174,6 +174,12 @@
                                 <textarea class="textarea is-large" type="text" placeholder="Ingresar alguna observación si hay alguna diferencia en el corte" style="font-size:12px;font-weight:bold" id="observaciones_corte"></textarea>
                             </div>
 
+                            <div class="field  pt-4">
+                                <p class="">
+                                    <button type="button" class="button is-success button-lg" onclick="cerrarCaja('<?= $_SESSION['sesion_caja'] ?>')"><i class="fas fa-money-check-alt"></i> &nbsp; Cerrar Caja</button>
+                                </p>
+                            </div>
+
                         </div>
                         <div class="column">
                             <div class="field">
@@ -189,11 +195,6 @@
                                 </div>
                             </div>
 
-                            <div class="field  pt-4">
-                                <p class="">
-                                    <button type="button" class="button is-success button-lg" onclick="cerrarCaja('<?= $_SESSION['sesion_caja'] ?>')"><i class="fas fa-money-check-alt"></i> &nbsp; Cerrar Caja</button>
-                                </p>
-                            </div>
 
                         </div>
                     </div>

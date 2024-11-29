@@ -18,7 +18,7 @@
 
 		if ($datos_venta["estatus_pago"] == 1) {
 			$buttonPago = '<p class="has-text-centered ">
-			<a href="#" class="button is-link is-rounded is-success is-large">
+			<a href="#" class="button is-link is-rounded is-success is-large js-modal-trigger"  data-target="modal-detalle-pago" onclick="obtenerDetallePago(\'' . $code . '\')">
 				<i class="fas fa-check-circle"></i> &nbsp;Pago Realizado </a>
 		</p>';
 		} else {

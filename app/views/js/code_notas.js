@@ -1,6 +1,7 @@
 $(function () {
   urlPath = window.location.pathname;
   url = "http://localhost/pos/";
+
   ruta = urlPath.split("/");
   switch (ruta[2]) {
     case "dashboard":
@@ -574,10 +575,117 @@ function calcularDiferenciaCaja(el) {
   var efectivo = $(el).val();
   var total_caja = $("#field-total-caja").text();
   
-  var diferencia_caja = parseFloat(total_caja)-parseFloat(efectivo);
+  var diferencia_caja = parseFloat(efectivo)-parseFloat(total_caja);
   $("#field-diferencia-caja").val(diferencia_caja.toFixed(2));
 
 }
-function cerrarCaja(){
+function cerrarCaja(sesion){
 
+  Swal.fire({
+    title: "¿Desea Cerrar La Caja?",
+    text: "",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#B99654",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Si, Cerrar",
+    cancelButtonText: "No, cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      var saldo_final = $("#saldo_final_corte").val();
+      var diferencia = $("#field-diferencia-caja").val();
+      var observaciones = $("#observaciones_corte").val();
+     
+
+      let datos = new FormData();
+      datos.append("saldo_final", saldo_final);
+      datos.append("diferencia", diferencia);
+      datos.append("observaciones", observaciones);
+      datos.append("sesion_caja", sesion);
+
+      datos.append("modulo_caja", "cerrar_caja");
+      fetch(url + "app/ajax/cajaAjax.php", {
+        method: "POST",
+        body: datos,
+      }).then((respuesta) => respuesta.json())
+      .then((respuesta) => {
+        localStorage.removeItem("session_caja");
+        return alertas_ajax(respuesta);
+      })
+          
+    }
+  });
+
+}
+function salidaEfectivo(sesion){
+  var efectivo = $("#salida_efectivo").val();
+  var motivo = $("#salida_motivo").val();
+
+  let datos = new FormData();
+  datos.append("efectivo", efectivo);
+  datos.append("motivo", motivo);
+  datos.append("sesion_caja", sesion);
+  datos.append("modulo_caja", "salida_efectivo_caja");
+  fetch(url + "app/ajax/cajaAjax.php", {
+    method: "POST",
+    body: datos,
+  }).then((respuesta) => respuesta.json())
+  .then((respuesta) => {
+    
+    return alertas_ajax(respuesta);
+  })
+}
+
+function entradaEfectivo(sesion){
+
+  var efectivo = $("#entrada_efectivo").val();
+  var motivo = $("#entrada_motivo").val();
+
+  let datos = new FormData();
+  datos.append("efectivo", efectivo);
+  datos.append("motivo", motivo);
+  datos.append("sesion_caja", sesion);
+  datos.append("modulo_caja", "entrada_efectivo_caja");
+  fetch(url + "app/ajax/cajaAjax.php", {
+    method: "POST",
+    body: datos,
+  }).then((respuesta) => respuesta.json())
+  .then((respuesta) => {
+
+    return alertas_ajax(respuesta);
+  })
+
+}
+
+function obtenerDetallePago(codigo_venta){
+  $.ajax({
+    url: url+"app/ajax/cajaAjax.php",
+    type: "POST",
+    data: {
+      codigo_venta:codigo_venta,
+      modulo_caja: "detalle_pago",
+    },
+    success: function (response) {
+      var datos = JSON.parse(response);
+    
+      var forma_pago = document.getElementById("forma_pago_venta");
+
+      var option = document.createElement("option");
+      option.text = datos.metodo;
+      option.value = datos.id_pago;
+      forma_pago.add(option);
+      eleccionFormaPago(datos.id_metodo_pago);
+      if(datos.id_metodo_pago == 1){
+        $("#total_pagar_venta").val(datos.total_pago);
+        $("#total_pagado_venta").val(datos.total_pagado);
+        $("#total_cambio_venta").val(datos.total_cambio);
+      }else{
+        $("#total_pagar_venta").val(datos.total_pago);
+        $("#referencia_venta").val(datos.referencia);
+      }
+  
+      
+    },
+  })
+  
 }

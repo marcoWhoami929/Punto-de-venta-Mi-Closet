@@ -469,11 +469,11 @@ class productController extends mainModel
 				$tabla .= '<div class="card  pb-4">
 								<header class="card-header" style="background:#B99654;color:#ffffff">
 								 <p class="card-header-title"><strong style="color:#ffffff">' . $rows['producto'] . '</strong></p>
-								   <p class="card-header-title"><strong style="color:#ffffff">' . $rows['codigo'] . '</strong></p>
-									<button type="submit" class="button is-danger is-rounded pt-4" onclick="eliminarProducto(\'' . $rows['cid_producto'] . '\')">
+										  <p class="card-header-title"><strong style="color:#ffffff">' . $rows['codigo'] . '</strong></p>
+										  <button type="submit" class="button is-danger is-rounded pt-4" onclick="eliminarProducto(\'' . $rows['cid_producto'] . '\')">
 														<i class="fas fa-trash fa-fw"></i>
 											</button>
-										
+	
 								</header>
 								<div class="card-content">
 									<div class="content">
@@ -518,24 +518,44 @@ class productController extends mainModel
 									</div>
 								</div>
 								<footer class="card-footer">
-									
-										<div class=" card-footer-item">
-										
-												<a href="' . APP_URL . 'productPhoto/' . $rows['cid_producto'] . '/" class="button is-info is-rounded is-small">
-														<i class="far fa-image fa-fw"></i>
-													</a>
-												
+										<div class="columns">
+											<div class="column is-full">
+												<div class=" card-footer-item">
+														<div class="columns">
+															<div class="column">
+																<a href="' . APP_URL . 'productPhoto/' . $rows['cid_producto'] . '/" class="button is-info is-rounded is-small">
+																	<i class="far fa-image fa-fw"></i> Imagen
+																</a>
+															</div>
+															<div class="column">
+																<a href="' . APP_URL . 'productUpdate/' . $rows['cid_producto'] . '/" class="button is-success is-rounded is-small">
+																	<i class="fas fa-edit fa-fw"></i> Actualizar
+																</a>
+															</div>
+														</div>
+	
+												</div>
+											</div>
+											<div class="column is-full">
+													<div class=" card-footer-item">
+														<div class="columns">
+																<div class="column">
+																	<button class="button is-warning is-rounded is-small js-modal-trigger"  data-target="modal-abastecer-inventario" onclick="reabastecerInventario(\'' . $rows["cid_producto"] . '\')">
+																	<i class="fas fa-boxes fa-fw"></i> Abastecer
+																</button>
+																</div>
+																<div class="column">
+																		<button class="button is-danger is-rounded is-small" onclick="desecharInventario(\'' . $rows["cid_producto"] . '\')">
+																	<i class="fas fa-recycle fa-fw"></i> Desechar
+																</button>
+																</div>
+															</div>
+	
+													</div>
+
+											</div>
 										</div>
-										<div class=" card-footer-item">
-											
-													<a href="' . APP_URL . 'productUpdate/' . $rows['cid_producto'] . '/" class="button is-success is-rounded is-small">
-														<i class="fas fa-sync fa-fw"></i>
-													</a>
-												
-										</div>
-								
-									
-									
+
 								</footer>
 								</div>
 									<hr>';

@@ -62,7 +62,7 @@ class loginController extends mainModel
 							$_SESSION['nombre_caja'] = $check_usuario['nombreCaja'];
 							$_SESSION['perfil'] = $check_usuario['perfil'];
 							if ($check_usuario['codigo_sesion'] != NULL) {
-								echo '<script>document.write(setItem("session_caja", "abierta"));</script>';
+
 
 								$_SESSION["sesion_caja"] = $check_usuario['codigo_sesion'];
 							}

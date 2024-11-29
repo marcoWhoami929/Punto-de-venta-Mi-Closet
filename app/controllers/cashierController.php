@@ -230,6 +230,305 @@ class cashierController extends mainModel
 
 		return json_encode($alerta);
 	}
+	/*----------  Controlador cerrar caja  ----------*/
+	public function cerrarCajaControlador()
+	{
+
+		# Almacenando datos#
+
+		$saldo_final = $this->limpiarCadena($_POST["saldo_final"]);
+		$diferencia = $this->limpiarCadena($_POST["diferencia"]);
+		$observaciones = $this->limpiarCadena($_POST["observaciones"]);
+		$codigo_sesion = $this->limpiarCadena($_POST["sesion_caja"]);
+
+		# Verificando campos obligatorios #
+		if ($saldo_final == "" || $saldo_final == '0' || $saldo_final == '0.00') {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "El saldo final no puede estar vacio",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+
+		# Comprobando que el efectivo sea mayor o igual a 0 #
+		$saldo_final = number_format($saldo_final, 2, '.', '');
+		if ($saldo_final < 0) {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No puedes colocar una cantidad de efectivo menor a 0",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+		date_default_timezone_set('America/Mexico_City');
+		$fecha_cierre = date('Y/m/d H:i:s');
+
+		$caja_datos_up = [
+			[
+				"campo_nombre" => "saldo_final",
+				"campo_marcador" => ":SaldoFinal",
+				"campo_valor" => $saldo_final
+			],
+			[
+				"campo_nombre" => "diferencia",
+				"campo_marcador" => ":Diferencia",
+				"campo_valor" => $diferencia
+			],
+			[
+				"campo_nombre" => "observaciones",
+				"campo_marcador" => ":Observaciones",
+				"campo_valor" => $observaciones
+			],
+			[
+				"campo_nombre" => "fecha_cierre",
+				"campo_marcador" => ":FechaCierre",
+				"campo_valor" => $fecha_cierre
+			],
+			[
+				"campo_nombre" => "estado",
+				"campo_marcador" => ":Estado",
+				"campo_valor" => "cerrada"
+			]
+
+		];
+
+		$condicion = [
+			"condicion_campo" => "codigo_sesion",
+			"condicion_marcador" => ":CodigoSesion",
+			"condicion_valor" => $codigo_sesion
+		];
+
+		$actualizar_sesion = $this->actualizarDatos("sesiones_caja", $caja_datos_up, $condicion);
+
+		if ($actualizar_sesion->rowCount() == 1) {
+
+			unset($_SESSION['sesion_caja']);
+
+			$usuario_up = [
+				[
+					"campo_nombre" => "codigo_sesion",
+					"campo_marcador" => ":CodigoSesion",
+					"campo_valor" => NULL
+				]
+			];
+
+			$condicion = [
+				"condicion_campo" => "id_usuario",
+				"condicion_marcador" => ":IdUsuaro",
+				"condicion_valor" => $_SESSION["id"]
+			];
+
+			$actualizar_sesion = $this->actualizarDatos("usuario", $usuario_up, $condicion);
+
+			$bitacora_reg = [
+				[
+					"campo_nombre" => "accion",
+					"campo_marcador" => ":Accion",
+					"campo_valor" => 'Cierre de Caja Con N° de Sesion ' . $codigo_sesion . ''
+				],
+				[
+					"campo_nombre" => "id_usuario",
+					"campo_marcador" => ":IdUsuario",
+					"campo_valor" => $_SESSION["id"]
+				]
+			];
+
+			$registrar_caja = $this->guardarDatos("bitacora", $bitacora_reg);
+
+
+			$alerta = [
+				"tipo" => "recargar",
+				"titulo" => "Sesion Finalizada",
+				"texto" => "El cierre de Caja Con " . " #" . $codigo_sesion . " se ha finalizado con exito",
+				"icono" => "success"
+			];
+		} else {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No se pudo cerrar la sesion de caja, por favor intente nuevamente",
+				"icono" => "error"
+			];
+		}
+
+		return json_encode($alerta);
+	}
+	/*----------  Controlador registrar caja  ----------*/
+	public function entradaEfectivoCajaControlador()
+	{
+
+		# Almacenando datos#
+		$efectivo = $this->limpiarCadena($_POST['efectivo']);
+		$motivo = $this->limpiarCadena($_POST['motivo']);
+		$sesion_caja = $this->limpiarCadena($_POST['sesion_caja']);
+		$id_caja = $_SESSION["caja"];
+
+		# Verificando campos obligatorios #
+		if ($efectivo == "" || $efectivo == "0" || $efectivo == "0.00") {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "El campo efectivo no puede estar vacio",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+
+
+		$caja_datos_reg = [
+			[
+				"campo_nombre" => "sesion_caja",
+				"campo_marcador" => ":SesionCaja",
+				"campo_valor" => $sesion_caja
+			],
+			[
+				"campo_nombre" => "id_caja",
+				"campo_marcador" => ":IdCaja",
+				"campo_valor" => $id_caja
+			],
+			[
+				"campo_nombre" => "tipo_movimiento",
+				"campo_marcador" => ":TipoMovimiento",
+				"campo_valor" => 'ingreso'
+			],
+			[
+				"campo_nombre" => "monto",
+				"campo_marcador" => ":Monto",
+				"campo_valor" => $efectivo
+			],
+			[
+				"campo_nombre" => "descripcion",
+				"campo_marcador" => ":Descripcion",
+				"campo_valor" => 'ENTRADA'
+			]
+		];
+
+		$registrar_movimiento_caja = $this->guardarDatos("movimiento_caja", $caja_datos_reg);
+
+
+		if ($registrar_movimiento_caja->rowCount() == 1) {
+			$bitacora_reg = [
+				[
+					"campo_nombre" => "accion",
+					"campo_marcador" => ":Accion",
+					"campo_valor" => 'Ingreso de Efectivo a Caja en la Sesion N° ' . $sesion_caja . ''
+				],
+				[
+					"campo_nombre" => "id_usuario",
+					"campo_marcador" => ":IdUsuario",
+					"campo_valor" => $_SESSION["id"]
+				]
+			];
+
+			$registrar_caja = $this->guardarDatos("bitacora", $bitacora_reg);
+			$alerta = [
+				"tipo" => "recargar",
+				"titulo" => "Exitoso",
+				"texto" => "La entrada de efectivo se ha realizado con exito",
+				"icono" => "success"
+			];
+		} else {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No se pudo registrar el ingreso de efectivo, por favor intente nuevamente",
+				"icono" => "error"
+			];
+		}
+
+		return json_encode($alerta);
+	}
+	public function salidaEfectivoCajaControlador()
+	{
+
+		# Almacenando datos#
+		$efectivo = $this->limpiarCadena($_POST['efectivo']);
+		$motivo = $this->limpiarCadena($_POST['motivo']);
+		$sesion_caja = $this->limpiarCadena($_POST['sesion_caja']);
+		$id_caja = $_SESSION["caja"];
+
+		# Verificando campos obligatorios #
+		if ($efectivo == "" || $efectivo == "0" || $efectivo == "0.00") {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "El campo efectivo no puede estar vacio",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+
+
+		$caja_datos_reg = [
+			[
+				"campo_nombre" => "sesion_caja",
+				"campo_marcador" => ":SesionCaja",
+				"campo_valor" => $sesion_caja
+			],
+			[
+				"campo_nombre" => "id_caja",
+				"campo_marcador" => ":IdCaja",
+				"campo_valor" => $id_caja
+			],
+			[
+				"campo_nombre" => "tipo_movimiento",
+				"campo_marcador" => ":TipoMovimiento",
+				"campo_valor" => 'egreso'
+			],
+			[
+				"campo_nombre" => "monto",
+				"campo_marcador" => ":Monto",
+				"campo_valor" => $efectivo
+			],
+			[
+				"campo_nombre" => "descripcion",
+				"campo_marcador" => ":Descripcion",
+				"campo_valor" => 'SALIDA'
+			]
+		];
+
+		$registrar_movimiento_caja = $this->guardarDatos("movimiento_caja", $caja_datos_reg);
+
+
+		if ($registrar_movimiento_caja->rowCount() == 1) {
+			$bitacora_reg = [
+				[
+					"campo_nombre" => "accion",
+					"campo_marcador" => ":Accion",
+					"campo_valor" => 'Salida de Efectivo de Caja en la Sesion N° ' . $sesion_caja . ''
+				],
+				[
+					"campo_nombre" => "id_usuario",
+					"campo_marcador" => ":IdUsuario",
+					"campo_valor" => $_SESSION["id"]
+				]
+			];
+
+			$registrar_caja = $this->guardarDatos("bitacora", $bitacora_reg);
+			$alerta = [
+				"tipo" => "recargar",
+				"titulo" => "Exitoso",
+				"texto" => "La salida de efectivo se ha realizado con exito",
+				"icono" => "success"
+			];
+		} else {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No se pudo registrar la salida de efectivo, por favor intente nuevamente",
+				"icono" => "error"
+			];
+		}
+
+		return json_encode($alerta);
+	}
 	/*----------  Controlador listar cajas  ----------*/
 	public function listarCajaControlador($datos)
 	{
@@ -551,6 +850,16 @@ class cashierController extends mainModel
 
 		$datos = $this->ejecutarConsulta("SELECT sesion.*,count(pay.codigo_venta) as 'num_ventas',(sesion.efectivo+sesion.transferencia+sesion.tarjeta_debito+sesion.tarjeta_credito) as 'total_ventas',sum(IF(mov.descripcion = 'ENTRADA',mov.monto,0)) as 'entrada_efectivo',sum(IF(mov.descripcion = 'SALIDA',mov.monto,0)) as 'salida_efectivo' FROM `sesiones_caja` as sesion LEFT OUTER JOIN movimiento_caja as mov ON sesion.codigo_sesion = mov.sesion_caja LEFT OUTER JOIN pago as pay ON mov.descripcion = pay.codigo_pago WHERE mov.sesion_caja = '" . $sesion . "'");
 		$datos = $datos->fetch();
+		return json_encode($datos);
+	}
+	public function obtenerDetallePago()
+	{
+		$codigo_venta = $this->limpiarCadena($_POST['codigo_venta']);
+
+		$datos = $this->ejecutarConsulta("SELECT pago.*,met.metodo FROM `pago` INNER JOIN `metodopago` as met ON pago.id_metodo_pago = met.id_metodo_pago WHERE pago.codigo_venta ='" . $codigo_venta . "'");
+
+		$datos = $datos->fetch();
+
 		return json_encode($datos);
 	}
 }

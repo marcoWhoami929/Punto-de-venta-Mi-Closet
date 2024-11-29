@@ -27,6 +27,18 @@ if (isset($_POST['modulo_caja'])) {
 	if ($_POST['modulo_caja'] == "datos_corte_caja") {
 		echo $insCaja->obtenerDatosCorteCaja();
 	}
+	if ($_POST['modulo_caja'] == "cerrar_caja") {
+		echo $insCaja->cerrarCajaControlador();
+	}
+	if ($_POST['modulo_caja'] == "detalle_pago") {
+		echo $insCaja->obtenerDetallePago();
+	}
+	if ($_POST['modulo_caja'] == "entrada_efectivo_caja") {
+		echo $insCaja->entradaEfectivoCajaControlador();
+	}
+	if ($_POST['modulo_caja'] == "salida_efectivo_caja") {
+		echo $insCaja->salidaEfectivoCajaControlador();
+	}
 } else {
 	session_destroy();
 	header("Location: " . APP_URL . "login/");

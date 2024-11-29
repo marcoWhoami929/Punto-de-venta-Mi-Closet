@@ -275,7 +275,7 @@
                         <label class="label">Elegir Forma de Pago</label>
                         <div class="control has-text-centered">
                             <div class="select is-primary  is-rounded is-large">
-                                <select onchange="eleccionFormaPago()" id="forma_pago_venta">
+                                <select onchange="eleccionFormaPago(0)" id="forma_pago_venta">
                                     <option value="1">Efectivo</option>
                                     <option value="2">Transferencia Electrónica</option>
                                     <option value="3">Tarjeta de Crédito</option>

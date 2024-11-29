@@ -8,6 +8,12 @@
 			} else {
 				echo '<img class="is-rounded" src="' . APP_URL . 'app/views/fotos/default.png">';
 			}
+
+
+			if (isset($_SESSION["sesion_caja"])) {
+				echo '<script>localStorage.setItem("session_caja", "abierta");</script>';
+			}
+
 			?>
 		</figure>
 	</div>

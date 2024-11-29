@@ -311,15 +311,20 @@ function establecerFormaPago(formaPago, total_pago, codigo_venta, estatus) {
     return alertas_ajax(respuesta);
   } else {
     new Promise(function (resolve) {
-      resolve(eleccionFormaPago());
+      resolve(eleccionFormaPago(0));
     }).then(function (result) {
       calcularCambio();
     });
   }
 }
-function eleccionFormaPago() {
-  var forma_pago = $("#forma_pago_venta").val();
+function eleccionFormaPago(forma_pago) {
 
+  if(forma_pago == 0){
+    var forma_pago = $("#forma_pago_venta").val();
+  }else{
+    var forma_pago = forma_pago;
+  }
+  
   if (forma_pago === "1") {
     document.getElementById("div-payment-efectivo-1").style.display = "";
     document.getElementById("div-payment-efectivo-2").style.display = "";

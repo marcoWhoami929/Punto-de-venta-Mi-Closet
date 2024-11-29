@@ -9,7 +9,7 @@ class viewsModel
 	protected function obtenerVistasModelo($vista)
 	{
 
-		$listaBlanca = ["dashboard", "cashierNew", "cashierList", "cashierSearch", "cashierUpdate", "userNew", "userList", "userUpdate", "userSearch", "userPhoto", "clientNew", "clientList", "clientSearch", "clientUpdate", "categoryNew", "categoryList", "categorySearch", "categoryUpdate", "productNew", "productList", "productSearch", "productUpdate", "productPhoto", "productCategory", "companyNew", "saleNew", "saleList", "saleSearch", "saleDetail", "logOut", "notesNew", "notesList", "noteDetail", "paymentList"];
+		$listaBlanca = ["dashboard", "cashierNew", "cashierList", "cashierSearch", "cashierUpdate", "userNew", "userList", "userUpdate", "userSearch", "userPhoto", "clientNew", "clientList", "clientSearch", "clientUpdate", "categoryNew", "categoryList", "categorySearch", "categoryUpdate", "productNew", "productList", "productSearch", "productUpdate", "productPhoto", "productCategory", "companyNew", "saleNew", "saleList", "saleSearch", "saleDetail", "logOut", "notesNew", "notesList", "noteDetail", "paymentList", "sessionsList", "kardex"];
 
 		if (in_array($vista, $listaBlanca)) {
 			if (is_file("./app/views/content/" . $vista . "-view.php")) {

@@ -29,3 +29,10 @@ function eliminarProducto(id_producto){
         }
       });
 }
+
+function reabastecerInventario(id_producto){
+
+}
+function desecharInventario(id_producto){
+
+}
