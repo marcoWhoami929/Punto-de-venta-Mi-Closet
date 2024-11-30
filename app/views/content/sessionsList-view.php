@@ -14,7 +14,7 @@
                     <input class="input is-rounded" type="text" id="busqueda" placeholder="¿Qué sesión estás buscando?" onkeyup="listarSesiones()">
                 </p>
                 <p class="control">
-                    <button class="button is-info" type="button" onclick="listarSesiones()">Buscar</button>
+                    <button class="button is-info" type="button" onclick="listarSesiones()">Actualizar</button>
                 </p>
             </div>
         </div>
@@ -53,15 +53,9 @@
     </div>
 </div>
 <div class="container is-fluid pb-2 pt-2 ">
+    <div class="columns">
+        <div class="column div-sesiones">
 
-    <div class="columns is-multiline">
-        <div class="column ">
-            <div class="card">
-                <div class="column div-sesiones">
-
-                </div>
-
-            </div>
         </div>
     </div>
 </div>

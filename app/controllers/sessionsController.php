@@ -51,33 +51,66 @@ class sessionsController extends mainModel
             $pag_inicio = $inicio + 1;
 
             foreach ($datos as $rows) {
+                if ($rows["estado"] == "abierta") {
+                    $color = "is-success";
+                    $texto = "Activa";
+                } else {
+                    $color = "is-danger";
+                    $texto = "Cerrada";
+                }
+                $caja = $this->ejecutarConsulta("SELECT sesion.*,count(pay.codigo_venta) as 'num_ventas',(sesion.efectivo+sesion.transferencia+sesion.tarjeta_debito+sesion.tarjeta_credito) as 'total_ventas',sum(IF(mov.descripcion = 'ENTRADA',mov.monto,0)) as 'entrada_efectivo',sum(IF(mov.descripcion = 'SALIDA',mov.monto,0)) as 'salida_efectivo' FROM `sesiones_caja` as sesion LEFT OUTER JOIN movimiento_caja as mov ON sesion.codigo_sesion = mov.sesion_caja LEFT OUTER JOIN pago as pay ON mov.descripcion = pay.codigo_pago WHERE mov.sesion_caja = '" . $rows["codigo_sesion"]  . "'");
+                $caja = $caja->fetch();
 
-
-                $tabla .= '
-                     
-                                <div class="card mb-3">
+                $tabla .= '<div class="column">
+                                <div class="card">
                                 <header class="card-header" style="background:#B99654">
                                     <p class="card-header-title" style="color:#ffffff">' . $rows["codigo_sesion"] . '</p>
+                                    <p class="card-header-title" style="color:#ffffff">' . $rows["fecha_cierre"] . '</p>
                                     <button class="card-header-icon" aria-label="more options">
-                                    <span class="tag is-success is-large">Sesión Activa</span>
+                                    <span class="tag ' . $color . ' is-large">' . $texto . '</span>
                                     </button>
                                 </header>
                                 <div class="card-content">
                                     <div class="content">
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus nec
-                                    iaculis mauris.
-                                    <a href="#">@bulmaio</a>. <a href="#">#css</a> <a href="#">#responsive</a>
-                                    <br />
-                                    <time datetime="2016-1-1">11:09 PM - 1 Jan 2016</time>
+                                        <div class="columns">
+                                            <div class="column">
+                                                <label class="has-text-centered"><strong></strong></label>
+                                                <h4 class="is-info">' . $rows["fecha_apertura"] . '</h4>
+                                            </div>
+                                            <div class="column">
+                                                <label class="has-text-centered"><strong></strong></label>
+                                                <h4 class="is-info">' . $rows["nombreCaja"] . '</h4>
+                                            </div>
+                                            <div class="column">
+                                                <label class="has-text-centered"><strong></strong></label>
+                                                <h4 class="is-info">' . $caja["total_ventas"] . '</h4>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                                 <footer class="card-footer">
-                                    <a href="#" class="card-footer-item">Save</a>
-                                    <a href="#" class="card-footer-item">Edit</a>
-                                    <a href="#" class="card-footer-item">Delete</a>
+                                    <div class="content  is-full">
+                                 
+                                    <div class="columns">
+                                        <div class="column is-full">
+                                        <label class="has-text-centered"><strong>Saldo Inicial:</strong></label>
+                                                <h4 class="has-text-info" style="font-size:22px">' . MONEDA_SIMBOLO . " " . number_format($rows['saldo_inicial'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</h4>
+                                            </div>
+                                        <div class="column  is-full">
+                                         <label class="has-text-centered"><strong>Saldo Final:</strong></label>
+                                                <h4 class="has-text-info" style="font-size:22px">' . MONEDA_SIMBOLO . " " . number_format($rows['saldo_final'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</h4>
+                                        </div>
+                                        <div class="column  is-full">
+                                                               <label class="has-text-centered"><strong>Diferencia:</strong></label>
+                                                <h4 class="has-text-info" style="font-size:22px">' . MONEDA_SIMBOLO . " " . number_format($rows['diferencia'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</h4>
+                                        </div>
+                                    </div>
+                                   
+                                  
+                                     </div>
                                 </footer>
                                 </div>
-                          
+                            </div>
                     
                             ';
                 $contador++;
