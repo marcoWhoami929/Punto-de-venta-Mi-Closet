@@ -2,68 +2,68 @@
 	<h1 class="title">Productos</h1>
 	<h2 class="subtitle"><i class="fas fa-clipboard-list fa-fw"></i> &nbsp; Lista de productos</h2>
 </div>
-<div class="container is-fluid pb-6">
+<div class="container is-fluid pb-2 pt-2">
 
-	<div class="form-rest mb-6 mt-6"></div>
-
-	<?php
-
-	use app\controllers\productController;
-
-	$insProducto = new productController();
-
-	echo $insProducto->listarProductoControlador($url[1], 10, $url[0], "", 0);
-	?>
-</div>
-<div class="modal fade is-large" id="modal-abastecer-inventario" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-background"></div>
-	<div class="modal-card ">
-		<header class="modal-card-head" style="background:#B99654">
-			<p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-cash-register"></i> &nbsp; Abastecer Inventario</p>
-			<button class="delete" aria-label="close" id="btn-close-pago"></button>
-		</header>
-		<section class="modal-card-body">
-
-			<div class="columns  mb-6">
-				<div class="column">
-					<div class="field">
-						<label class="label">Unidades a Ingresar:</label>
-						<div class="control has-icons-left has-icons-right">
-							<input class="input is-large" type="text" placeholder="0.00" style="font-size:50px;font-weight:bold" id="unidades_inventario" />
-							<span class="icon is-medium is-left " style="margin-top:20px">
-								<i class="fas fa-dollar-sign fa-3x"></i>
-							</span>
-
-						</div>
-					</div>
-				</div>
-
+	<div class="columns">
+		<div class="column is-half">
+			<label></label><br>
+			<div class="field is-grouped">
+				<input type="hidden" id="pagina" value="<?= $url[1] ?>">
+				<input type="hidden" id="url" value="<?= $url[0] ?>">
+				<p class="control is-expanded">
+					<input class="input is-rounded" type="text" id="busqueda" placeholder="¿Qué producto estás buscando?" onkeyup="listarProductos()">
+				</p>
+				<p class="control">
+					<button class="button is-info" type="button" onclick="listarProductos()">Buscar</button>
+				</p>
 			</div>
+		</div>
+		<div class="column">
+			<label>Mostrar</label><br>
+			<div class="select">
+				<select id="per_page" onchange="listarProductos()">
+					<option value="15">15</option>
+					<option value="50">50</option>
+					<option value="100">100</option>
 
-			<div class="columns  mb-6" style="display:none" id="div-payment-transferencia">
-				<div class="column">
-					<div class="field">
-						<label class="label">Referencia Pago</label>
-						<div class="control">
-
-							<textarea class="textarea is-large" type="text" placeholder="Capturar descripción del movimiento" style="font-size:12px;font-weight:bold" id="descripcion_inventario"></textarea>
-
-
-						</div>
-					</div>
-				</div>
-
+				</select>
 			</div>
-			<div class="columns">
-				<div class="column">
-					<p class="has-text-centered">
-						<button type="button" class="button is-success button-lg" onclick="registrarVenta()"><i class="fas fa-money-check-alt"></i> &nbsp; Confirmar Pago</button>
-					</p>
-				</div>
+		</div>
+		<div class="column">
+			<label>Ordenar por</label><br>
+			<div class="select">
+				<select id="campoOrden" onchange="listarProductos()">
+					<option value="nombre">Nombre</option>
+					<option value="cid_producto">Id Producto</option>
+					<option value="precio_venta">Precio</option>
+
+				</select>
 			</div>
+		</div>
+		<div class="column">
+			<label>Orden</label><br>
+			<div class="select">
+				<select id="orden" onchange="listarProductos()">
+					<option value="asc">Asc</option>
+					<option value="desc">Desc</option>
 
-
-
-		</section>
+				</select>
+			</div>
+		</div>
 	</div>
 </div>
+<div class="container is-fluid pb-2 pt-2">
+
+	<div class="columns is-multiline">
+		<div class="column ">
+			<div class="card">
+				<div class="column div-productos">
+
+				</div>
+
+			</div>
+		</div>
+	</div>
+</div>
+<button class="js-modal-trigger" data-target="modal-entrada-inventario" id="btn-modal-entrada" style="display:none"></button>
+<button class="js-modal-trigger" data-target="modal-salida-inventario" id="btn-modal-salida" style="display:none"></button>

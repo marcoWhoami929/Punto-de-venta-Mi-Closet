@@ -252,3 +252,109 @@
         </section>
     </div>
 </div>
+<div class="modal fade is-large" id="modal-entrada-inventario" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-background"></div>
+    <div class="modal-card ">
+        <header class="modal-card-head" style="background:#B99654">
+            <p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-cash-register"></i> &nbsp; Abastecer Inventario</p>
+            <button class="delete" aria-label="close" id="btn-close-pago"></button>
+        </header>
+        <section class="modal-card-body">
+
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Unidades a Ingresar:</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input type="hidden" id="id_producto_entrada_inventario">
+                            <input class="input is-large" type="text" style="font-size:50px;font-weight:bold" id="unidades_entrada_inventario" />
+                            <span class="icon is-medium is-left" style="margin-top:20px">
+                                <i class="fas fa-hashtag fa-3x"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="columns  mb-6">
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Observaciones</label>
+                        <div class="control">
+
+                            <textarea class="textarea is-large" type="text" placeholder="Capturar descripción del movimiento" style="font-size:12px;font-weight:bold" id="descripcion_entrada_inventario"></textarea>
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <p class="has-text-centered">
+                        <button type="button" class="button is-success button-lg" onclick="entradaInventario(0)"><i class="fas fa-money-check-alt"></i> &nbsp; Confirmar Entrada</button>
+                    </p>
+                </div>
+            </div>
+
+
+
+        </section>
+    </div>
+</div>
+<div class="modal fade is-large" id="modal-salida-inventario" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-background"></div>
+    <div class="modal-card ">
+        <header class="modal-card-head" style="background:#B99654">
+            <p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-cash-register"></i> &nbsp; Salida de Inventario</p>
+            <button class="delete" aria-label="close" id="btn-close-pago"></button>
+        </header>
+        <section class="modal-card-body">
+
+            <div class="columns">
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Unidades a Sacar:</label>
+                        <div class="control has-icons-left has-icons-right">
+                            <input type="hidden" id="id_producto_salida_inventario">
+                            <input class="input is-large" type="text" style="font-size:50px;font-weight:bold" id="unidades_salida_inventario" />
+                            <span class="icon is-medium is-left" style="margin-top:20px">
+                                <i class="fas fa-hashtag fa-3x"></i>
+                            </span>
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="columns  mb-6">
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Observaciones</label>
+                        <div class="control">
+
+                            <textarea class="textarea is-large" type="text" placeholder="Capturar descripción del movimiento" style="font-size:12px;font-weight:bold" id="descripcion_salida_inventario"></textarea>
+
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="columns">
+                <div class="column">
+                    <p class="has-text-centered">
+                        <button type="button" class="button is-success button-lg" onclick="salidaInventario(0)"><i class="fas fa-money-check-alt"></i> &nbsp; Confirmar Salida</button>
+                    </p>
+                </div>
+            </div>
+
+
+
+        </section>
+    </div>
+</div>

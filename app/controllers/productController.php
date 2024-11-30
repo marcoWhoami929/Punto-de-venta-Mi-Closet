@@ -407,6 +407,187 @@ class productController extends mainModel
 
 
 	/*----------  Controlador listar producto  ----------*/
+	public function listarProductosControlador($datos)
+	{
+
+		$pagina = $this->limpiarCadena($datos["page"]);
+		$registros = $this->limpiarCadena($datos["per_page"]);
+		$campoOrden = $this->limpiarCadena($datos["campoOrden"]);
+		$orden = $this->limpiarCadena($datos["orden"]);
+
+		$url = $this->limpiarCadena($datos["url"]);
+		$url = APP_URL . $url . "/";
+
+		$busqueda = $this->limpiarCadena($datos["busqueda"]);
+		$campos = "prod.cid_producto,prod.codigo,prod.nombre as 'producto',prod.precio_venta,prod.foto,cat.nombre as 'categoria',inven.stock_total";
+		$tabla = "";
+
+		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+
+		if (isset($busqueda) && $busqueda != "") {
+
+			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.cid_producto=inven.id_producto WHERE prod.codigo LIKE '%$busqueda%' OR prod.nombre LIKE '%$busqueda%' OR prod.marca LIKE '%$busqueda%' OR prod.modelo LIKE '%$busqueda%' ORDER BY prod.$campoOrden $orden LIMIT $inicio,$registros";
+
+			$consulta_total = "SELECT COUNT(cid_producto) FROM producto WHERE codigo LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' OR marca LIKE '%$busqueda%' OR modelo LIKE '%$busqueda%'";
+		} else {
+
+			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.cid_producto=inven.id_producto ORDER BY prod.$campoOrden $orden LIMIT $inicio,$registros";
+
+			$consulta_total = "SELECT COUNT(cid_producto) FROM producto";
+		}
+
+		$datos = $this->ejecutarConsulta($consulta_datos);
+		$datos = $datos->fetchAll();
+
+		$total = $this->ejecutarConsulta($consulta_total);
+		$total = (int) $total->fetchColumn();
+
+		$numeroPaginas = ceil($total / $registros);
+
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+			foreach ($datos as $rows) {
+
+				if (is_file("./app/views/productos/" . $rows['foto'])) {
+					$foto = '<img src="' . APP_URL . 'app/views/productos/' . $rows['foto'] . '">';
+				} else {
+					$foto = '<img src="' . APP_URL . 'app/views/productos/default.png">';
+				}
+				$tabla .= '<div class="card  pb-4">
+							<header class="card-header" style="background:#B99654;color:#ffffff">
+							 <p class="card-header-title"><strong style="color:#ffffff">' . $rows['producto'] . '</strong></p>
+									  <p class="card-header-title"><strong style="color:#ffffff">' . $rows['codigo'] . '</strong></p>
+									  <button type="button" class="button is-danger is-rounded pt-4" onclick="eliminarProducto(\'' . $rows['cid_producto'] . '\')">
+													<i class="fas fa-trash fa-fw"></i>
+										</button>
+
+							</header>
+							<div class="card-content">
+								<div class="content">
+									<div class="columns">
+										<div class="column">
+											<figure class="media-left">
+												<p class="image is-64x64">
+													' . $foto . '
+												</p>
+												</figure>
+										</div>
+									 
+									
+										 <div class="column">
+												<div class="columns">
+												<label><strong>Precio:</strong></label>
+												</div>
+												<div class="columns">
+												' . MONEDA_SIMBOLO . " " . number_format($rows['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+												 </div>
+										</div>
+										<div class="column">
+												<div class="columns">
+												<label><strong>Existencia:</strong></label>
+												</div>
+												<div class="columns">
+												' . $rows['stock_total'] . '
+												</div>
+										</div>
+											<div class="column">
+												<div class="columns">
+												<label><strong>Categoria:</strong></label>
+												</div>
+												<div class="columns">
+												' . $rows['categoria'] . '
+												</div>
+										</div>
+										  
+									</div>
+									
+									
+								</div>
+							</div>
+							<footer class="card-footer">
+									<div class="columns">
+										<div class="column is-full">
+											<div class=" card-footer-item">
+													<div class="columns">
+														<div class="column">
+															<a href="' . APP_URL . 'productPhoto/' . $rows['cid_producto'] . '/" class="button is-info is-rounded is-small">
+																<i class="far fa-image fa-fw"></i> Imagen
+															</a>
+														</div>
+														<div class="column">
+															<a href="' . APP_URL . 'productUpdate/' . $rows['cid_producto'] . '/" class="button is-success is-rounded is-small">
+																<i class="fas fa-edit fa-fw"></i> Actualizar
+															</a>
+														</div>
+													</div>
+
+											</div>
+										</div>
+										<div class="column is-full">
+												<div class=" card-footer-item">
+													<div class="columns">
+															<div class="column">
+																<button class="button is-warning is-rounded is-small"  onclick="entradaInventario(\'' . $rows["cid_producto"] . '\')">
+																<i class="fas fa-boxes fa-fw"></i> Abastecer
+															</button>
+															</div>
+															<div class="column">
+																	<button class="button is-danger is-rounded is-small js-modal-trigger"  data-target="modal-salida-inventario" onclick="salidaInventario(\'' . $rows["cid_producto"] . '\')">
+																<i class="fas fa-recycle fa-fw"></i> Desechar
+															</button>
+															</div>
+														</div>
+
+												</div>
+
+										</div>
+									</div>
+
+							</footer>
+							</div>
+								<hr>';
+				$contador++;
+			}
+			$pag_final = $contador - 1;
+		} else {
+			if ($total >= 1) {
+				$tabla .= '
+						<tr class="has-text-centered" >
+			                <td colspan="5">
+			                    <a href="' . $url . '1/" class="button is-link is-rounded is-small mt-4 mb-4">
+			                        Haga clic acá para recargar el listado
+			                    </a>
+			                </td>
+			            </tr>
+					';
+			} else {
+				$tabla .= '
+							<article class="message is-warning mt-4 mb-4">
+				 <div class="message-header">
+					<p></p>
+				 </div>
+				<div class="message-body has-text-centered">
+					<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+					No hay Productos Registrados Actualmente
+				</div>
+			</article>
+					';
+			}
+		}
+
+
+
+		### Paginacion ###
+		if ($total > 0 && $pagina <= $numeroPaginas) {
+			$tabla .= '<p class="has-text-right">Mostrando productos <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+
+			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
+		}
+
+		return $tabla;
+	}
 	public function listarProductoControlador($pagina, $registros, $url, $busqueda, $categoria)
 	{
 
@@ -540,12 +721,12 @@ class productController extends mainModel
 													<div class=" card-footer-item">
 														<div class="columns">
 																<div class="column">
-																	<button class="button is-warning is-rounded is-small js-modal-trigger"  data-target="modal-abastecer-inventario" onclick="reabastecerInventario(\'' . $rows["cid_producto"] . '\')">
+																	<button class="button is-warning is-rounded is-small js-modal-trigger"  data-target="modal-entrada-inventario" onclick="entradaInventario(\'' . $rows["cid_producto"] . '\')">
 																	<i class="fas fa-boxes fa-fw"></i> Abastecer
 																</button>
 																</div>
 																<div class="column">
-																		<button class="button is-danger is-rounded is-small" onclick="desecharInventario(\'' . $rows["cid_producto"] . '\')">
+																		<button class="button is-danger is-rounded is-small js-modal-trigger"  data-target="modal-salida-inventario" onclick="salidaInventario(\'' . $rows["cid_producto"] . '\')">
 																	<i class="fas fa-recycle fa-fw"></i> Desechar
 																</button>
 																</div>
@@ -1176,5 +1357,243 @@ class productController extends mainModel
 		}
 
 		return json_encode($alerta);
+	}
+	/*----------  Controlador entrada producto  ----------*/
+	public function entradaProductoControlador()
+	{
+
+		$id = $this->limpiarCadena($_POST['id_producto']);
+		$unidades = $this->limpiarCadena($_POST['unidades_entrada']);
+		$observaciones = $this->limpiarCadena($_POST['observaciones_entrada']);
+
+		# Verificando campos obligatorios #
+		if ($unidades == "" || $unidades == "0" || $unidades == "0.00") {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "Debe ingresar una cantidad mayor a 0 para realizar el movimiento.",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+
+		# Verificando ventas #
+		$stock_producto = $this->ejecutarConsulta("SELECT prod.*,inven.stock_total FROM producto as prod INNER JOIN inventario as inven ON prod.cid_producto = inven.id_producto WHERE prod.cid_producto='$id' ");
+
+		if ($stock_producto->rowCount() < 1) {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No hemos encontrado el producto en el sistema.",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+		$stock_producto = $stock_producto->fetch();
+		$movimiento_inventario_reg = [
+			[
+				"campo_nombre" => "id_producto",
+				"campo_marcador" => ":Producto",
+				"campo_valor" => $id
+			],
+			[
+				"campo_nombre" => "tipo_movimiento",
+				"campo_marcador" => ":TipoMovimiento",
+				"campo_valor" => 'entrada'
+			],
+			[
+				"campo_nombre" => "documento",
+				"campo_marcador" => ":Documento",
+				"campo_valor" => NULL
+			],
+			[
+				"campo_nombre" => "cantidad",
+				"campo_marcador" => ":Cantidad",
+				"campo_valor" =>  $unidades
+			],
+			[
+				"campo_nombre" => "descripcion",
+				"campo_marcador" => ":Descripcion",
+				"campo_valor" => $observaciones
+			]
+		];
+
+		$movimiento_inventario = $this->guardarDatos("movimiento_inventario", $movimiento_inventario_reg);
+
+
+		if ($movimiento_inventario->rowCount() == 1) {
+
+			$stock = $stock_producto['stock_total'] + $unidades;
+
+			$inventario_rs = [
+				[
+					"campo_nombre" => "stock_total",
+					"campo_marcador" => ":StockTotal",
+					"campo_valor" => $stock
+				]
+			];
+
+			$condicion = [
+				"condicion_campo" => "id_producto",
+				"condicion_marcador" => ":IdProducto",
+				"condicion_valor" => $id
+			];
+
+			$inventario = $this->actualizarDatos("inventario", $inventario_rs, $condicion);
+
+			$bitacora_reg = [
+				[
+					"campo_nombre" => "accion",
+					"campo_marcador" => ":Accion",
+					"campo_valor" => 'Entrada de Inventario de ' . $unidades . ' unidades de ' . $stock_producto['nombre'] . ''
+				],
+				[
+					"campo_nombre" => "id_usuario",
+					"campo_marcador" => ":IdUsuario",
+					"campo_valor" => $_SESSION["id"]
+				]
+			];
+
+			$registrar_caja = $this->guardarDatos("bitacora", $bitacora_reg);
+
+
+			$alerta = [
+				"tipo" => "recargar",
+				"titulo" => "Producto actualizado",
+				"texto" => "El producto " . $stock_producto['nombre'] . " ha sido reabastecido con " . $unidades . " unidades.",
+				"icono" => "success"
+			];
+		} else {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No hemos podido reabastecer el producto, por favor intente nuevamente",
+				"icono" => "error"
+			];
+		}
+
+		return json_encode($alerta);
+		exit();
+	}
+	/*----------  Controlador salida producto  ----------*/
+	public function salidaProductoControlador()
+	{
+
+		$id = $this->limpiarCadena($_POST['id_producto']);
+		$unidades = $this->limpiarCadena($_POST['unidades_salida']);
+		$observaciones = $this->limpiarCadena($_POST['observaciones_salida']);
+
+		# Verificando campos obligatorios #
+		if ($unidades == "" || $unidades == "0" || $unidades == "0.00") {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "Debe ingresar una cantidad mayor a 0 para realizar el movimiento.",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+
+		# Verificando ventas #
+		$stock_producto = $this->ejecutarConsulta("SELECT prod.*,inven.stock_total FROM producto as prod INNER JOIN inventario as inven ON prod.cid_producto = inven.id_producto WHERE prod.cid_producto='$id' ");
+
+		if ($stock_producto->rowCount() < 1) {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No hemos encontrado el producto en el sistema.",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+		$stock_producto = $stock_producto->fetch();
+		$movimiento_inventario_reg = [
+			[
+				"campo_nombre" => "id_producto",
+				"campo_marcador" => ":Producto",
+				"campo_valor" => $id
+			],
+			[
+				"campo_nombre" => "tipo_movimiento",
+				"campo_marcador" => ":TipoMovimiento",
+				"campo_valor" => 'salida'
+			],
+			[
+				"campo_nombre" => "documento",
+				"campo_marcador" => ":Documento",
+				"campo_valor" => NULL
+			],
+			[
+				"campo_nombre" => "cantidad",
+				"campo_marcador" => ":Cantidad",
+				"campo_valor" =>  $unidades
+			],
+			[
+				"campo_nombre" => "descripcion",
+				"campo_marcador" => ":Descripcion",
+				"campo_valor" => $observaciones
+			]
+		];
+
+		$movimiento_inventario = $this->guardarDatos("movimiento_inventario", $movimiento_inventario_reg);
+
+
+		if ($movimiento_inventario->rowCount() == 1) {
+
+			$stock = $stock_producto['stock_total'] - $unidades;
+
+			$inventario_rs = [
+				[
+					"campo_nombre" => "stock_total",
+					"campo_marcador" => ":StockTotal",
+					"campo_valor" => $stock
+				]
+			];
+
+			$condicion = [
+				"condicion_campo" => "id_producto",
+				"condicion_marcador" => ":IdProducto",
+				"condicion_valor" => $id
+			];
+
+			$inventario = $this->actualizarDatos("inventario", $inventario_rs, $condicion);
+
+			$bitacora_reg = [
+				[
+					"campo_nombre" => "accion",
+					"campo_marcador" => ":Accion",
+					"campo_valor" => 'Salida de Inventario de ' . $unidades . ' unidades de ' . $stock_producto['nombre'] . ''
+				],
+				[
+					"campo_nombre" => "id_usuario",
+					"campo_marcador" => ":IdUsuario",
+					"campo_valor" => $_SESSION["id"]
+				]
+			];
+
+			$registrar_caja = $this->guardarDatos("bitacora", $bitacora_reg);
+
+
+			$alerta = [
+				"tipo" => "recargar",
+				"titulo" => "Producto actualizado",
+				"texto" => "El producto " . $stock_producto['nombre'] . " ha desechado " . $unidades . " unidades.",
+				"icono" => "success"
+			];
+		} else {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No hemos podido actualizar el producto, por favor intente nuevamente",
+				"icono" => "error"
+			];
+		}
+
+		return json_encode($alerta);
+		exit();
 	}
 }

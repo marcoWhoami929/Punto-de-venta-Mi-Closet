@@ -1,36 +1,41 @@
 <?php
-	
-	require_once "../../config/app.php";
-	require_once "../views/inc/session_start.php";
-	require_once "../../autoload.php";
-	
-	use app\controllers\productController;
 
-	if(isset($_POST['modulo_producto'])){
+require_once "../../config/app.php";
+require_once "../views/inc/session_start.php";
+require_once "../../autoload.php";
 
-		$insProducto = new productController();
+use app\controllers\productController;
 
-		if($_POST['modulo_producto']=="registrar"){
-			echo $insProducto->registrarProductoControlador();
-		}
+if (isset($_POST['modulo_producto'])) {
 
-		if($_POST['modulo_producto']=="eliminar"){
-			echo $insProducto->eliminarProductoControlador();
-		}
+	$insProducto = new productController();
 
-		if($_POST['modulo_producto']=="actualizar"){
-			echo $insProducto->actualizarProductoControlador();
-		}
-
-		if($_POST['modulo_producto']=="eliminarFoto"){
-			echo $insProducto->eliminarFotoProductoControlador();
-		}
-
-		if($_POST['modulo_producto']=="actualizarFoto"){
-			echo $insProducto->actualizarFotoProductoControlador();
-		}
-		
-	}else{
-		session_destroy();
-		header("Location: ".APP_URL."login/");
+	if ($_POST['modulo_producto'] == "registrar") {
+		echo $insProducto->registrarProductoControlador();
 	}
+
+	if ($_POST['modulo_producto'] == "eliminar") {
+		echo $insProducto->eliminarProductoControlador();
+	}
+
+	if ($_POST['modulo_producto'] == "actualizar") {
+		echo $insProducto->actualizarProductoControlador();
+	}
+
+	if ($_POST['modulo_producto'] == "eliminarFoto") {
+		echo $insProducto->eliminarFotoProductoControlador();
+	}
+
+	if ($_POST['modulo_producto'] == "actualizarFoto") {
+		echo $insProducto->actualizarFotoProductoControlador();
+	}
+	if ($_POST['modulo_producto'] == "entradaProducto") {
+		echo $insProducto->entradaProductoControlador();
+	}
+	if ($_POST['modulo_producto'] == "salidaProducto") {
+		echo $insProducto->salidaProductoControlador();
+	}
+} else {
+	session_destroy();
+	header("Location: " . APP_URL . "login/");
+}

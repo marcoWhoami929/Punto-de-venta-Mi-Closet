@@ -7,8 +7,14 @@ $(function () {
     case "dashboard":
       cargarAperturaCaja();
     break;
+    case "sessionsList":
+      listarSesiones();
+    break;
     case "cashierList":
       listarCajas();
+    break;
+    case "productList":
+      listarProductos();
     break;
     case "saleNew":
       cargarListaCamaras();
@@ -140,6 +146,60 @@ function listarCajas() {
     },
   });
 }
+
+function listarProductos() {
+
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var url = $("#url").val();
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      url:url,
+      modulo_pos: "listarProductos",
+    },
+    success: function (response) {
+      $(".div-productos").html(response);
+    },
+  });
+}
+function listarSesiones() {
+
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var url = $("#url").val();
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      url:url,
+      modulo_pos: "listarSesiones",
+    },
+    success: function (response) {
+      $(".div-sesiones").html(response);
+    },
+  });
+}
+/*************************************************************** */
 function eliminarCaja(id_caja){
   let datos = new FormData();
   datos.append("id_caja", id_caja);
