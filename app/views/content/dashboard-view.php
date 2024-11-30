@@ -136,7 +136,7 @@ $total_ventas = $insLogin->seleccionarDatos("Normal", "venta", "id_venta", 0);
 				<div class="column">
 					<div class="field">
 						<label class="label">Efectivo de apertura:</label>
-						<div class="control has-icons-left has-icons-right">
+						<div class="control has-icons-left">
 							<input class="input is-large" type="text" placeholder="0.00" style="font-size:50px;font-weight:bold" id="saldo_inicial" value="0.00" />
 							<span class="icon is-medium is-left " style="margin-top:20px">
 								<i class="fas fa-dollar-sign fa-3x"></i>
@@ -152,7 +152,7 @@ $total_ventas = $insLogin->seleccionarDatos("Normal", "venta", "id_venta", 0);
 				<div class="column">
 					<div class="field">
 						<label class="label">Notas de apertura</label>
-						<div class="control has-icons-left has-icons-right">
+						<div class="control has-icons-left">
 							<textarea class="textarea is-large" type="text" placeholder="Notas de apertura de caja" style="font-size:12px;font-weight:bold" id="notas_apertura"></textarea>
 
 

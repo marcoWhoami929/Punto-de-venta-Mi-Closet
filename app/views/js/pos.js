@@ -81,3 +81,23 @@ function salidaInventario(id_producto){
     $("#id_producto_salida_inventario").val(id_producto);
   }
 }
+
+function calcularDenominacion(id_denominacion,denominacion){
+    var cantidad = $("#dn"+id_denominacion+"").val();
+    var total = parseFloat(cantidad*denominacion);
+     $("#dif_dn_"+id_denominacion+"").val(total.toFixed(2));
+     calcularTotalDenominaciones();
+}
+function calcularTotalDenominaciones(){
+  alert("dd");
+  var valores = new Array();  
+  var coleccion = document.getElementsByTagName('input-denominacion');  
+  for (var i = 0; i < coleccion.length; i++)  {  
+  valores[i] = coleccion[i].value; 
+  }  
+    
+  for (var i = 0; i < valores.length; i++) {  
+  console.log(valores[i]); 
+  }
+
+}

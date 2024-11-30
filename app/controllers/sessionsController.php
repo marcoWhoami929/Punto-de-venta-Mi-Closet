@@ -74,22 +74,22 @@ class sessionsController extends mainModel
                                     <div class="content">
                                         <div class="columns">
                                             <div class="column">
-                                                <label class="has-text-centered"><strong></strong></label>
+                                                <label class="has-text-centered"><strong style="color:#B99654">Fecha Apertura</strong></label>
                                                 <h4 class="is-info">' . $rows["fecha_apertura"] . '</h4>
                                             </div>
                                             <div class="column">
-                                                <label class="has-text-centered"><strong></strong></label>
-                                                <h4 class="is-info">' . $rows["nombreCaja"] . '</h4>
+                                                <label class="has-text-centered"><strong style="color:#B99654">Usuario</strong></label>
+                                                <h4 class="is-info">' . $rows["nombreUsuario"] . '</h4>
                                             </div>
                                             <div class="column">
-                                                <label class="has-text-centered"><strong></strong></label>
-                                                <h4 class="is-info">' . $caja["total_ventas"] . '</h4>
+                                                <label class="has-text-centered"><strong style="color:#B99654">Saldo Actual</strong></label>
+                                                <h4 class="is-info">' . MONEDA_SIMBOLO . " " . number_format($caja['total_ventas'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</h4>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                                 <footer class="card-footer">
-                                    <div class="content  is-full">
+                                    <div class="content  is-full" style="padding-left:20px">
                                  
                                     <div class="columns">
                                         <div class="column is-full">

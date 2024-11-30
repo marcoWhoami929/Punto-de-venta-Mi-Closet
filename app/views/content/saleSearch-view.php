@@ -115,7 +115,7 @@
                 <div class="column">
                     <div class="field">
                         <label class="label">Total a Pagar:</label>
-                        <div class="control has-icons-left has-icons-right">
+                        <div class="control has-icons-left">
                             <input class="input is-large" type="text" placeholder="0.00" style="font-size:50px;font-weight:bold" id="total_pagar_venta" disabled />
                             <span class="icon is-medium is-left " style="margin-top:20px">
                                 <i class="fas fa-dollar-sign fa-3x"></i>
@@ -130,7 +130,7 @@
                 <div class="column">
                     <div class="field">
                         <label class="label">Su Pago</label>
-                        <div class="control has-icons-left has-icons-right">
+                        <div class="control has-icons-left">
                             <input class="input is-large" type="text" placeholder="0.00" style="font-size:40px;font-weight:bold" id="total_pagado_venta" onkeyup="calcularCambio()" value="0.00" />
                             <span class="icon is-medium is-left " style="margin-top:20px">
                                 <i class="fas fa-dollar-sign fa-3x"></i>
@@ -142,7 +142,7 @@
                 <div class="column">
                     <div class="field">
                         <label class="label">Cambio</label>
-                        <div class="control has-icons-left has-icons-right">
+                        <div class="control has-icons-left">
                             <input class="input is-large" type="text" placeholder="0.00" style="font-size:40px;font-weight:bold" id="total_cambio_venta" readonly />
                             <span class="icon is-medium is-left " style="margin-top:20px">
                                 <i class="fas fa-dollar-sign fa-3x"></i>
@@ -156,7 +156,7 @@
                 <div class="column">
                     <div class="field">
                         <label class="label">Referencia Pago</label>
-                        <div class="control has-icons-left has-icons-right">
+                        <div class="control has-icons-left">
                             <input class="input is-large" type="text" placeholder="Capturar referencia de pago" style="font-size:20px;font-weight:bold" id="referencia_venta" />
                             <span class="icon is-medium is-left">
 
@@ -207,7 +207,7 @@
                 <div class="column">
                     <div class="field">
                         <label class="label">Total a Pagar:</label>
-                        <div class="control has-icons-left has-icons-right">
+                        <div class="control has-icons-left">
                             <input class="input is-large" type="text" placeholder="0.00" style="font-size:50px;font-weight:bold" id="total_pagar_venta" disabled />
                             <span class="icon is-medium is-left " style="margin-top:20px">
                                 <i class="fas fa-dollar-sign fa-3x"></i>
@@ -222,7 +222,7 @@
                 <div class="column">
                     <div class="field">
                         <label class="label">Pagado</label>
-                        <div class="control has-icons-left has-icons-right">
+                        <div class="control has-icons-left">
                             <input class="input is-large" type="text" placeholder="0.00" style="font-size:40px;font-weight:bold" id="total_pagado_venta" value="0.00" disabled />
                             <span class="icon is-medium is-left " style="margin-top:20px">
                                 <i class="fas fa-dollar-sign fa-3x"></i>
@@ -238,7 +238,7 @@
                 <div class="column">
                     <div class="field">
                         <label class="label">Cambio</label>
-                        <div class="control has-icons-left has-icons-right">
+                        <div class="control has-icons-left">
                             <input class="input is-large" type="text" placeholder="0.00" style="font-size:40px;font-weight:bold" id="total_cambio_venta" disabled value="0.00" />
                             <span class="icon is-medium is-left " style="margin-top:20px">
                                 <i class="fas fa-dollar-sign fa-3x"></i>
@@ -252,7 +252,7 @@
                 <div class="column">
                     <div class="field">
                         <label class="label">Referencia Pago</label>
-                        <div class="control has-icons-left has-icons-right">
+                        <div class="control has-icons-left">
                             <input class="input is-large" type="text" placeholder="Capturar referencia de pago" style="font-size:20px;font-weight:bold" id="referencia_venta" disabled />
                             <span class="icon is-medium is-left">
 
