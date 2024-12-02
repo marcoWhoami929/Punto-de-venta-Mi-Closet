@@ -136,16 +136,7 @@ if ($_SESSION['perfil'] == 'Administrador') {
 								</div>
 							</a>
 						</li>
-						<li class="full-width">
-							<a href="<?php echo APP_URL; ?>userSearch/" class="full-width">
-								<div class="navLateral-body-cl">
-									<i class="fas fa-search fa-fw"></i>
-								</div>
-								<div class="navLateral-body-cr">
-									Buscar usuario
-								</div>
-							</a>
-						</li>
+
 					</ul>
 				</li>
 
@@ -182,16 +173,7 @@ if ($_SESSION['perfil'] == 'Administrador') {
 								</div>
 							</a>
 						</li>
-						<li class="full-width">
-							<a href="<?php echo APP_URL; ?>clientSearch/" class="full-width">
-								<div class="navLateral-body-cl">
-									<i class="fas fa-search fa-fw"></i>
-								</div>
-								<div class="navLateral-body-cr">
-									Buscar cliente
-								</div>
-							</a>
-						</li>
+
 					</ul>
 				</li>
 

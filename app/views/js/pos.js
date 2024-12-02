@@ -89,15 +89,83 @@ function calcularDenominacion(id_denominacion,denominacion){
      calcularTotalDenominaciones();
 }
 function calcularTotalDenominaciones(){
-  alert("dd");
-  var valores = new Array();  
-  var coleccion = document.getElementsByTagName('input-denominacion');  
-  for (var i = 0; i < coleccion.length; i++)  {  
-  valores[i] = coleccion[i].value; 
-  }  
-    
-  for (var i = 0; i < valores.length; i++) {  
-  console.log(valores[i]); 
-  }
 
+  var suma = 0;
+  $('.input-denominacion').each(function(){
+         suma += parseFloat($(this).val());
+  });
+ 
+  $("#total_denominaciones_caja").val(suma.toFixed(2));
+  $("#saldo_final_corte").val(suma.toFixed(2));
+  calcularDiferenciaCaja();
+}
+function  obtenerDetalleCorteCaja(sesion){
+  $("#btn-detalle-corte-caja").click();
+  $.ajax({
+    url: "../app/ajax/cajaAjax.php",
+    type: "POST",
+    data: {
+      sesion_caja:sesion,
+      modulo_caja: "detalle_corte_caja",
+    },
+    success: function (response) {
+      var datos = JSON.parse(response)
+     document.getElementById('field-ordenes-detalle').innerHTML = "<label class='label' style='color:#B99654'>"+datos.num_ventas+" Ventas: <span>$ "+datos.total_ventas+"</span></label>";
+     document.getElementById('field-saldo-inicial-detalle').innerHTML = "$ "+datos.saldo_inicial+"";
+     document.getElementById('field-efectivo-detalle').innerHTML = "$ "+datos.efectivo+"";
+     document.getElementById('field-transferencia-detalle').innerHTML = "$ "+datos.transferencia+"";
+     document.getElementById('field-td-detalle').innerHTML = "$ "+datos.tarjeta_debito+"";
+     document.getElementById('field-tc-detalle').innerHTML = "$ "+datos.tarjeta_credito+"";
+     document.getElementById('field-entrada-efectivo-detalle').innerHTML = "$ "+datos.entrada_efectivo+"";
+     document.getElementById('field-salida-efectivo-detalle').innerHTML = "$ "+datos.salida_efectivo+"";
+     var total_caja = (parseFloat(datos.saldo_inicial)+parseFloat(datos.efectivo)+parseFloat(datos.entrada_efectivo))-parseFloat(datos.salida_efectivo);
+     document.getElementById('field-total-caja-detalle').innerHTML = total_caja.toFixed(2);
+     $("#saldo_final_corte_detalle").val(parseFloat(datos.saldo_final).toFixed(2));
+     $("#field-diferencia-caja-detalle").val(parseFloat(datos.diferencia).toFixed(2));
+     $("#observaciones_corte_detalle").val(datos.observaciones);
+     obtenerDetalleDenominaciones(sesion);     
+    },
+  })
+}
+function  obtenerDetalleDenominaciones(sesion){
+
+  $.ajax({
+    url: "../app/ajax/cajaAjax.php",
+    type: "POST",
+    data: {
+      sesion_caja:sesion,
+      modulo_caja: "detalle_denominaciones",
+    },
+    success: function (response) {
+      var datos = JSON.parse(response);
+      $("#detalle_denominaciones").val(datos.total_caja);
+      $("#det_dn1").val(parseFloat(datos.det_dn1).toFixed(0));
+      $("#det_dn2").val(parseFloat(datos.det_dn2).toFixed(0));
+      $("#det_dn3").val(parseFloat(datos.det_dn3).toFixed(0));
+      $("#det_dn4").val(parseFloat(datos.det_dn4).toFixed(0));
+      $("#det_dn5").val(parseFloat(datos.det_dn5).toFixed(0));
+      $("#det_dn6").val(parseFloat(datos.det_dn6).toFixed(0));
+      $("#det_dn7").val(parseFloat(datos.det_dn7).toFixed(0));
+      $("#det_dn8").val(parseFloat(datos.det_dn8).toFixed(0));
+      $("#det_dn9").val(parseFloat(datos.det_dn9).toFixed(0));
+      $("#det_dn10").val(parseFloat(datos.det_dn10).toFixed(0));
+      $("#det_dn11").val(parseFloat(datos.det_dn11).toFixed(0));
+      $("#det_dn12").val(parseFloat(datos.det_dn12).toFixed(0));
+      $("#det_dn13").val(parseFloat(datos.det_dn13).toFixed(0));
+      $("#det_dif_dn_1").val(parseFloat(datos.dn1).toFixed(2));
+      $("#det_dif_dn_2").val(parseFloat(datos.dn2).toFixed(2));
+      $("#det_dif_dn_3").val(parseFloat(datos.dn3).toFixed(2));
+      $("#det_dif_dn_4").val(parseFloat(datos.dn4).toFixed(2));
+      $("#det_dif_dn_5").val(parseFloat(datos.dn5).toFixed(2));
+      $("#det_dif_dn_6").val(parseFloat(datos.dn6).toFixed(2));
+      $("#det_dif_dn_7").val(parseFloat(datos.dn7).toFixed(2));
+      $("#det_dif_dn_8").val(parseFloat(datos.dn8).toFixed(2));
+      $("#det_dif_dn_9").val(parseFloat(datos.dn9).toFixed(2));
+      $("#det_dif_dn_10").val(parseFloat(datos.dn10).toFixed(2));
+      $("#det_dif_dn_11").val(parseFloat(datos.dn11).toFixed(2));
+      $("#det_dif_dn_12").val(parseFloat(datos.dn12).toFixed(2));
+      $("#det_dif_dn_13").val(parseFloat(datos.dn13).toFixed(2));
+     
+    },
+  })
 }

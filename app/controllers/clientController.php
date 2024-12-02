@@ -168,6 +168,139 @@ class clientController extends mainModel
 
 
 	/*----------  Controlador listar cliente  ----------*/
+	public function listarClientesControlador($datos)
+	{
+
+		$pagina = $this->limpiarCadena($datos["page"]);
+		$registros = $this->limpiarCadena($datos["per_page"]);
+		$campoOrden = $this->limpiarCadena($datos["campoOrden"]);
+		$orden = $this->limpiarCadena($datos["orden"]);
+
+		$url = $this->limpiarCadena($datos["url"]);
+		$url = APP_URL . $url . "/";
+
+		$busqueda = $this->limpiarCadena($datos["busqueda"]);
+
+		$sWhere = "id_cliente!='1'";
+		if ($datos["estatus"] != "") {
+			$sWhere .= " and estatus = '" . $datos["estatus"] . "'";
+		}
+		if (isset($busqueda) && $busqueda != "") {
+			$sWhere .= " and nombre LIKE '%$busqueda%' OR apellidos LIKE '%$busqueda%' OR email LIKE '%$busqueda%'";
+		}
+
+		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+
+		$consulta_datos = "SELECT * FROM cliente WHERE $sWhere ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+		$consulta_total = "SELECT COUNT(id_cliente) FROM cliente WHERE $sWhere";
+
+		$datos = $this->ejecutarConsulta($consulta_datos);
+		$datos = $datos->fetchAll();
+
+		$total = $this->ejecutarConsulta($consulta_total);
+		$total = (int) $total->fetchColumn();
+
+		$numeroPaginas = ceil($total / $registros);
+		$tabla = "";
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+			$tabla .= '
+		        <div class="table-container">
+		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+		            <thead style="background:#B99654;color:#ffffff;">
+		                <tr>
+		                    <th class="has-text-centered" style="color:#ffffff">#</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Tipo Cliente</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Nombre</th>
+		            
+							<th class="has-text-centered" style="color:#ffffff">Celular</th>
+							<th class="has-text-centered" style="color:#ffffff">Crédito</th>
+							<th class="has-text-centered" style="color:#ffffff">Pagado</th>
+							<th class="has-text-centered" style="color:#ffffff">Pendiente</th>
+							<th class="has-text-centered" style="color:#ffffff">Historial</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Editar</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Eliminar</th>
+		                </tr>
+		            </thead>
+		            <tbody>
+		    ';
+
+			foreach ($datos as $rows) {
+				$tabla .= '
+						<tr class="has-text-centered" >
+							<td>' . $contador . '</td>
+							<td>' . $rows['tipo_cliente'] . '</td>
+							<td>' . $rows['nombre'] . ' ' . $rows['apellidos'] . '</td>
+							<td>' . $rows['celular'] . '</td>
+							<td>' . $rows['credito'] . '</td>
+							<td>' . $rows['pagado'] . '</td>
+							<td>' . $rows['pendiente'] . '</td>
+							 <td>
+			                    <a href="' . APP_URL . 'clientUpdate/' . $rows['id_cliente'] . '/" class="button is-info is-rounded is-small">
+			                    	<i class="fas fa-history fa-fw"></i>
+			                    </a>
+			                </td>
+			                <td>
+			                    <a href="' . APP_URL . 'clientUpdate/' . $rows['id_cliente'] . '/" class="button is-success is-rounded is-small">
+			                    	<i class="fas fa-sync fa-fw"></i>
+			                    </a>
+			                </td>
+			                <td>
+			                	<form class="FormularioAjax" action="' . APP_URL . 'app/ajax/clienteAjax.php" method="POST" autocomplete="off" >
+
+			                		<input type="hidden" name="modulo_cliente" value="eliminar">
+			                		<input type="hidden" name="id_cliente" value="' . $rows['id_cliente'] . '">
+
+			                    	<button type="submit" class="button is-danger is-rounded is-small">
+			                    		<i class="far fa-trash-alt fa-fw"></i>
+			                    	</button>
+			                    </form>
+			                </td>
+						</tr>
+					';
+				$contador++;
+			}
+
+			$pag_final = $contador - 1;
+		} else {
+			if ($total >= 1) {
+				$tabla .= '
+						<tr class="has-text-centered" >
+			                <td colspan="5">
+			                    <a href="' . $url . '1/" class="button is-link is-rounded is-small mt-4 mb-4">
+			                        Haga clic acá para recargar el listado
+			                    </a>
+			                </td>
+			            </tr>
+					';
+			} else {
+				$tabla .= '
+							<article class="message is-warning mt-4 mb-4">
+					 <div class="message-header">
+					    <p></p>
+					 </div>
+				    <div class="message-body has-text-centered">
+				    	<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+						No hay resultados de la busqueda.
+				    </div>
+				</article>';
+			}
+		}
+
+		$tabla .= '</tbody></table></div>';
+		### Paginacion ###
+		if ($total > 0 && $pagina <= $numeroPaginas) {
+			$tabla .= '<p class="has-text-right">Mostrando sesiones <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+
+			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
+		}
+
+		return $tabla;
+	}
+
 	public function listarClienteControlador($pagina, $registros, $url, $busqueda)
 	{
 

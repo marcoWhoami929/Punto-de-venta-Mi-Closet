@@ -39,6 +39,12 @@ if (isset($_POST['modulo_caja'])) {
 	if ($_POST['modulo_caja'] == "salida_efectivo_caja") {
 		echo $insCaja->salidaEfectivoCajaControlador();
 	}
+	if ($_POST['modulo_caja'] == "detalle_corte_caja") {
+		echo $insCaja->obtenerDetalleCorteCaja();
+	}
+	if ($_POST['modulo_caja'] == "detalle_denominaciones") {
+		echo $insCaja->obtenerDetalleDenominaciones();
+	}
 } else {
 	session_destroy();
 	header("Location: " . APP_URL . "login/");

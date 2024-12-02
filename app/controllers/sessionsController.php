@@ -21,22 +21,20 @@ class sessionsController extends mainModel
 
         $busqueda = $this->limpiarCadena($datos["busqueda"]);
         $campos = "sess.*,usr.nombre as 'nombreUsuario', caj.nombre as 'nombreCaja' ";
-
+        $sWhere = "id_sesion != 0";
+        if ($datos["estatus"] != "") {
+            $sWhere .= " and estado = '" . $datos["estatus"] . "'";
+        }
+        if (isset($busqueda) && $busqueda != "") {
+            $sWhere .= " and sess.codigo_sesion LIKE '%$busqueda%' OR caj.nombre LIKE '%$busqueda%' OR usr.nombre LIKE '%$busqueda%'";
+        }
 
         $pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
         $inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
 
-        if (isset($busqueda) && $busqueda != "") {
+        $consulta_datos = "SELECT $campos FROM sesiones_caja as sess INNER JOIN usuario as usr ON sess.id_caja = usr.id_caja INNER JOIN caja as caj ON sess.id_caja = caj.id_caja WHERE $sWhere ORDER BY sess.$campoOrden $orden LIMIT $inicio,$registros";
 
-            $consulta_datos = "SELECT $campos FROM sesiones_caja as sess INNER JOIN usuario as usr ON sess.id_caja = usr.id_caja INNER JOIN caja as caj ON sess.id_caja = caj.id_caja WHERE sess.codigo_sesion LIKE '%$busqueda%' OR caj.nombre LIKE '%$busqueda%' OR usr.nombre LIKE '%$busqueda%' ORDER BY sess.$campoOrden $orden LIMIT $inicio,$registros";
-
-            $consulta_total = "SELECT COUNT(id_sesion) FROM sesiones_caja as sess INNER JOIN usuario as usr ON sess.id_caja = usr.id_caja INNER JOIN caja as caj ON sess.id_caja = caj.id_caja WHERE sess.codigo_sesion LIKE '%$busqueda%' OR caj.nombre LIKE '%$busqueda%' OR usr.nombre LIKE '%$busqueda%'";
-        } else {
-
-            $consulta_datos = "SELECT $campos FROM sesiones_caja as sess INNER JOIN usuario as usr ON sess.id_caja = usr.id_caja INNER JOIN caja as caj ON sess.id_caja = caj.id_caja ORDER BY sess.$campoOrden $orden LIMIT $inicio,$registros";
-
-            $consulta_total = "SELECT COUNT(id_sesion) FROM sesiones_caja as sess INNER JOIN usuario as usr ON sess.id_caja = usr.id_caja INNER JOIN caja as caj ON sess.id_caja = caj.id_caja";
-        }
+        $consulta_total = "SELECT COUNT(id_sesion) FROM sesiones_caja as sess INNER JOIN usuario as usr ON sess.id_caja = usr.id_caja INNER JOIN caja as caj ON sess.id_caja = caj.id_caja WHERE $sWhere";
 
         $datos = $this->ejecutarConsulta($consulta_datos);
         $datos = $datos->fetchAll();
@@ -54,14 +52,18 @@ class sessionsController extends mainModel
                 if ($rows["estado"] == "abierta") {
                     $color = "is-success";
                     $texto = "Activa";
+                    $modal = "";
                 } else {
                     $color = "is-danger";
                     $texto = "Cerrada";
+                    $modal = 'onclick=obtenerDetalleCorteCaja("' . $rows["codigo_sesion"] . '")';
                 }
+
+
                 $caja = $this->ejecutarConsulta("SELECT sesion.*,count(pay.codigo_venta) as 'num_ventas',(sesion.efectivo+sesion.transferencia+sesion.tarjeta_debito+sesion.tarjeta_credito) as 'total_ventas',sum(IF(mov.descripcion = 'ENTRADA',mov.monto,0)) as 'entrada_efectivo',sum(IF(mov.descripcion = 'SALIDA',mov.monto,0)) as 'salida_efectivo' FROM `sesiones_caja` as sesion LEFT OUTER JOIN movimiento_caja as mov ON sesion.codigo_sesion = mov.sesion_caja LEFT OUTER JOIN pago as pay ON mov.descripcion = pay.codigo_pago WHERE mov.sesion_caja = '" . $rows["codigo_sesion"]  . "'");
                 $caja = $caja->fetch();
 
-                $tabla .= '<div class="column">
+                $tabla .= '<div class="column" ' . $modal . ' style="cursor:pointer">
                                 <div class="card">
                                 <header class="card-header" style="background:#B99654">
                                     <p class="card-header-title" style="color:#ffffff">' . $rows["codigo_sesion"] . '</p>

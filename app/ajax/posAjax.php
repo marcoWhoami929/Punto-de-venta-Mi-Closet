@@ -51,12 +51,29 @@ if (isset($_POST['modulo_pos'])) {
             "orden" => $_POST["orden"],
             "page" => $_POST["page"],
             "per_page" => $_POST["per_page"],
+            "estatus" => $_POST["estatus"],
             "url" => $_POST["url"],
         );
 
         $sessions = new sessionsController();
 
         echo $sessions->listarSesionesControlador($datos);
+    }
+    if ($_POST['modulo_pos'] == "listarClientes") {
+
+        $datos = array(
+            "busqueda" => $_POST["busqueda"],
+            "campoOrden" => $_POST["campoOrden"],
+            "orden" => $_POST["orden"],
+            "page" => $_POST["page"],
+            "per_page" => $_POST["per_page"],
+            "estatus" => $_POST["estatus"],
+            "url" => $_POST["url"],
+        );
+
+        $clients = new clientController();
+
+        echo $clients->listarClientesControlador($datos);
     }
 } else {
     session_destroy();

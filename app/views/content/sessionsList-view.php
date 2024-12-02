@@ -30,6 +30,17 @@
             </div>
         </div>
         <div class="column">
+            <label>Estado Sesion</label><br>
+            <div class="select">
+                <select id="estatus" onchange="listarSesiones()">
+                    <option value="">Todos</option>
+                    <option value="abierta">Abierta</option>
+                    <option value="cerrada">Cerrada</option>
+
+                </select>
+            </div>
+        </div>
+        <div class="column">
             <label>Ordenar por</label><br>
             <div class="select">
                 <select id="campoOrden" onchange="listarSesiones()">

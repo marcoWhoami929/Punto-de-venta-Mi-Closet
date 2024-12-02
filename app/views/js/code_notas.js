@@ -10,6 +10,9 @@ $(function () {
     case "sessionsList":
       listarSesiones();
     break;
+    case "clientList":
+      listarClientes();
+    break;
     case "cashierList":
       listarCajas();
     break;
@@ -180,6 +183,7 @@ function listarSesiones() {
   var orden = $("#orden").val();
   var per_page = $("#per_page").val();
   var page = $("#pagina").val();
+  var estatus = $("#estatus").val();
   var url = $("#url").val();
 
   $.ajax({
@@ -192,10 +196,39 @@ function listarSesiones() {
       per_page:per_page,
       page:page,
       url:url,
+      estatus:estatus,
       modulo_pos: "listarSesiones",
     },
     success: function (response) {
       $(".div-sesiones").html(response);
+    },
+  });
+}
+function listarClientes() {
+
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var estatus = $("#estatus").val();
+  var url = $("#url").val();
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      url:url,
+      estatus:estatus,
+      modulo_pos: "listarClientes",
+    },
+    success: function (response) {
+      $(".div-clientes").html(response);
     },
   });
 }
@@ -631,8 +664,8 @@ function obtenerDatosCorteCaja(sesion){
   })
   
 }
-function calcularDiferenciaCaja(el) {
-  var efectivo = $(el).val();
+function calcularDiferenciaCaja() {
+  var efectivo = $("#saldo_final_corte").val();
   var total_caja = $("#field-total-caja").text();
   
   var diferencia_caja = parseFloat(efectivo)-parseFloat(total_caja);
@@ -655,12 +688,41 @@ function cerrarCaja(sesion){
       var saldo_final = $("#saldo_final_corte").val();
       var diferencia = $("#field-diferencia-caja").val();
       var observaciones = $("#observaciones_corte").val();
+      var dif_dn_1 = $("#dif_dn_1").val();
+      var dif_dn_2 = $("#dif_dn_2").val();
+      var dif_dn_3 = $("#dif_dn_3").val();
+      var dif_dn_4 = $("#dif_dn_4").val();
+      var dif_dn_5 = $("#dif_dn_5").val();
+      var dif_dn_6 = $("#dif_dn_6").val();
+      var dif_dn_7 = $("#dif_dn_7").val();
+      var dif_dn_8 = $("#dif_dn_8").val();
+      var dif_dn_9 = $("#dif_dn_9").val();
+      var dif_dn_10 = $("#dif_dn_10").val();
+      var dif_dn_11 = $("#dif_dn_11").val();
+      var dif_dn_12 = $("#dif_dn_12").val();
+      var dif_dn_13 = $("#dif_dn_13").val();
+
+      var total_denominaciones_caja = $("#total_denominaciones_caja").val();
      
 
       let datos = new FormData();
       datos.append("saldo_final", saldo_final);
       datos.append("diferencia", diferencia);
+      datos.append("dif_dn_1", dif_dn_1);
+      datos.append("dif_dn_2", dif_dn_2);
+      datos.append("dif_dn_3", dif_dn_3);
+      datos.append("dif_dn_4", dif_dn_4);
+      datos.append("dif_dn_5", dif_dn_5);
+      datos.append("dif_dn_6", dif_dn_6);
+      datos.append("dif_dn_7", dif_dn_7);
+      datos.append("dif_dn_8", dif_dn_8);
+      datos.append("dif_dn_9", dif_dn_9);
+      datos.append("dif_dn_10", dif_dn_10);
+      datos.append("dif_dn_11", dif_dn_11);
+      datos.append("dif_dn_12", dif_dn_12);
+      datos.append("dif_dn_13", dif_dn_13);
       datos.append("observaciones", observaciones);
+      datos.append("total_denominaciones_caja", total_denominaciones_caja);
       datos.append("sesion_caja", sesion);
 
       datos.append("modulo_caja", "cerrar_caja");

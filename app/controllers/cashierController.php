@@ -240,6 +240,20 @@ class cashierController extends mainModel
 		$diferencia = $this->limpiarCadena($_POST["diferencia"]);
 		$observaciones = $this->limpiarCadena($_POST["observaciones"]);
 		$codigo_sesion = $this->limpiarCadena($_POST["sesion_caja"]);
+		$dif_dn_1 = $this->limpiarCadena($_POST["dif_dn_1"]);
+		$dif_dn_2 = $this->limpiarCadena($_POST["dif_dn_2"]);
+		$dif_dn_3 = $this->limpiarCadena($_POST["dif_dn_3"]);
+		$dif_dn_4 = $this->limpiarCadena($_POST["dif_dn_4"]);
+		$dif_dn_5 = $this->limpiarCadena($_POST["dif_dn_5"]);
+		$dif_dn_6 = $this->limpiarCadena($_POST["dif_dn_6"]);
+		$dif_dn_7 = $this->limpiarCadena($_POST["dif_dn_7"]);
+		$dif_dn_8 = $this->limpiarCadena($_POST["dif_dn_8"]);
+		$dif_dn_9 = $this->limpiarCadena($_POST["dif_dn_9"]);
+		$dif_dn_10 = $this->limpiarCadena($_POST["dif_dn_10"]);
+		$dif_dn_11 = $this->limpiarCadena($_POST["dif_dn_11"]);
+		$dif_dn_12 = $this->limpiarCadena($_POST["dif_dn_12"]);
+		$dif_dn_13 = $this->limpiarCadena($_POST["dif_dn_13"]);
+		$total_denominaciones_caja = $this->limpiarCadena($_POST["total_denominaciones_caja"]);
 
 		# Verificando campos obligatorios #
 		if ($saldo_final == "" || $saldo_final == '0' || $saldo_final == '0.00') {
@@ -304,6 +318,94 @@ class cashierController extends mainModel
 		];
 
 		$actualizar_sesion = $this->actualizarDatos("sesiones_caja", $caja_datos_up, $condicion);
+		if ($total_denominaciones_caja != '0.00') {
+
+
+			$denominaciones_reg = [
+				[
+					"campo_nombre" => "codigo_sesion",
+					"campo_marcador" => ":Codigo",
+					"campo_valor" => $codigo_sesion
+				],
+				[
+					"campo_nombre" => "id_caja",
+					"campo_marcador" => ":IdCaja",
+					"campo_valor" => $_SESSION["caja"]
+				],
+				[
+					"campo_nombre" => "dn1",
+					"campo_marcador" => ":Dn1",
+					"campo_valor" => $dif_dn_1
+				],
+				[
+					"campo_nombre" => "dn2",
+					"campo_marcador" => ":Dn2",
+					"campo_valor" => $dif_dn_2
+				],
+				[
+					"campo_nombre" => "dn3",
+					"campo_marcador" => ":Dn3",
+					"campo_valor" => $dif_dn_3
+				],
+				[
+					"campo_nombre" => "dn4",
+					"campo_marcador" => ":Dn4",
+					"campo_valor" => $dif_dn_4
+				],
+				[
+					"campo_nombre" => "dn5",
+					"campo_marcador" => ":Dn5",
+					"campo_valor" => $dif_dn_5
+				],
+				[
+					"campo_nombre" => "dn6",
+					"campo_marcador" => ":Dn6",
+					"campo_valor" => $dif_dn_6
+				],
+				[
+					"campo_nombre" => "dn7",
+					"campo_marcador" => ":Dn7",
+					"campo_valor" => $dif_dn_7
+				],
+				[
+					"campo_nombre" => "dn8",
+					"campo_marcador" => ":Dn8",
+					"campo_valor" => $dif_dn_8
+				],
+				[
+					"campo_nombre" => "dn9",
+					"campo_marcador" => ":Dn9",
+					"campo_valor" => $dif_dn_9
+				],
+				[
+					"campo_nombre" => "dn10",
+					"campo_marcador" => ":Dn10",
+					"campo_valor" => $dif_dn_10
+				],
+				[
+					"campo_nombre" => "dn11",
+					"campo_marcador" => ":Dn11",
+					"campo_valor" => $dif_dn_11
+				],
+				[
+					"campo_nombre" => "dn12",
+					"campo_marcador" => ":Dn12",
+					"campo_valor" => $dif_dn_12
+				],
+				[
+					"campo_nombre" => "dn13",
+					"campo_marcador" => ":Dn13",
+					"campo_valor" => $dif_dn_13
+				],
+				[
+					"campo_nombre" => "total_caja",
+					"campo_marcador" => ":TotalCaja",
+					"campo_valor" => $total_denominaciones_caja
+				]
+			];
+
+			$registrar_denominaciones = $this->guardarDatos("corte_caja", $denominaciones_reg);
+		}
 
 		if ($actualizar_sesion->rowCount() == 1) {
 
@@ -848,7 +950,7 @@ class cashierController extends mainModel
 	{
 		$sesion = $this->limpiarCadena($_POST['sesion_caja']);
 
-		$datos = $this->ejecutarConsulta("SELECT sesion.*,count(pay.codigo_venta) as 'num_ventas',(sesion.efectivo+sesion.transferencia+sesion.tarjeta_debito+sesion.tarjeta_credito) as 'total_ventas',sum(IF(mov.descripcion = 'ENTRADA',mov.monto,0)) as 'entrada_efectivo',sum(IF(mov.descripcion = 'SALIDA',mov.monto,0)) as 'salida_efectivo' FROM `sesiones_caja` as sesion LEFT OUTER JOIN movimiento_caja as mov ON sesion.codigo_sesion = mov.sesion_caja LEFT OUTER JOIN pago as pay ON mov.descripcion = pay.codigo_pago WHERE mov.sesion_caja = '" . $sesion . "'");
+		$datos = $this->ejecutarConsulta("SELECT sesion.*,count(pay.codigo_venta) as 'num_ventas',(sesion.efectivo+sesion.transferencia+sesion.tarjeta_debito+sesion.tarjeta_credito) as 'total_ventas',sum(IF(mov.descripcion = 'ENTRADA',mov.monto,0)) as 'entrada_efectivo',sum(IF(mov.descripcion = 'SALIDA',mov.monto,0)) as 'salida_efectivo' FROM `sesiones_caja` as sesion LEFT OUTER JOIN movimiento_caja as mov ON sesion.codigo_sesion = mov.sesion_caja LEFT OUTER JOIN pago as pay ON mov.descripcion = pay.codigo_pago WHERE sesion.codigo_sesion = '" . $sesion . "'");
 		$datos = $datos->fetch();
 		return json_encode($datos);
 	}
@@ -860,6 +962,22 @@ class cashierController extends mainModel
 
 		$datos = $datos->fetch();
 
+		return json_encode($datos);
+	}
+	public function obtenerDetalleCorteCaja()
+	{
+		$sesion = $this->limpiarCadena($_POST['sesion_caja']);
+
+		$datos = $this->ejecutarConsulta("SELECT sesion.*,count(pay.codigo_venta) as 'num_ventas',(sesion.efectivo+sesion.transferencia+sesion.tarjeta_debito+sesion.tarjeta_credito) as 'total_ventas',sum(IF(mov.descripcion = 'ENTRADA',mov.monto,0)) as 'entrada_efectivo',sum(IF(mov.descripcion = 'SALIDA',mov.monto,0)) as 'salida_efectivo' FROM `sesiones_caja` as sesion LEFT OUTER JOIN movimiento_caja as mov ON sesion.codigo_sesion = mov.sesion_caja LEFT OUTER JOIN pago as pay ON mov.descripcion = pay.codigo_pago WHERE sesion.codigo_sesion = '" . $sesion . "'");
+		$datos = $datos->fetch();
+		return json_encode($datos);
+	}
+	public function obtenerDetalleDenominaciones()
+	{
+		$sesion = $this->limpiarCadena($_POST['sesion_caja']);
+
+		$datos = $this->ejecutarConsulta("SELECT (dn1/1000) as 'det_dn1',(dn2/500) as 'det_dn2',(dn3/200) as 'det_dn3',(dn4/100) as 'det_dn4',(dn5/50) as 'det_dn5',(dn6/20) as 'det_dn6',(dn7/10) as 'det_dn7',(dn8/5) as 'det_dn8',(dn9/2) as 'det_dn9',(dn10/1) as 'det_dn10',(dn11/0.50) as 'det_dn11',(dn12/0.20) as 'det_dn12',(dn13/0.10) as 'det_dn13',dn1,dn2,dn3,dn4,dn5,dn6,dn7,dn8,dn9,dn10,dn11,dn12,dn13,total_caja FROM `corte_caja` WHERE codigo_sesion = '" . $sesion . "'");
+		$datos = $datos->fetch();
 		return json_encode($datos);
 	}
 }

@@ -162,7 +162,7 @@
                             </div>
                             <div class="field">
                                 <div class="control has-icons-left">
-                                    <input class="input is-small" type="number" placeholder="0.00" style="font-size:25px;font-weight:bold" onkeyup="calcularDiferenciaCaja(this)" value="0.00" id="saldo_final_corte" />
+                                    <input class="input is-small" type="number" placeholder="0.00" style="font-size:25px;font-weight:bold" onkeyup="calcularDiferenciaCaja()" value="0.00" id="saldo_final_corte" />
                                     <span class="icon is-large is-left" style="margin-top:10px">
                                         <i class="fas fa-dollar-sign fa-3x"></i>
                                     </span>
@@ -537,9 +537,7 @@
                                 </div>
                             </div>
 
-                            <div class="field">
-                                <label class="label" style="color:#B99654;font-size:25px">Total Caja:</label>
-                            </div>
+
                         </div>
                         <div class="column">
                             <div class="field">
@@ -697,6 +695,503 @@
                             <div class="field">
                                 <div class="control has-icons-left">
                                     <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="dif_dn_13" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </section>
+    </div>
+</div>
+
+<!--------------------------------->
+<button class="button js-modal-trigger" data-target="modal-detalle-caja" id="btn-detalle-corte-caja" style="display:none"></button>
+<div class="modal fade" id="modal-detalle-caja" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-background"></div>
+    <div class="modal-card" style="width:80%">
+        <header class="modal-card-head" style="background:#B99654">
+            <p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-cash-register"></i> &nbsp; Detalle Corte Caja</p>
+            <button class="delete " aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+
+            <div class="columns  mb-6">
+                <div class="column">
+                    <div class="columns">
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Cierre de Caja Registradora:</label>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field" id="field-ordenes-detalle">
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="columns">
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Métodos de Pago:</label>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Esperado:</label>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Contado:</label>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Diferencia:</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="columns">
+                        <div class="column">
+                            <div class="field">
+                                <label class="label" style="color:#b4afaf">Saldo Inicial:</label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#b4afaf">Efectivo:</label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#b4afaf">Transferencia:</label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#b4afaf">Tarjeta Crédito:</label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#b4afaf">Tarjeta Débito:</label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#b4afaf">Salidas Efectivo:</label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#b4afaf">Entradas Efectivo:</label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#B99654;font-size:25px">Total Caja:</label>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="label" style="color:#B99654"><span id="field-saldo-inicial-detalle" style="font-weight:bold;color:#000000"></span></label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#B99654"><span id="field-efectivo-detalle" style="font-weight:bold;color:#000000"></span></label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#B99654"><span id="field-transferencia-detalle" style="font-weight:bold;color:#000000"></span></label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#B99654"><span id="field-td-detalle" style="font-weight:bold;color:#000000"></span></label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#B99654"><span id="field-tc-detalle" style="font-weight:bold;color:#000000"></span></label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#B99654"><span id="field-salida-efectivo-detalle" style="font-weight:bold;color:#000000"></span></label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#B99654"><span id="field-entrada-efectivo-detalle" style="font-weight:bold;color:#000000"></span></label>
+                            </div>
+                            <div class="field">
+                                <label class="label" style="color:#B99654;font-size:25px">$ <span id="field-total-caja-detalle" style="font-weight:bold;color:#B99654;font-size:25px"></span></label>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-small" type="number" placeholder="0.00" style="font-size:25px;font-weight:bold" value="0.00" id="saldo_final_corte_detalle" disabled />
+                                    <span class="icon is-large is-left" style="margin-top:10px">
+                                        <i class="fas fa-dollar-sign fa-3x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <label class="label">Nota de Cierre:</label>
+                                <textarea class="textarea is-large" type="text" placeholder="Ingresar alguna observación si hay alguna diferencia en el corte" style="font-size:12px;font-weight:bold" id="observaciones_corte_detalle" disabled></textarea>
+                            </div>
+
+
+                            <div class="field  pt-4">
+                                <p class="">
+
+                                    <button type="button" class="button is-info button-lg js-modal-trigger" data-target="modal-detalle-denominaciones-caja" onclick="obtenerDetalleDenominaciones()"><i class="fas fa-money-bill-wave"></i> &nbsp; Detalle Denominaciones</button>
+                                </p>
+                            </div>
+
+                        </div>
+                        <div class="column">
+                            <div class="field">
+
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-small" type="number" placeholder="0.00" style="font-size:25px;font-weight:bold" id="field-diferencia-caja-detalle" value="0.00" disabled />
+                                    <span class="icon is-large is-left" style="margin-top:10px">
+                                        <i class="fas fa-dollar-sign fa-3x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+<div class="modal fade" id="modal-detalle-denominaciones-caja" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head" style="background:#B99654">
+            <p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-cash-register"></i> &nbsp; Detalle</p>
+            <div class="column" style="background:#B99654">
+                <div class="field">
+
+                    <div class="control has-icons-left">
+                        <input class="input is-large" type="number" id="detalle_denominaciones" placeholder="0.00" style="font-size:22px;font-weight:bold;background:#B99654;color:#ffffff;border:none" value="0.00" disabled />
+                        <span class="icon is-large is-left">
+                            <i class="fas fa-dollar-sign fa-1x" style="color:#ffffff"></i>
+                        </span>
+
+                    </div>
+
+                </div>
+            </div>
+            <button class="delete " aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+
+
+            <div class="columns  mb-6">
+                <div class="column">
+                    <div class="columns">
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">*Capturar denominaciones de efectivo en caja.</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="columns">
+                        <div class="column" style="background:#B99654">
+                            <div class="field">
+                                <label class="label" style="color:#ffffff">Denominacíon</label>
+                            </div>
+                        </div>
+                        <div class="column" style="background:#B99654">
+                            <div class="field">
+                                <label class="label" style="color:#ffffff">Cantidad</label>
+                            </div>
+                        </div>
+                        <div class="column" style="background:#B99654">
+                            <div class="field">
+                                <label class="label" style="color:#ffffff">Total:</label>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="columns">
+                        <div class="column">
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="1000" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="500" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="200" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="100" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="50" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="20" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="10" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="5" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="2" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="1" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="0.50" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="0.20" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" value="0.10" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+
+
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn1" value="0" disabled>
+                            </div>
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn2" value="0" disabled>
+                            </div>
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn3" value="0" disabled>
+                            </div>
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn4" value="0" disabled>
+                            </div>
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn5" value="0" disabled>
+                            </div>
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn6" value="0" disabled>
+                            </div>
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn7" value="0" disabled>
+                            </div>
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn8" value="0" disabled>
+                            </div>
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn9" value="0" disabled>
+                            </div>
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn10" value="0" disabled>
+                            </div>
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn11" value="0" disabled>
+                            </div>
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn12" value="0" disabled>
+                            </div>
+                            <div class="field">
+                                <input type="text" class="input is-medium has-text-centered" id="det_dn13" value="0" disabled>
+                            </div>
+
+                        </div>
+
+                        <div class="column">
+
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_1" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_2" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_3" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_4" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_5" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_6" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_7" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_8" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_9" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_10" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_11" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_12" value="0.00" disabled />
+                                    <span class="icon is-large is-left">
+                                        <i class="fas fa-dollar-sign fa-1x"></i>
+                                    </span>
+
+                                </div>
+                            </div>
+                            <div class="field">
+                                <div class="control has-icons-left">
+                                    <input class="input is-large input-denominacion" type="number" placeholder="0.00" style="font-size:20px;font-weight:bold" id="det_dif_dn_13" value="0.00" disabled />
                                     <span class="icon is-large is-left">
                                         <i class="fas fa-dollar-sign fa-1x"></i>
                                     </span>
