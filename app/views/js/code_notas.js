@@ -10,6 +10,9 @@ $(function () {
     case "sessionsList":
       listarSesiones();
     break;
+    case "userList":
+      listarUsuarios();
+    break;
     case "clientList":
       listarClientes();
     break;
@@ -18,6 +21,9 @@ $(function () {
     break;
     case "productList":
       listarProductos();
+    break;
+    case "saleList":
+      listarVentas();
     break;
     case "saleNew":
       cargarListaCamaras();
@@ -158,6 +164,7 @@ function listarProductos() {
   var per_page = $("#per_page").val();
   var page = $("#pagina").val();
   var url = $("#url").val();
+  var estatus = $("#estatus").val();
 
   $.ajax({
     url: "../app/ajax/posAjax.php",
@@ -169,6 +176,7 @@ function listarProductos() {
       per_page:per_page,
       page:page,
       url:url,
+      estatus: estatus,
       modulo_pos: "listarProductos",
     },
     success: function (response) {
@@ -232,21 +240,70 @@ function listarClientes() {
     },
   });
 }
-/*************************************************************** */
-function eliminarCaja(id_caja){
-  let datos = new FormData();
-  datos.append("id_caja", id_caja);
-  datos.append("modulo_caja", "eliminar");
+function listarUsuarios() {
 
-  fetch(url + "app/ajax/cajaAjax.php", {
-    method: "POST",
-    body: datos,
-  })
-    .then((respuesta) => respuesta.json())
-    .then((respuesta) => {
-      return alertas_ajax(respuesta);
-    });
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var estatus = $("#estatus").val();
+  var url = $("#url").val();
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      url:url,
+      estatus:estatus,
+      modulo_pos: "listarUsuarios",
+    },
+    success: function (response) {
+      $(".div-usuarios").html(response);
+    },
+  });
 }
+
+function listarVentas() {
+
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var url = $("#url").val();
+  var tipo_venta = $("#tipo_venta").val();
+  var forma_pago = $("#forma_pago").val();
+  var estatus_pago = $("#estatus_pago").val();
+  var tipo_entrega = $("#tipo_entrega").val();
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      url:url,
+      tipo_venta:tipo_venta,
+      forma_pago:forma_pago,
+      estatus_pago:estatus_pago,
+      tipo_entrega:tipo_entrega,
+      modulo_pos: "listarVentas",
+    },
+    success: function (response) {
+      $(".div-ventas").html(response);
+    },
+  });
+}
+/*************************************************************** */
 function cargarListaCamaras(){
   // This method will trigger user permissions
 Html5Qrcode.getCameras().then(camaras => {

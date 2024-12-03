@@ -419,23 +419,25 @@ class productController extends mainModel
 		$url = APP_URL . $url . "/";
 
 		$busqueda = $this->limpiarCadena($datos["busqueda"]);
+		$sWhere = "prod.cid_producto!='0'";
+
+		if ($datos["estatus"] != "") {
+			$sWhere .= " and estado = '" . $datos["estatus"] . "'";
+		}
+
+		if (isset($busqueda) && $busqueda != "") {
+			$sWhere .= " AND prod.codigo LIKE '%$busqueda%' OR prod.nombre LIKE '%$busqueda%' OR prod.marca LIKE '%$busqueda%' OR prod.modelo LIKE '%$busqueda%'";
+		}
+
 		$campos = "prod.cid_producto,prod.codigo,prod.nombre as 'producto',prod.precio_venta,prod.foto,cat.nombre as 'categoria',inven.stock_total";
 		$tabla = "";
 
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
 		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
 
-		if (isset($busqueda) && $busqueda != "") {
+		$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.cid_producto=inven.id_producto WHERE $sWhere ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
 
-			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.cid_producto=inven.id_producto WHERE prod.codigo LIKE '%$busqueda%' OR prod.nombre LIKE '%$busqueda%' OR prod.marca LIKE '%$busqueda%' OR prod.modelo LIKE '%$busqueda%' ORDER BY prod.$campoOrden $orden LIMIT $inicio,$registros";
-
-			$consulta_total = "SELECT COUNT(cid_producto) FROM producto WHERE codigo LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' OR marca LIKE '%$busqueda%' OR modelo LIKE '%$busqueda%'";
-		} else {
-
-			$consulta_datos = "SELECT $campos FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.cid_producto=inven.id_producto ORDER BY prod.$campoOrden $orden LIMIT $inicio,$registros";
-
-			$consulta_total = "SELECT COUNT(cid_producto) FROM producto";
-		}
+		$consulta_total = "SELECT COUNT(cid_producto) FROM producto as prod INNER JOIN categoria as cat ON prod.id_categoria=cat.id_categoria INNER JOIN inventario as inven ON prod.cid_producto=inven.id_producto WHERE $sWhere";
 
 		$datos = $this->ejecutarConsulta($consulta_datos);
 		$datos = $datos->fetchAll();

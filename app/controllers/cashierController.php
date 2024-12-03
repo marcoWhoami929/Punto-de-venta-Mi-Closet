@@ -643,23 +643,18 @@ class cashierController extends mainModel
 		$url = $this->limpiarCadena($datos["url"]);
 		$url = APP_URL . $url . "/";
 
-		$busqueda = $this->limpiarCadena($datos["busqueda"]);
+		$sWhere = "id_caja!='0'";
+
+		if (isset($busqueda) && $busqueda != "") {
+			$sWhere .= " AND numero LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%'";
+		}
 		$tabla = "";
 
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
 		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
 
-		if (isset($busqueda) && $busqueda != "") {
-
-			$consulta_datos = "SELECT * FROM caja WHERE numero LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%' ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
-
-			$consulta_total = "SELECT COUNT(id_caja) FROM caja WHERE numero LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%'";
-		} else {
-
-			$consulta_datos = "SELECT * FROM caja ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
-
-			$consulta_total = "SELECT COUNT(id_caja) FROM caja";
-		}
+		$consulta_datos = "SELECT * FROM caja WHERE $sWhere ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+		$consulta_total = "SELECT COUNT(id_caja) FROM caja WHERE $sWhere";
 
 		$datos = $this->ejecutarConsulta($consulta_datos);
 		$datos = $datos->fetchAll();

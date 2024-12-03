@@ -11,7 +11,7 @@
 				<input type="hidden" id="pagina" value="<?= $url[1] ?>">
 				<input type="hidden" id="url" value="<?= $url[0] ?>">
 				<p class="control is-expanded">
-					<input class="input is-rounded" type="text" id="busqueda" placeholder="¿Qué cliente estás buscando?" onkeyup="listarUsuarios()">
+					<input class="input is-rounded" type="text" id="busqueda" placeholder="¿Qué usuario estás buscando?" onkeyup="listarUsuarios()">
 				</p>
 				<p class="control">
 					<button class="button is-info" type="button" onclick="listarUsuarios()">Actualizar</button>
@@ -46,7 +46,7 @@
 				<select id="campoOrden" onchange="listarUsuarios()">
 					<option value="id_usuario">Id</option>
 					<option value="nombre">Nombre</option>
-					<option value="fecha_registro">Fecha Registro</option>
+					<option value="fecha_alta">Fecha Registro</option>
 
 				</select>
 			</div>
@@ -69,15 +69,4 @@
 
 		</div>
 	</div>
-</div>
-<div class="container is-fluid pb-6">
-
-	<?php
-
-	use app\controllers\userController;
-
-	$insUsuario = new userController();
-
-	echo $insUsuario->listarUsuarioControlador($url[1], 15, $url[0], "");
-	?>
 </div>

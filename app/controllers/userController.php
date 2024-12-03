@@ -233,6 +233,11 @@ class userController extends mainModel
 				"campo_nombre" => "perfil",
 				"campo_marcador" => ":Perfil",
 				"campo_valor" => $perfil
+			],
+			[
+				"campo_nombre" => "estatus",
+				"campo_marcador" => ":Estatus",
+				"campo_valor" => '1'
 			]
 		];
 
@@ -266,6 +271,127 @@ class userController extends mainModel
 
 
 	/*----------  Controlador listar usuario  ----------*/
+
+	public function listarUsuariosControlador($datos)
+	{
+
+		$pagina = $this->limpiarCadena($datos["page"]);
+		$registros = $this->limpiarCadena($datos["per_page"]);
+		$campoOrden = $this->limpiarCadena($datos["campoOrden"]);
+		$orden = $this->limpiarCadena($datos["orden"]);
+
+		$url = $this->limpiarCadena($datos["url"]);
+		$url = APP_URL . $url . "/";
+
+		$busqueda = $this->limpiarCadena($datos["busqueda"]);
+
+		$sWhere = "id_usuario!='" . $_SESSION['id'] . "' and id_usuario!='1'";
+		if ($datos["estatus"] != "") {
+			$sWhere .= " and estatus = '" . $datos["estatus"] . "'";
+		}
+		if (isset($busqueda) && $busqueda != "") {
+			$sWhere .= " AND nombre LIKE '%$busqueda%' OR email LIKE '%$busqueda%' OR usuario LIKE '%$busqueda%'";
+		}
+
+		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+
+		$consulta_datos = "SELECT * FROM usuario WHERE $sWhere ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+		$consulta_total = "SELECT COUNT(id_usuario) FROM usuario WHERE $sWhere";
+
+		$datos = $this->ejecutarConsulta($consulta_datos);
+		$datos = $datos->fetchAll();
+
+		$total = $this->ejecutarConsulta($consulta_total);
+		$total = (int) $total->fetchColumn();
+
+		$numeroPaginas = ceil($total / $registros);
+		$tabla = "";
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+			$tabla .= '
+		        <div class="table-container">
+		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+		            <thead style="background:#B99654;color:#ffffff;">
+		                <tr>
+		                    <th class="has-text-centered" style="color:#ffffff">#</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Nombre</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Usuario</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Email</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Foto</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Actualizar</th>
+		                    <th class="has-text-centered" style="color:#ffffff">Eliminar</th>
+		                </tr>
+		            </thead>
+		            <tbody>
+		    ';
+
+			foreach ($datos as $rows) {
+				$tabla .= '
+						<tr class="has-text-centered" >
+							<td>' . $contador . '</td>
+							<td>' . $rows['nombre'] . '</td>
+							<td>' . $rows['usuario'] . '</td>
+							<td>' . $rows['email'] . '</td>
+							<td>
+			                    <a href="' . APP_URL . 'userPhoto/' . $rows['id_usuario'] . '/" class="button is-info is-rounded is-small">
+			                    	<i class="fas fa-camera fa-fw"></i>
+			                    </a>
+			                </td>
+			                <td>
+			                    <a href="' . APP_URL . 'userUpdate/' . $rows['id_usuario'] . '/" class="button is-success is-rounded is-small">
+			                    	<i class="fas fa-sync fa-fw"></i>
+			                    </a>
+			                </td>
+			                <td>
+			                	
+			                    	<button type="button" class="button is-danger is-rounded is-small" onclick="eliminarUsuario(\'' . $rows['id_usuario'] . '\')">
+			                    		<i class="far fa-trash-alt fa-fw"></i>
+			                    	</button>
+			                </td>
+						</tr>
+					';
+				$contador++;
+			}
+
+			$pag_final = $contador - 1;
+		} else {
+			if ($total >= 1) {
+				$tabla .= '
+						<tr class="has-text-centered" >
+			                <td colspan="5">
+			                    <a href="' . $url . '1/" class="button is-link is-rounded is-small mt-4 mb-4">
+			                        Haga clic acá para recargar el listado
+			                    </a>
+			                </td>
+			            </tr>
+					';
+			} else {
+				$tabla .= '
+							<article class="message is-warning mt-4 mb-4">
+					 <div class="message-header">
+					    <p></p>
+					 </div>
+				    <div class="message-body has-text-centered">
+				    	<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+						No hay resultados de la busqueda.
+				    </div>
+				</article>';
+			}
+		}
+
+		$tabla .= '</tbody></table></div>';
+		### Paginacion ###
+		if ($total > 0 && $pagina <= $numeroPaginas) {
+			$tabla .= '<p class="has-text-right">Mostrando sesiones <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+
+			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
+		}
+
+		return $tabla;
+	}
 	public function listarUsuarioControlador($pagina, $registros, $url, $busqueda)
 	{
 
@@ -434,6 +560,20 @@ class userController extends mainModel
 			exit();
 		}
 
+		# Verificando sesiones #
+		$check_ventas = $this->ejecutarConsulta("SELECT id_usuario FROM sesiones_caja WHERE id_usuario='$id' LIMIT 1");
+		if ($check_ventas->rowCount() > 0) {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "No podemos eliminar el usuario del sistema ya que tiene sesiones de caja asociadas",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+
+
 		$eliminarUsuario = $this->eliminarRegistro("usuario", "id_usuario", $id);
 
 		if ($eliminarUsuario->rowCount() == 1) {
@@ -557,6 +697,11 @@ class userController extends mainModel
 		$clave2 = $this->limpiarCadena($_POST['password_2']);
 		$caja = $this->limpiarCadena($_POST['usuario_caja']);
 		$perfil = $this->limpiarCadena($_POST['perfil_usuario']);
+		if (isset($_POST['estatus'])) {
+			$estatus = 1;
+		} else {
+			$estatus = 0;
+		}
 
 		# Verificando campos obligatorios #
 		if ($nombre == ""  || $usuario == "") {
@@ -699,6 +844,11 @@ class userController extends mainModel
 				"campo_nombre" => "perfil",
 				"campo_marcador" => ":Perfil",
 				"campo_valor" => $perfil
+			],
+			[
+				"campo_nombre" => "estatus",
+				"campo_marcador" => ":Estatus",
+				"campo_valor" => $estatus
 			]
 		];
 

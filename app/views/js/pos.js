@@ -1,5 +1,6 @@
 /** 
- * FUNCIONES MODULO PRODUCTOS
+ * FUNCIONES MODULO POS
+ * 
  */
 
 function eliminarProducto(id_producto){
@@ -30,6 +31,63 @@ function eliminarProducto(id_producto){
       });
 }
 
+function eliminarUsuario(id_producto){
+
+
+  Swal.fire({
+      title: "¿Desea Eliminar El Usuario?",
+      text: "",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#B99654",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Eliminar",
+      cancelButtonText: "No, cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+          let datos = new FormData();
+          datos.append("id_usuario", id_producto);
+          datos.append("modulo_usuario", "eliminar");
+          fetch(url + "app/ajax/usuarioAjax.php", {
+            method: "POST",
+            body: datos,
+          }).then((respuesta) => respuesta.json())
+          .then((respuesta) => {
+            return alertas_ajax(respuesta);
+          }) 
+      }
+    });
+}
+
+function eliminarCaja(id_caja){
+
+  Swal.fire({
+    title: "¿Desea Eliminar La Caja?",
+    text: "",
+    icon: "question",
+    showCancelButton: true,
+    confirmButtonColor: "#B99654",
+    cancelButtonColor: "#d33",
+    confirmButtonText: "Si, Eliminar",
+    cancelButtonText: "No, cancelar",
+  }).then((result) => {
+    if (result.isConfirmed) {
+      let datos = new FormData();
+      datos.append("id_caja", id_caja);
+      datos.append("modulo_caja", "eliminar");
+    
+      fetch(url + "app/ajax/cajaAjax.php", {
+        method: "POST",
+        body: datos,
+      })
+        .then((respuesta) => respuesta.json())
+        .then((respuesta) => {
+          return alertas_ajax(respuesta);
+        });
+    }
+  });
+  
+}
 function entradaInventario(id_producto){
     $("#btn-modal-entrada").click();
     if(id_producto == 0){

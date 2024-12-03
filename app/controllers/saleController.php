@@ -1076,6 +1076,227 @@ class saleController extends mainModel
 
 
 	/*----------  Controlador listar venta  ----------*/
+	public function listarVentasControlador($datos)
+	{
+
+		$pagina = $this->limpiarCadena($datos["page"]);
+		$registros = $this->limpiarCadena($datos["per_page"]);
+		$campoOrden = $this->limpiarCadena($datos["campoOrden"]);
+		$orden = $this->limpiarCadena($datos["orden"]);
+
+		$url = $this->limpiarCadena($datos["url"]);
+		$url = APP_URL . $url . "/";
+
+		$busqueda = $this->limpiarCadena($datos["busqueda"]);
+		$sWhere = "venta.id_venta !='0'";
+		if ($datos["tipo_venta"] != "") {
+			$sWhere .= " and venta.tipo_venta = '" . $datos["tipo_venta"] . "'";
+		}
+		if ($datos["forma_pago"] != "") {
+			$sWhere .= " and venta.forma_pago = '" . $datos["forma_pago"] . "'";
+		}
+
+		if ($datos["estatus_pago"] != "") {
+			$sWhere .= " and venta.estatus_pago = '" . $datos["estatus_pago"] . "'";
+		}
+
+		if ($datos["tipo_entrega"] != "") {
+			$sWhere .= " and venta.tipo_entrega = '" . $datos["tipo_entrega"] . "'";
+		}
+
+		if (isset($busqueda) && $busqueda != "") {
+			$sWhere .= " AND venta.codigo LIKE '%$busqueda%' OR venta.codigo_nota LIKE '%$busqueda%'";
+		}
+
+		$campos = "venta.forma_pago,venta.tipo_entrega,venta.estatus_pago,venta.id_venta,venta.estatus,venta.subtotal,venta.descuento,venta.tipo_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre as 'nombreVendedor',cliente.id_cliente,cliente.nombre as 'nombreCliente',cliente.apellidos";
+		$tabla = "";
+
+		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+
+		$consulta_datos = "SELECT $campos FROM venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario WHERE $sWhere  ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+		$consulta_total = "SELECT COUNT(id_venta) FROM venta INNER JOIN cliente ON venta.id_cliente=cliente.id_cliente INNER JOIN usuario ON venta.id_usuario=usuario.id_usuario WHERE $sWhere";
+
+
+		$datos = $this->ejecutarConsulta($consulta_datos);
+		$datos = $datos->fetchAll();
+
+		$total = $this->ejecutarConsulta($consulta_total);
+		$total = (int) $total->fetchColumn();
+
+		$numeroPaginas = ceil($total / $registros);
+
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+			foreach ($datos as $rows) {
+				if ($rows["estatus"] == 0) {
+					$modalPago = '';
+				} else {
+					$modalPago = 'data-target="modal-pago-venta"';
+				}
+				if ($rows['estatus_pago'] == 0) {
+					$estatus_pago = '<button class="button is-danger is-light js-modal-trigger" ' . $modalPago . ' onclick="establecerFormaPago(' . $rows['forma_pago'] . ',' . $rows['total'] . ',' . $rows['codigo'] . ',' . $rows['estatus'] . ')">Sin Pagar</button>';
+					$disabled = "";
+				} else {
+					$estatus_pago = '<button class="button is-success" style="margin-right:10px;margin-top:5px">Pagado</button>';
+					$disabled = "display:none";
+				}
+				switch ($rows['estatus']) {
+					case '0':
+						$estatus = '<button class="button is-danger" >Cancelado</button>';
+
+						break;
+					case '1':
+						$estatus = '<button class="button is-info  " onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'2\',' . $rows['estatus_pago'] . ')">Recibido</button>';
+
+						break;
+					case '2':
+						$estatus = '<button class="button is-warning" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'3\',' . $rows['estatus_pago'] . ')">En Preparación</button>';
+
+						break;
+					case '3':
+						$estatus = '<button class="button is-primary" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'4\',' . $rows['estatus_pago'] . ')">Enviado</button>';
+
+						break;
+					case '4':
+						$estatus = '<button class="button is-success">Entregado</button>';
+
+						break;
+				}
+
+				$tabla .= '<div class="card  pb-4">
+							<header class="card-header" style="background:#B99654;color:#ffffff">
+							 <p class="card-header-title"><strong style="color:#ffffff">' . $rows['codigo'] . '</strong></p>
+									  <p class="card-header-title"><strong style="color:#ffffff">' . $rows['fecha_registro'] . '</strong></p>
+									 	' . $estatus_pago . '
+
+							</header>
+							<div class="card-content">
+								<div class="content">
+									<div class="columns">
+										<div class="column">
+												<div class="columns">
+												<label><strong>Cliente:</strong></label>
+												</div>
+												<div class="columns">
+												' . $rows['nombreCliente'] . '
+												 </div>
+										</div>
+									
+										 <div class="column">
+												<div class="columns">
+												<label><strong>Precio:</strong></label>
+												</div>
+												<div class="columns">
+												' . MONEDA_SIMBOLO . " " . number_format($rows['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+												 </div>
+										</div>
+										<div class="column">
+												<div class="columns">
+												<label><strong>Existencia:</strong></label>
+												</div>
+												<div class="columns">
+												' . $rows['stock_total'] . '
+												</div>
+										</div>
+											<div class="column">
+												<div class="columns">
+												<label><strong>Categoria:</strong></label>
+												</div>
+												<div class="columns">
+												' . $rows['categoria'] . '
+												</div>
+										</div>
+										  
+									</div>
+									
+									
+								</div>
+							</div>
+							<footer class="card-footer">
+									<div class="columns">
+										<div class="column is-full">
+											<div class=" card-footer-item">
+													<div class="columns">
+														<div class="column">
+															<a href="' . APP_URL . 'productPhoto/' . $rows['cid_producto'] . '/" class="button is-info is-rounded is-small">
+																<i class="far fa-image fa-fw"></i> Imagen
+															</a>
+														</div>
+														<div class="column">
+															<a href="' . APP_URL . 'productUpdate/' . $rows['cid_producto'] . '/" class="button is-success is-rounded is-small">
+																<i class="fas fa-edit fa-fw"></i> Actualizar
+															</a>
+														</div>
+													</div>
+
+											</div>
+										</div>
+										<div class="column is-full">
+												<div class=" card-footer-item">
+													<div class="columns">
+															<div class="column">
+																<button class="button is-warning is-rounded is-small"  onclick="entradaInventario(\'' . $rows["cid_producto"] . '\')">
+																<i class="fas fa-boxes fa-fw"></i> Abastecer
+															</button>
+															</div>
+															<div class="column">
+																	<button class="button is-danger is-rounded is-small js-modal-trigger"  data-target="modal-salida-inventario" onclick="salidaInventario(\'' . $rows["cid_producto"] . '\')">
+																<i class="fas fa-recycle fa-fw"></i> Desechar
+															</button>
+															</div>
+														</div>
+
+												</div>
+
+										</div>
+									</div>
+
+							</footer>
+							</div>
+								<hr>';
+				$contador++;
+			}
+			$pag_final = $contador - 1;
+		} else {
+			if ($total >= 1) {
+				$tabla .= '
+						<tr class="has-text-centered" >
+			                <td colspan="5">
+			                    <a href="' . $url . '1/" class="button is-link is-rounded is-small mt-4 mb-4">
+			                        Haga clic acá para recargar el listado
+			                    </a>
+			                </td>
+			            </tr>
+					';
+			} else {
+				$tabla .= '
+							<article class="message is-warning mt-4 mb-4">
+				 <div class="message-header">
+					<p></p>
+				 </div>
+				<div class="message-body has-text-centered">
+					<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+					No hay Productos Registrados Actualmente
+				</div>
+			</article>
+					';
+			}
+		}
+
+
+
+		### Paginacion ###
+		if ($total > 0 && $pagina <= $numeroPaginas) {
+			$tabla .= '<p class="has-text-right">Mostrando productos <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+
+			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
+		}
+
+		return $tabla;
+	}
 	public function listarVentaControlador($pagina, $registros, $url, $busqueda)
 	{
 

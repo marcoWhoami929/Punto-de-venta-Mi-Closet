@@ -19,6 +19,17 @@
 			</div>
 		</div>
 		<div class="column">
+			<label>Filtro Estatus</label><br>
+			<div class="select">
+				<select id="estatus" onchange="listarProductos()">
+					<option value="">Todos</option>
+					<option value="1">Activo</option>
+					<option value="0">Inactivo</option>
+
+				</select>
+			</div>
+		</div>
+		<div class="column">
 			<label>Mostrar</label><br>
 			<div class="select">
 				<select id="per_page" onchange="listarProductos()">
@@ -33,9 +44,10 @@
 			<label>Ordenar por</label><br>
 			<div class="select">
 				<select id="campoOrden" onchange="listarProductos()">
-					<option value="nombre">Nombre</option>
-					<option value="cid_producto">Id Producto</option>
-					<option value="precio_venta">Precio</option>
+					<option value="prod.nombre">Nombre</option>
+					<option value="inven.stock_total">Stock</option>
+					<option value="prod.cid_producto">Id Producto</option>
+					<option value="prod.precio_venta">Precio</option>
 
 				</select>
 			</div>

@@ -2,39 +2,111 @@
 	<h1 class="title">Ventas</h1>
 	<h2 class="subtitle"><i class="fas fa-clipboard-list fa-fw"></i> &nbsp; Lista de Ventas</h2>
 </div>
-<div class="container is-fluid pb-6">
 
-	<div class="form-rest mb-6 mt-6"></div>
+<div class="container is-fluid pb-2 pt-2">
 
-	<?php
-
-	use app\controllers\saleController;
-
-	$insVenta = new saleController();
-
-	echo $insVenta->listarVentaControlador($url[1], 15, $url[0], "");
-
-	include "./app/views/inc/print_invoice_script.php";
-	?>
-</div>
-<div class="modal fade" id="modal-pago-venta" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-	<div class="modal-background"></div>
-	<div class="modal-card">
-		<header class="modal-card-head">
-			<p class="modal-card-title is-uppercase"><i class="fas fa-cashier"></i> &nbsp; Confirmar Pago</p>
-			<button class="delete" aria-label="close"></button>
-		</header>
-		<section class="modal-card-body">
-			<div class="field mt-6 mb-6">
-				<label class="label">Nombre, marca, modelo, código</label>
-				<div class="control">
-					<input class="input" type="text" pattern="[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ ]{1,30}" placeholder="Ingresa el nombre del producto,marca o código del producto" name="input_codigo" autofocus="autofocus" onkeyup="buscar_codigo()" id="input_codigo" maxlength="30">
-				</div>
+	<div class="columns">
+		<div class="column is-half">
+			<label></label><br>
+			<div class="field is-grouped">
+				<input type="hidden" id="pagina" value="<?= $url[1] ?>">
+				<input type="hidden" id="url" value="<?= $url[0] ?>">
+				<p class="control is-expanded">
+					<input class="input is-rounded" type="text" id="busqueda" placeholder="¿Qué venta estás buscando?" onkeyup="listarVentas()">
+				</p>
+				<p class="control">
+					<button class="button is-info" type="button" onclick="listarVentas()">Actualizar</button>
+				</p>
 			</div>
+		</div>
+		<div class="column">
+			<label>Mostrar</label><br>
+			<div class="select">
+				<select id="per_page" onchange="listarVentas()">
+					<option value="15">15</option>
+					<option value="50">50</option>
+					<option value="100">100</option>
 
-			<p class="has-text-centered">
-				<button type="button" class="button is-link is-light" onclick="buscar_codigo()"><i class="fas fa-search"></i> &nbsp; Buscar</button>
-			</p>
-		</section>
+				</select>
+			</div>
+		</div>
+		<div class="column">
+			<label>Filtro Tipo Venta</label><br>
+			<div class="select">
+				<select id="tipo_venta" onchange="listarVentas()">
+					<option value="">Todos</option>
+					<option value="directa">Directa</option>
+					<option value="nota">Nota</option>
+
+				</select>
+			</div>
+		</div>
+		<div class="column">
+			<label>Filtro Forma Pago</label><br>
+			<div class="select">
+				<select id="forma_pago" onchange="listarVentas()">
+					<option value="">Todos</option>
+					<option value="1">Efectivo</option>
+					<option value="2">Transferencia Electrónica</option>
+					<option value="3">Tarjeta de Crédito</option>
+					<option value="4">Tarjeta de Débito</option>
+
+				</select>
+			</div>
+		</div>
+
+	</div>
+	<div class="columns">
+
+		<div class="column">
+			<label>Filtro Pago</label><br>
+			<div class="select">
+				<select id="estatus_pago" onchange="listarVentas()">
+					<option value="">Todos</option>
+					<option value="1">Pagado</option>
+					<option value="0">Sin Pagar</option>
+
+				</select>
+			</div>
+		</div>
+		<div class="column">
+			<label>Filtro Tipo Entrega</label><br>
+			<div class="select">
+				<select id="tipo_entrega" onchange="listarVentas()">
+					<option value="">Todos</option>
+					<option value="recoleccion">Recolección</option>
+					<option value="envio">Envio</option>
+
+				</select>
+			</div>
+		</div>
+		<div class="column">
+			<label>Ordenar por</label><br>
+			<div class="select">
+				<select id="campoOrden" onchange="listarVentas()">
+					<option value="codigo">Codigo</option>
+					<option value="total">Total</option>
+					<option value="fecha_registro">Fecha Registro</option>
+
+				</select>
+			</div>
+		</div>
+		<div class="column">
+			<label>Orden</label><br>
+			<div class="select">
+				<select id="orden" onchange="listarVentas()">
+					<option value="asc">Asc</option>
+					<option value="desc">Desc</option>
+
+				</select>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="container is-fluid pb-2 pt-2 ">
+	<div class="columns">
+		<div class="column div-ventas">
+
+		</div>
 	</div>
 </div>

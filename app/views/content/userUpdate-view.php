@@ -100,6 +100,25 @@
 						</select>
 					</div>
 				</div>
+				<div class="column">
+					<div class="control">
+						<label>Estatus Usuario</label><br>
+						<div class="checkboxes ">
+							<label class="checkbox">
+								<?php
+								if ($datos['estatus'] == 0) {
+									$checked = '';
+								} else {
+									$checked = 'checked';
+								}
+								?>
+								<input type="checkbox" name="estatus" id="estatus" <?= $checked ?> />
+
+							</label>
+						</div>
+
+					</div>
+				</div>
 
 			</div>
 
@@ -139,6 +158,7 @@
 						<input class="input" type="password" name="administrador_clave" pattern="[a-zA-Z0-9$@.-]{7,100}" maxlength="100" required>
 					</div>
 				</div>
+
 			</div>
 			<p class="has-text-centered">
 				<button type="submit" class="button is-success is-rounded"><i class="fas fa-sync-alt"></i> &nbsp; Actualizar</button>
