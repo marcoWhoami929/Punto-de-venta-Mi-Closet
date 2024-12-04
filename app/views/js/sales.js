@@ -297,6 +297,7 @@ function actualizarEstatus(tabla, id, estatus, estatus_pago) {
 }
 
 function establecerFormaPago(formaPago, total_pago, codigo_venta, estatus) {
+  $("#btn-modal-pago").click();
   localStorage.setItem("codigo_venta", codigo_venta);
   $("#forma_pago_venta").val(formaPago);
   $("#total_pagar_venta").val(parseFloat(total_pago).toFixed(2));

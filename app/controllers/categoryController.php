@@ -90,6 +90,129 @@ class categoryController extends mainModel
 
 
 	/*----------  Controlador listar categoria  ----------*/
+
+	public function listarCategoriasControlador($datos)
+	{
+
+		$pagina = $this->limpiarCadena($datos["page"]);
+		$registros = $this->limpiarCadena($datos["per_page"]);
+		$campoOrden = $this->limpiarCadena($datos["campoOrden"]);
+		$orden = $this->limpiarCadena($datos["orden"]);
+
+		$url = $this->limpiarCadena($datos["url"]);
+		$url = APP_URL . $url . "/";
+
+		$sWhere = "id_categoria !='0'";
+		$busqueda = $this->limpiarCadena($datos["busqueda"]);
+		if (isset($busqueda) && $busqueda != "") {
+			$sWhere .= " AND nombre LIKE '%$busqueda%' OR ubicacion LIKE '%$busqueda%'";
+		}
+		$tabla = "";
+
+		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+
+		$consulta_datos = "SELECT * FROM categoria WHERE $sWhere ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+		$consulta_total = "SELECT COUNT(id_categoria) FROM categoria WHERE $sWhere ";
+
+		$datos = $this->ejecutarConsulta($consulta_datos);
+		$datos = $datos->fetchAll();
+
+		$total = $this->ejecutarConsulta($consulta_total);
+		$total = (int) $total->fetchColumn();
+
+		$numeroPaginas = ceil($total / $registros);
+
+
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+
+			$tabla .= '
+			<div class="table-container">
+			<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+				<thead style="background:#B99654;color:#ffffff;">
+					<tr>
+						<th class="has-text-centered" style="color:#ffffff">#</th>
+						<th class="has-text-centered" style="color:#ffffff">Nombre</th>
+						<th class="has-text-centered" style="color:#ffffff">Ubicacion</th>
+						<th class="has-text-centered" style="color:#ffffff">Productos</th>
+						<th class="has-text-centered" style="color:#ffffff">Actualizar</th>
+						<th class="has-text-centered" style="color:#ffffff">Eliminar</th>
+					</tr>
+				</thead>
+				<tbody>
+		';
+
+			foreach ($datos as $rows) {
+				$tabla .= '
+						<tr class="has-text-centered" >
+							<td>' . $contador . '</td>
+							<td>' . $rows['nombre'] . '</td>
+							<td>' . $rows['ubicacion'] . '</td>
+							<td>
+			                    <a href="' . APP_URL . 'productCategory/' . $rows['id_categoria'] . '/" class="button is-info is-rounded is-small">
+			                    	<i class="fas fa-boxes fa-fw"></i>
+			                    </a>
+			                </td>
+			                <td>
+			                    <a href="' . APP_URL . 'categoryUpdate/' . $rows['id_categoria'] . '/" class="button is-success is-rounded is-small">
+			                    	<i class="fas fa-sync fa-fw"></i>
+			                    </a>
+			                </td>
+			                <td>
+			                	<form class="FormularioAjax" action="' . APP_URL . 'app/ajax/categoriaAjax.php" method="POST" autocomplete="off" >
+
+			                		<input type="hidden" name="modulo_categoria" value="eliminar">
+			                		<input type="hidden" name="id_categoria" value="' . $rows['id_categoria'] . '">
+
+			                    	<button type="submit" class="button is-danger is-rounded is-small">
+			                    		<i class="far fa-trash-alt fa-fw"></i>
+			                    	</button>
+			                    </form>
+			                </td>
+						</tr>
+					';
+				$contador++;
+			}
+			$pag_final = $contador - 1;
+		} else {
+			if ($total >= 1) {
+				$tabla .= '
+						<tr class="has-text-centered" >
+			                <td colspan="5">
+			                    <a href="' . $url . '1/" class="button is-link is-rounded is-small mt-4 mb-4">
+			                        Haga clic acá para recargar el listado
+			                    </a>
+			                </td>
+			            </tr>
+					';
+			} else {
+				$tabla .= '
+				<article class="message is-warning mt-4 mb-4">
+		 <div class="message-header">
+			<p></p>
+		 </div>
+		<div class="message-body has-text-centered">
+			<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+			No hay resultados de la busqueda.
+		</div>
+	</article>';
+			}
+		}
+
+		$tabla .= '</tbody></table></div>';
+
+		### Paginacion ###
+		if ($total > 0 && $pagina <= $numeroPaginas) {
+			$tabla .= '<p class="has-text-right">Mostrando categorias <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+
+			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
+		}
+
+		return $tabla;
+	}
 	public function listarCategoriaControlador($pagina, $registros, $url, $busqueda)
 	{
 

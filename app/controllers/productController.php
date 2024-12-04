@@ -1598,4 +1598,167 @@ class productController extends mainModel
 		return json_encode($alerta);
 		exit();
 	}
+	/*******************KARDEX INVENTARIO */
+	public function listarKardexInventarioControlador($datos)
+	{
+
+		$pagina = $this->limpiarCadena($datos["page"]);
+		$registros = $this->limpiarCadena($datos["per_page"]);
+		$campoOrden = $this->limpiarCadena($datos["campoOrden"]);
+		$orden = $this->limpiarCadena($datos["orden"]);
+		$estatus = $this->limpiarCadena($datos["stock"]);
+
+		$url = $this->limpiarCadena($datos["url"]);
+		$url = APP_URL . $url . "/";
+
+		$sWhere = "prod.id_producto !='0'";
+		if ($datos["stock"] != "") {
+			$sWhere .= " and inv.stock_total = '" . $estatus . "'";
+		}
+		$busqueda = $this->limpiarCadena($datos["busqueda"]);
+		if (isset($busqueda) && $busqueda != "") {
+			$sWhere .= " AND prod.nombre LIKE '%$busqueda%' OR prod.codigo LIKE '%$busqueda%'";
+		}
+		$tabla = "";
+		$campos = "prod.cid_producto,prod.nombre,prod.codigo, SUM(IF(mov.tipo_movimiento = 'entrada',cantidad,0)) as 'entradas',SUM(IF(mov.tipo_movimiento = 'salida',cantidad,0)) as 'salidas', inv.stock_total as 'existencias',inv.stock_minimo,inv.stock_maximo,((inv.stock_maximo-inv.stock_minimo)/2) as media,IF(inv.stock_total=0,'0',IF(inv.stock_total<inv.stock_minimo,'1',IF(inv.stock_total>=inv.stock_minimo and inv.stock_total <= ((inv.stock_maximo-inv.stock_minimo)/2),'2',IF(inv.stock_total >((inv.stock_maximo-inv.stock_minimo)/2),'3','' )))) as estatus";
+		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+
+		$consulta_datos = "SELECT $campos FROM producto as prod LEFT OUTER JOIN movimiento_inventario as mov ON prod.cid_producto = mov.id_producto LEFT OUTER JOIN inventario as inv ON prod.cid_producto = inv.id_producto WHERE $sWhere GROUP by prod.cid_producto,prod.nombre,prod.codigo ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+		$consulta_total = "SELECT COUNT(prod.cid_producto) FROM producto as prod WHERE $sWhere ";
+
+		$datos = $this->ejecutarConsulta($consulta_datos);
+		$datos = $datos->fetchAll();
+
+		$total = $this->ejecutarConsulta($consulta_total);
+		$total = (int) $total->fetchColumn();
+
+		$numeroPaginas = ceil($total / $registros);
+
+
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+
+			$tabla .= '
+			<div class="table-container">
+			<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+				<thead style="background:#B99654;color:#ffffff;">
+					<tr>
+						<th style="color:#ffffff">#</th>
+						<th style="color:#ffffff">Producto</th>
+						<th style="color:#ffffff">Código</th>
+						<th class="has-text-centered" style="color:#ffffff">Entradas</th>
+						<th class="has-text-centered"style="color:#ffffff">Salidas</th>
+						<th class="has-text-centered" style="color:#ffffff">Existencias</th>
+						<th class="has-text-centered"style="color:#ffffff">Stock Mínimo</th>
+						<th class="has-text-centered"style="color:#ffffff">Stock Máximo</th>
+						<th class="has-text-centered"style="color:#ffffff"></th>
+						<th class="has-text-centered"style="color:#ffffff">Nivel de Stock</th>
+					</tr>
+				</thead>
+				<tbody>
+		';
+			$totalEntradas = 0;
+			$totalSalidas = 0;
+			$totalExistencias = 0;
+
+			foreach ($datos as $rows) {
+
+				switch ($rows['estatus']) {
+					case '0':
+						$colorProgress = 'is-danger';
+						$color = "#ffa3a3";
+						break;
+					case '1':
+						$colorProgress = 'is-warning';
+						$color = "#fffa91";
+						break;
+					case '2':
+						$colorProgress = 'is-info';
+						$color = "";
+						break;
+					case '3':
+						$colorProgress = 'is-success';
+						$color = "";
+						break;
+				}
+
+
+				$tabla .= '
+						<tr style="background:' . $color . '">
+							<td>' . $contador . '</td>
+							<td><strong>' . $rows['nombre'] . '</strong></td>
+							<td><strong>' . $rows['codigo'] . '</strong></td>
+							<td class="has-text-centered">' . $rows['entradas'] . '</td>
+							<td class="has-text-centered">' . $rows['salidas'] . '</td>
+							<td class="has-text-centered">' . $rows['existencias'] . '</td>
+							<td class="has-text-centered">' . $rows['stock_minimo'] . '</td>
+							<td class="has-text-centered">' . $rows['stock_maximo'] . '</td>
+							<td>
+							
+							 <a href="' . APP_URL . 'kardexDetail/' . $rows['cid_producto'] . '/" class="button is-link is-rounded is-medium" title="Detalle Movimientos Producto ' . $rows['codigo'] . '" ><i class="fas fa-eye"></i></a>
+							</td>
+							<td style="width:350px"><progress class="progress ' . $colorProgress . '" value="' . $rows['existencias'] . '" min="0" max="' . $rows['stock_maximo'] . '"></progress></td>
+							
+						</tr>
+					';
+				$totalEntradas += $rows['entradas'];
+				$totalSalidas += $rows['salidas'];
+				$totalExistencias += $rows['existencias'];
+				$contador++;
+			}
+			$tabla .= '
+						<tr>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td class="has-text-right"><strong>' . $totalEntradas . '</strong></td>
+							<td class="has-text-right"><strong>' . $totalSalidas . '</strong></td>
+							<td class="has-text-right"><strong>' . $totalExistencias . '</strong></td>
+							<td class="has-text-right"></td>
+							<td class="has-text-centered"></td>
+							<td style="width:50px"></td>
+							<td style="width:350px"></td>
+							
+						</tr>
+					';
+			$pag_final = $contador - 1;
+		} else {
+			if ($total >= 1) {
+				$tabla .= '
+						<tr class="has-text-centered" >
+			                <td colspan="5">
+			                    <a href="' . $url . '1/" class="button is-link is-rounded is-small mt-4 mb-4">
+			                        Haga clic acá para recargar el listado
+			                    </a>
+			                </td>
+			            </tr>
+					';
+			} else {
+				$tabla .= '
+				<article class="message is-warning mt-4 mb-4">
+		 <div class="message-header">
+			<p></p>
+		 </div>
+		<div class="message-body has-text-centered">
+			<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+			No hay resultados de la busqueda.
+		</div>
+	</article>';
+			}
+		}
+
+		$tabla .= '</tbody></table></div>';
+
+		### Paginacion ###
+		if ($total > 0 && $pagina <= $numeroPaginas) {
+			$tabla .= '<p class="has-text-right">Mostrando categorias <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+
+			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
+		}
+
+		return $tabla;
+	}
 }

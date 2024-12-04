@@ -122,8 +122,8 @@
 				</div>
 
 				<div class="full-width sale-details text-condensedLight">
-					<div class="has-text-weight-bold">Código de venta</div>
-					<span class="has-text-link"><?php echo $datos_venta['codigo']; ?></span>
+					<div class="has-text-weight-bold">Código de Nota</div>
+					<span class="has-text-link"><?php echo $datos_venta['codigo_nota']; ?></span>
 				</div>
 
 			</div>

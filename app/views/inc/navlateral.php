@@ -313,7 +313,7 @@ if ($_SESSION['perfil'] == 'Administrador') {
 						</li>
 
 						<li class="full-width">
-							<a href="<?php echo APP_URL; ?>saleSearch/" class="full-width">
+							<a href="<?php echo APP_URL; ?>saleList/" class="full-width">
 								<div class="navLateral-body-cl">
 									<i class="fas fa-search-dollar fa-fw"></i>
 								</div>

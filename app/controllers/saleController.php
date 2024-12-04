@@ -1105,10 +1105,10 @@ class saleController extends mainModel
 		}
 
 		if (isset($busqueda) && $busqueda != "") {
-			$sWhere .= " AND venta.codigo LIKE '%$busqueda%' OR venta.codigo_nota LIKE '%$busqueda%'";
+			$sWhere .= " AND venta.codigo LIKE '%$busqueda%' OR venta.codigo_nota LIKE '%$busqueda%' OR usuario.nombre LIKE '%$busqueda%' OR cliente.nombre LIKE '%$busqueda%'";
 		}
 
-		$campos = "venta.forma_pago,venta.tipo_entrega,venta.estatus_pago,venta.id_venta,venta.estatus,venta.subtotal,venta.descuento,venta.tipo_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre as 'nombreVendedor',cliente.id_cliente,cliente.nombre as 'nombreCliente',cliente.apellidos";
+		$campos = "venta.pagado,venta.forma_pago,venta.tipo_entrega,venta.estatus_pago,venta.id_venta,venta.estatus,venta.subtotal,venta.descuento,venta.tipo_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.fecha_registro,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre as 'nombreVendedor',cliente.id_cliente,cliente.nombre as 'nombreCliente',cliente.apellidos";
 		$tabla = "";
 
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
@@ -1131,13 +1131,9 @@ class saleController extends mainModel
 			$contador = $inicio + 1;
 			$pag_inicio = $inicio + 1;
 			foreach ($datos as $rows) {
-				if ($rows["estatus"] == 0) {
-					$modalPago = '';
-				} else {
-					$modalPago = 'data-target="modal-pago-venta"';
-				}
+
 				if ($rows['estatus_pago'] == 0) {
-					$estatus_pago = '<button class="button is-danger is-light js-modal-trigger" ' . $modalPago . ' onclick="establecerFormaPago(' . $rows['forma_pago'] . ',' . $rows['total'] . ',' . $rows['codigo'] . ',' . $rows['estatus'] . ')">Sin Pagar</button>';
+					$estatus_pago = '<button class="button is-danger is-light" style="margin-right:10px;margin-top:5px" onclick="establecerFormaPago(' . $rows['forma_pago'] . ',' . $rows['total'] . ',\'' . $rows["codigo"] . '\',' . $rows['estatus'] . ')">Sin Pagar</button>';
 					$disabled = "";
 				} else {
 					$estatus_pago = '<button class="button is-success" style="margin-right:10px;margin-top:5px">Pagado</button>';
@@ -1149,29 +1145,34 @@ class saleController extends mainModel
 
 						break;
 					case '1':
-						$estatus = '<button class="button is-info  " onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'2\',' . $rows['estatus_pago'] . ')">Recibido</button>';
+						$estatus = '<button class="button is-info" style="background:#ef7216;margin-right:10px;margin-top:5px" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'2\',' . $rows['estatus_pago'] . ')">Recibido</button>';
 
 						break;
 					case '2':
-						$estatus = '<button class="button is-warning" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'3\',' . $rows['estatus_pago'] . ')">En Preparación</button>';
+						$estatus = '<button class="button is-warning" style="margin-right:10px;margin-top:5px" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'3\',' . $rows['estatus_pago'] . ')">En Preparación</button>';
 
 						break;
 					case '3':
-						$estatus = '<button class="button is-primary" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'4\',' . $rows['estatus_pago'] . ')">Enviado</button>';
+						$estatus = '<button class="button is-primary" style="margin-right:10px;margin-top:5px" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'4\',' . $rows['estatus_pago'] . ')">Enviado</button>';
 
 						break;
 					case '4':
-						$estatus = '<button class="button is-success">Entregado</button>';
+						$estatus = '<button class="button is-success" style="margin-right:10px;margin-top:5px">Entregado</button>';
 
 						break;
 				}
 
 				$tabla .= '<div class="card  pb-4">
 							<header class="card-header" style="background:#B99654;color:#ffffff">
-							 <p class="card-header-title"><strong style="color:#ffffff">' . $rows['codigo'] . '</strong></p>
-									  <p class="card-header-title"><strong style="color:#ffffff">' . $rows['fecha_registro'] . '</strong></p>
-									 	' . $estatus_pago . '
-
+							
+								 <p class="card-header-title"><strong style="color:#ffffff">' . $rows['codigo'] . '</strong></p>
+								
+								
+								 <p class="card-header-title"><strong style="color:#ffffff">' . $rows['fecha_registro'] . '</strong></p>
+								
+										' . $estatus_pago . '
+								
+							
 							</header>
 							<div class="card-content">
 								<div class="content">
@@ -1181,34 +1182,53 @@ class saleController extends mainModel
 												<label><strong>Cliente:</strong></label>
 												</div>
 												<div class="columns">
-												' . $rows['nombreCliente'] . '
-												 </div>
-										</div>
-									
-										 <div class="column">
-												<div class="columns">
-												<label><strong>Precio:</strong></label>
-												</div>
-												<div class="columns">
-												' . MONEDA_SIMBOLO . " " . number_format($rows['precio_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+												' . $rows['nombreCliente'] . " " . $rows['apellidos'] . '
 												 </div>
 										</div>
 										<div class="column">
 												<div class="columns">
-												<label><strong>Existencia:</strong></label>
+												<label><strong>Vendedor:</strong></label>
 												</div>
 												<div class="columns">
-												' . $rows['stock_total'] . '
+												' . strtoupper($rows['nombreVendedor']) . '
 												</div>
 										</div>
-											<div class="column">
+										<div class="column">
 												<div class="columns">
-												<label><strong>Categoria:</strong></label>
+												<label><strong>Tipo Venta:</strong></label>
 												</div>
 												<div class="columns">
-												' . $rows['categoria'] . '
+												' . strtoupper($rows['tipo_venta']) . '
 												</div>
 										</div>
+										<div class="column">
+												<div class="columns">
+												<label><strong>Tipo Entrega:</strong></label>
+												</div>
+												<div class="columns">
+												' . strtoupper($rows['tipo_entrega']) . '
+												</div>
+										</div>
+										 <div class="column">
+												<div class="columns">
+												<label><strong>Total:</strong></label>
+												</div>
+												<div class="columns">
+												' . MONEDA_SIMBOLO . " " . number_format($rows['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+												 </div>
+										</div>
+										<div class="column">
+											<div class="columns">
+												<label><strong>Estatus Venta:</strong></label>
+												</div>
+												<div class="columns">
+												' . $estatus . '
+												 </div>
+											
+															
+										</div>
+										
+									
 										  
 									</div>
 									
@@ -1221,15 +1241,20 @@ class saleController extends mainModel
 											<div class=" card-footer-item">
 													<div class="columns">
 														<div class="column">
-															<a href="' . APP_URL . 'productPhoto/' . $rows['cid_producto'] . '/" class="button is-info is-rounded is-small">
-																<i class="far fa-image fa-fw"></i> Imagen
-															</a>
+																<button type="button" class="button is-link is-outlined is-rounded is-medium btn-sale-options" onclick="print_invoice(\'' . APP_URL . 'app/pdf/invoice.php?code=' . $rows['codigo'] . '\')" title="Imprimir nota Nro. ' . $rows['id_venta'] . '" >
+																	<i class="fas fa-file-invoice-dollar fa-fw"></i>
+																</button>
 														</div>
 														<div class="column">
-															<a href="' . APP_URL . 'productUpdate/' . $rows['cid_producto'] . '/" class="button is-success is-rounded is-small">
-																<i class="fas fa-edit fa-fw"></i> Actualizar
-															</a>
+															 <button type="button" class="button is-link is-outlined is-rounded is-medium btn-sale-options" onclick="print_ticket(\'' . APP_URL . 'app/pdf/ticket.php?code=' . $rows['codigo'] . '\')" title="Imprimir ticket Nro. ' . $rows['id_venta'] . '" >
+																<i class="fas fa-receipt fa-fw"></i>
+															</button>
 														</div>
+															<div class="column">
+																 <a href="' . APP_URL . 'saleDetail/' . $rows['codigo'] . '/" class="button is-link is-rounded is-medium" title="Informacion de venta Nro. ' . $rows['id_venta'] . '" >
+																	<i class="fas fa-shopping-bag fa-fw"></i>
+																</a>
+															</div>
 													</div>
 
 											</div>
@@ -1237,16 +1262,15 @@ class saleController extends mainModel
 										<div class="column is-full">
 												<div class=" card-footer-item">
 													<div class="columns">
+														
 															<div class="column">
-																<button class="button is-warning is-rounded is-small"  onclick="entradaInventario(\'' . $rows["cid_producto"] . '\')">
-																<i class="fas fa-boxes fa-fw"></i> Abastecer
-															</button>
+																	<button type="button" class="button is-danger is-rounded is-medium" onclick="cancelarVenta(\'' . $rows['id_venta'] . '\')" style="' . $disabled . '" title="Cancelar venta Nro. ' . $rows['id_venta'] . '" >
+																		<i class="fas fa-times fa-fw"></i>
+																	</button>
+															
 															</div>
-															<div class="column">
-																	<button class="button is-danger is-rounded is-small js-modal-trigger"  data-target="modal-salida-inventario" onclick="salidaInventario(\'' . $rows["cid_producto"] . '\')">
-																<i class="fas fa-recycle fa-fw"></i> Desechar
-															</button>
-															</div>
+															
+															
 														</div>
 
 												</div>
@@ -1279,7 +1303,7 @@ class saleController extends mainModel
 				 </div>
 				<div class="message-body has-text-centered">
 					<i class="fas fa-exclamation-triangle fa-5x"></i><br>
-					No hay Productos Registrados Actualmente
+					No hay resultados de la busqueda.
 				</div>
 			</article>
 					';
@@ -1482,7 +1506,7 @@ class saleController extends mainModel
 
 
 	/*----------  Controlador eliminar venta  ----------*/
-	public function eliminarVentaControlador()
+	public function cancelarVentaControlador()
 	{
 
 		$id = $this->limpiarCadena($_POST['id_venta']);

@@ -644,7 +644,7 @@ class cashierController extends mainModel
 		$url = APP_URL . $url . "/";
 
 		$sWhere = "id_caja!='0'";
-
+		$busqueda = $this->limpiarCadena($datos["busqueda"]);
 		if (isset($busqueda) && $busqueda != "") {
 			$sWhere .= " AND numero LIKE '%$busqueda%' OR nombre LIKE '%$busqueda%'";
 		}
@@ -664,23 +664,25 @@ class cashierController extends mainModel
 
 		$numeroPaginas = ceil($total / $registros);
 
-		$tabla .= '
-		        <div class="table-container">
-		        <table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
-		            <thead>
-		                <tr>
-		                    <th class="has-text-centered is-info">Numero</th>
-		                    <th class="has-text-centered is-info">Nombre</th>
-		                    <th class="has-text-centered is-info">Actualizar</th>
-		                    <th class="has-text-centered is-info">Eliminar</th>
-		                </tr>
-		            </thead>
-		            <tbody>
-		    ';
 
 		if ($total >= 1 && $pagina <= $numeroPaginas) {
 			$contador = $inicio + 1;
 			$pag_inicio = $inicio + 1;
+
+
+			$tabla .= '
+					<div class="table-container">
+					<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+						<thead>
+							<tr>
+								<th class="has-text-centered is-info">Numero</th>
+								<th class="has-text-centered is-info">Nombre</th>
+								<th class="has-text-centered is-info">Actualizar</th>
+								<th class="has-text-centered is-info">Eliminar</th>
+							</tr>
+						</thead>
+						<tbody>
+				';
 			foreach ($datos as $rows) {
 				$tabla .= '
 						<tr class="has-text-centered" >
@@ -717,12 +719,15 @@ class cashierController extends mainModel
 					';
 			} else {
 				$tabla .= '
-						<tr class="has-text-centered" >
-			                <td colspan="5">
-			                    No hay registros en el sistema
-			                </td>
-			            </tr>
-					';
+							<article class="message is-warning mt-4 mb-4">
+					 <div class="message-header">
+					    <p></p>
+					 </div>
+				    <div class="message-body has-text-centered">
+				    	<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+						No hay resultados de la busqueda.
+				    </div>
+				</article>';
 			}
 		}
 

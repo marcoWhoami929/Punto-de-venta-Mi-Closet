@@ -23,10 +23,25 @@
             if ($datos_categorias->rowCount() > 0) {
                 $datos_categorias = $datos_categorias->fetchAll();
                 foreach ($datos_categorias as $row) {
-                    echo '<a href="' . APP_URL . $url[0] . '/' . $row['id_categoria'] . '/" class="button is-link is-inverted is-fullwidth">' . $row['nombre'] . '</a>';
+                    //echo '<a href="' . APP_URL . $url[0] . '/' . $row['id_categoria'] . '/" class="button is-link is-inverted is-fullwidth">' . $row['nombre'] . '</a>';
+                    echo '<a href="' . APP_URL . $url[0] . '/' . $row['id_categoria'] . '/"><article class="message is-link mb-2">
+                        <div class="message-header">
+                            <p>' . $row['nombre'] . '</p>
+                         
+                        </div>
+
+                        </article></a>';
                 }
             } else {
-                echo '<p class="has-text-centered" >No hay categorías registradas</p>';
+                echo '<article class="message is-warning mt-4 mb-4">
+					 <div class="message-header">
+					    <p></p>
+					 </div>
+				    <div class="message-body has-text-centered">
+				    	<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+						No hay categorias registradas
+				    </div>
+				</article>';
             }
             ?>
         </div>

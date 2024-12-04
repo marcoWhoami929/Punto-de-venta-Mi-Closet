@@ -56,10 +56,7 @@
 
 	<div class="columns is-multiline">
 		<div class="column ">
-			<div class="card">
-				<div class="column div-cashier">
-
-				</div>
+			<div class="column div-cashier">
 
 			</div>
 		</div>

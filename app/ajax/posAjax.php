@@ -112,6 +112,37 @@ if (isset($_POST['modulo_pos'])) {
 
         echo $sales->listarVentasControlador($datos);
     }
+    if ($_POST['modulo_pos'] == "listarCategorias") {
+
+        $datos = array(
+            "busqueda" => $_POST["busqueda"],
+            "campoOrden" => $_POST["campoOrden"],
+            "orden" => $_POST["orden"],
+            "page" => $_POST["page"],
+            "per_page" => $_POST["per_page"],
+            "url" => $_POST["url"],
+        );
+
+        $category = new categoryController();
+
+        echo $category->listarCategoriasControlador($datos);
+    }
+    if ($_POST['modulo_pos'] == "listarKardex") {
+
+        $datos = array(
+            "busqueda" => $_POST["busqueda"],
+            "campoOrden" => $_POST["campoOrden"],
+            "orden" => $_POST["orden"],
+            "page" => $_POST["page"],
+            "per_page" => $_POST["per_page"],
+            "stock" => $_POST["stock"],
+            "url" => $_POST["url"],
+        );
+
+        $inventory = new productController();
+
+        echo $inventory->listarKardexInventarioControlador($datos);
+    }
 } else {
     session_destroy();
     header("Location: " . APP_URL . "login/");

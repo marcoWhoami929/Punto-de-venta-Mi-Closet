@@ -62,9 +62,9 @@ if (isset($_POST['modulo_venta'])) {
 		echo $insVenta->registrarVentaControlador();
 	}
 
-	/*--------- Eliminar venta ---------*/
-	if ($_POST['modulo_venta'] == "eliminar_venta") {
-		echo $insVenta->eliminarVentaControlador();
+	/*--------- Cancelar venta ---------*/
+	if ($_POST['modulo_venta'] == "cancelar_venta") {
+		echo $insVenta->cancelarVentaControlador();
 	}
 	/*--------- Actualizar Carrito venta ---------*/
 	if ($_POST['modulo_venta'] == "actualizar_carrito") {

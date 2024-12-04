@@ -385,7 +385,7 @@ class userController extends mainModel
 		$tabla .= '</tbody></table></div>';
 		### Paginacion ###
 		if ($total > 0 && $pagina <= $numeroPaginas) {
-			$tabla .= '<p class="has-text-right">Mostrando sesiones <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+			$tabla .= '<p class="has-text-right">Mostrando usuarios <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
 
 			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
 		}
@@ -493,12 +493,15 @@ class userController extends mainModel
 					';
 			} else {
 				$tabla .= '
-						<tr class="has-text-centered" >
-			                <td colspan="7">
-			                    No hay registros en el sistema
-			                </td>
-			            </tr>
-					';
+				<article class="message is-warning mt-4 mb-4">
+		 <div class="message-header">
+			<p></p>
+		 </div>
+		<div class="message-body has-text-centered">
+			<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+			No hay resultados de la busqueda.
+		</div>
+	</article>';
 			}
 		}
 

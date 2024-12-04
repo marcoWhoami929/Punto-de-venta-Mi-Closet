@@ -180,24 +180,25 @@ class clientController extends mainModel
 		$url = APP_URL . $url . "/";
 
 		$busqueda = $this->limpiarCadena($datos["busqueda"]);
-
-		$sWhere = "id_cliente!='1'";
+		$campos = "clien.tipo_cliente,clien.id_cliente,clien.nombre,clien.apellidos,clien.celular,ven.fecha_venta,MAX(ven.fecha_venta) as 'UltimaCompra',sum(ven.total) as 'Compras',sum(ven.pagado) as 'Pagado',sum(ven.pendiente) as 'Pendiente' ";
+		$sWhere = "clien.id_cliente !='0'";
 		if ($datos["estatus"] != "") {
-			$sWhere .= " and estatus = '" . $datos["estatus"] . "'";
+			$sWhere .= " and clien.estatus = '" . $datos["estatus"] . "'";
 		}
 		if (isset($busqueda) && $busqueda != "") {
-			$sWhere .= " and nombre LIKE '%$busqueda%' OR apellidos LIKE '%$busqueda%' OR email LIKE '%$busqueda%'";
+			$sWhere .= " and clien.nombre LIKE '%$busqueda%' OR clien.apellidos LIKE '%$busqueda%' OR clien.email LIKE '%$busqueda%'";
 		}
 
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
 		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
 
-		$consulta_datos = "SELECT * FROM cliente WHERE $sWhere ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+		$consulta_datos = "SELECT $campos FROM cliente as clien LEFT OUTER JOIN venta as ven ON clien.id_cliente = ven.id_cliente WHERE $sWhere GROUP by clien.id_cliente,clien.nombre,clien.apellidos,clien.celular ORDER BY $campoOrden $orden  LIMIT $inicio,$registros";
 
-		$consulta_total = "SELECT COUNT(id_cliente) FROM cliente WHERE $sWhere";
+		$consulta_total = "SELECT COUNT(id_cliente) FROM cliente as clien WHERE $sWhere ";
 
 		$datos = $this->ejecutarConsulta($consulta_datos);
 		$datos = $datos->fetchAll();
+
 
 		$total = $this->ejecutarConsulta($consulta_total);
 		$total = (int) $total->fetchColumn();
@@ -215,9 +216,9 @@ class clientController extends mainModel
 		                    <th class="has-text-centered" style="color:#ffffff">#</th>
 		                    <th class="has-text-centered" style="color:#ffffff">Tipo Cliente</th>
 		                    <th class="has-text-centered" style="color:#ffffff">Nombre</th>
-		            
 							<th class="has-text-centered" style="color:#ffffff">Celular</th>
-							<th class="has-text-centered" style="color:#ffffff">Crédito</th>
+							<th class="has-text-centered" style="color:#ffffff">Ultima Compra</th>
+							<th class="has-text-centered" style="color:#ffffff">Compras</th>
 							<th class="has-text-centered" style="color:#ffffff">Pagado</th>
 							<th class="has-text-centered" style="color:#ffffff">Pendiente</th>
 							<th class="has-text-centered" style="color:#ffffff">Historial</th>
@@ -230,14 +231,15 @@ class clientController extends mainModel
 
 			foreach ($datos as $rows) {
 				$tabla .= '
-						<tr class="has-text-centered" >
+						<tr class="has-text-left" >
 							<td>' . $contador . '</td>
 							<td>' . $rows['tipo_cliente'] . '</td>
 							<td>' . $rows['nombre'] . ' ' . $rows['apellidos'] . '</td>
 							<td>' . $rows['celular'] . '</td>
-							<td>' . $rows['credito'] . '</td>
-							<td>' . $rows['pagado'] . '</td>
-							<td>' . $rows['pendiente'] . '</td>
+							<td>' . $rows['UltimaCompra'] . '</td>
+							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['Compras'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['Pagado'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['Pendiente'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
 							 <td>
 			                    <a href="' . APP_URL . 'clientUpdate/' . $rows['id_cliente'] . '/" class="button is-info is-rounded is-small">
 			                    	<i class="fas fa-history fa-fw"></i>
@@ -249,15 +251,9 @@ class clientController extends mainModel
 			                    </a>
 			                </td>
 			                <td>
-			                	<form class="FormularioAjax" action="' . APP_URL . 'app/ajax/clienteAjax.php" method="POST" autocomplete="off" >
-
-			                		<input type="hidden" name="modulo_cliente" value="eliminar">
-			                		<input type="hidden" name="id_cliente" value="' . $rows['id_cliente'] . '">
-
-			                    	<button type="submit" class="button is-danger is-rounded is-small">
+									<button type="button" class="button is-danger is-rounded is-small" onclick="eliminarCliente(\'' . $rows['id_cliente'] . '\')">
 			                    		<i class="far fa-trash-alt fa-fw"></i>
 			                    	</button>
-			                    </form>
 			                </td>
 						</tr>
 					';
@@ -293,7 +289,7 @@ class clientController extends mainModel
 		$tabla .= '</tbody></table></div>';
 		### Paginacion ###
 		if ($total > 0 && $pagina <= $numeroPaginas) {
-			$tabla .= '<p class="has-text-right">Mostrando sesiones <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+			$tabla .= '<p class="has-text-right">Mostrando clientes <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
 
 			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
 		}

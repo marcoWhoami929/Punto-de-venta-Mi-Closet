@@ -19,11 +19,17 @@ $(function () {
     case "cashierList":
       listarCajas();
     break;
+    case "categoryList":
+      listarCategorias();
+    break;
     case "productList":
       listarProductos();
     break;
     case "saleList":
       listarVentas();
+    break;
+    case "kardex":
+      listarKardex();
     break;
     case "saleNew":
       cargarListaCamaras();
@@ -36,8 +42,6 @@ $(function () {
       cargarListaCamaras();
       cargarCatalogoProductos(1);
       cargarCarritoNota();
-   
-  
       break;
    
  
@@ -300,6 +304,61 @@ function listarVentas() {
     },
     success: function (response) {
       $(".div-ventas").html(response);
+    },
+  });
+}
+
+function listarCategorias() {
+
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var url = $("#url").val();
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      url:url,
+      modulo_pos: "listarCategorias",
+    },
+    success: function (response) {
+      $(".div-categorias").html(response);
+    },
+  });
+}
+function listarKardex() {
+
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var url = $("#url").val();
+  var stock = $("#stock").val();
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      stock:stock,
+      url:url,
+      modulo_pos: "listarKardex",
+    },
+    success: function (response) {
+      $(".div-kardex").html(response);
     },
   });
 }

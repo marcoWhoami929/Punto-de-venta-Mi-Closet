@@ -58,6 +58,34 @@ function eliminarUsuario(id_producto){
       }
     });
 }
+function eliminarCliente(id_cliente){
+
+
+  Swal.fire({
+      title: "¿Desea Eliminar El Cliente?",
+      text: "",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#B99654",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Eliminar",
+      cancelButtonText: "No, cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+          let datos = new FormData();
+          datos.append("id_cliente", id_cliente);
+          datos.append("modulo_cliente", "eliminar");
+          fetch(url + "app/ajax/clienteAjax.php", {
+            method: "POST",
+            body: datos,
+          }).then((respuesta) => respuesta.json())
+          .then((respuesta) => {
+            return alertas_ajax(respuesta);
+          }) 
+      }
+    });
+}
+
 
 function eliminarCaja(id_caja){
 
@@ -87,6 +115,33 @@ function eliminarCaja(id_caja){
     }
   });
   
+}
+function cancelarVenta(id_venta){
+
+
+  Swal.fire({
+      title: "¿Desea Cancelar La Venta?",
+      text: "",
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#B99654",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Si, Cancelar",
+      cancelButtonText: "No, cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+          let datos = new FormData();
+          datos.append("id_venta", id_venta);
+          datos.append("modulo_venta", "cancelar_venta");
+          fetch(url + "app/ajax/ventaAjax.php", {
+            method: "POST",
+            body: datos,
+          }).then((respuesta) => respuesta.json())
+          .then((respuesta) => {
+            return alertas_ajax(respuesta);
+          }) 
+      }
+    });
 }
 function entradaInventario(id_producto){
     $("#btn-modal-entrada").click();
