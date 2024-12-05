@@ -803,6 +803,9 @@ function registrarVenta(){
         if (forma_pago == "1") {
           var venta_abono = total_pagado;
           var referencia = "";
+        }else if (forma_pago == "5") {
+          var venta_abono = 0;
+          var referencia = "";
         }else{
           var venta_abono = total_pago;
           var referencia = referencia_venta;
@@ -1017,13 +1020,13 @@ function obtenerDetallePago(codigo_venta){
       option.text = datos.metodo;
       option.value = datos.id_pago;
       forma_pago.add(option);
-      eleccionFormaPago(datos.id_metodo_pago);
-      if(datos.id_metodo_pago == 1){
-        $("#total_pagar_venta").val(datos.total_pago);
-        $("#total_pagado_venta").val(datos.total_pagado);
-        $("#total_cambio_venta").val(datos.total_cambio);
+      eleccionFormaPago(datos.forma_pago);
+      if(datos.forma_pago == 1){
+        $("#total_pagar_venta").val(datos.total);
+        $("#total_pagado_venta").val(datos.pagado);
+        $("#total_pendiente_venta").val(datos.pendiente);
       }else{
-        $("#total_pagar_venta").val(datos.total_pago);
+        $("#total_pagar_venta").val(datos.total);
         $("#referencia_venta").val(datos.referencia);
       }
   

@@ -296,11 +296,12 @@ function actualizarEstatus(tabla, id, estatus, estatus_pago) {
     });
 }
 
-function establecerFormaPago(formaPago, total_pago, codigo_venta, estatus) {
+function establecerFormaPago(formaPago, total_pago, codigo_venta, estatus,pendiente,pagado) {
   $("#btn-modal-pago").click();
   localStorage.setItem("codigo_venta", codigo_venta);
   $("#forma_pago_venta").val(formaPago);
-  $("#total_pagar_venta").val(parseFloat(total_pago).toFixed(2));
+ 
+  $("#total_pagar_venta").val(parseFloat(pendiente).toFixed(2));
   if (estatus == 0) {
     var respuesta = {
       tipo: "simple",
@@ -329,6 +330,10 @@ function eleccionFormaPago(forma_pago) {
   if (forma_pago === "1") {
     document.getElementById("div-payment-efectivo-1").style.display = "";
     document.getElementById("div-payment-efectivo-2").style.display = "";
+    document.getElementById("div-payment-transferencia").style.display = "none";
+  }else if(forma_pago === "5"){
+    document.getElementById("div-payment-efectivo-1").style.display = "none";
+    document.getElementById("div-payment-efectivo-2").style.display = "none";
     document.getElementById("div-payment-transferencia").style.display = "none";
   } else {
     document.getElementById("div-payment-efectivo-1").style.display = "none";
@@ -359,6 +364,7 @@ function confirmacionPago() {
   var referencia_venta = $("#referencia_venta").val();
   var codigo_venta = localStorage.getItem("codigo_venta");
   if (forma_pago == "1") {
+    /*
     if (total_pagado < total_pago) {
       Swal.fire({
         icon: "error",
@@ -367,24 +373,26 @@ function confirmacionPago() {
         confirmButtonText: "Aceptar",
       });
     } else {
-      let datos = new FormData();
-      datos.append("codigo_venta", codigo_venta);
-      datos.append("forma_pago", forma_pago);
-      datos.append("total_pago", total_pago);
-      datos.append("total_pagado", total_pagado);
-      datos.append("total_cambio", total_Cambio);
-      datos.append("referencia_venta", "");
-      datos.append("modulo_venta", "generar_pago_venta");
-
-      fetch(urlPathNew + "app/ajax/ventaAjax.php", {
-        method: "POST",
-        body: datos,
-      })
-        .then((respuesta) => respuesta.json())
-        .then((respuesta) => {
-          return alertas_ajax(respuesta);
-        });
+      
     }
+    */
+    let datos = new FormData();
+    datos.append("codigo_venta", codigo_venta);
+    datos.append("forma_pago", forma_pago);
+    datos.append("total_pago", total_pago);
+    datos.append("total_pagado", total_pagado);
+    datos.append("total_cambio", total_Cambio);
+    datos.append("referencia_venta", "");
+    datos.append("modulo_venta", "generar_pago_venta");
+
+    fetch(urlPathNew + "app/ajax/ventaAjax.php", {
+      method: "POST",
+      body: datos,
+    })
+      .then((respuesta) => respuesta.json())
+      .then((respuesta) => {
+        return alertas_ajax(respuesta);
+      });
   } else {
     let datos = new FormData();
     datos.append("codigo_venta", codigo_venta);

@@ -546,6 +546,9 @@ class productController extends mainModel
 																<i class="fas fa-recycle fa-fw"></i> Desechar
 															</button>
 															</div>
+															<div class="column">
+															<a href="' . APP_URL . 'kardexDetail/' . $rows['cid_producto'] . '/" class="button is-link is-rounded is-small" title="Detalle Movimientos Producto ' . $rows['codigo'] . '" ><i class="fas fa-eye"></i> Detalle Movimientos</a>
+															</div>
 														</div>
 
 												</div>
@@ -1519,6 +1522,19 @@ class productController extends mainModel
 			exit();
 		}
 		$stock_producto = $stock_producto->fetch();
+
+		$stock_actual = $stock_producto['stock_total'];
+		if ($unidades > $stock_actual) {
+			$alerta = [
+				"tipo" => "simple",
+				"titulo" => "Ocurrió un error inesperado",
+				"texto" => "Las unidades actuales " . $stock_actual . " no permiten realizar la salida de " . $unidades . " unidades solicitadas.",
+				"icono" => "error"
+			];
+			return json_encode($alerta);
+			exit();
+		}
+
 		$movimiento_inventario_reg = [
 			[
 				"campo_nombre" => "id_producto",

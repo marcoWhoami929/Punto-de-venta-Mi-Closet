@@ -116,7 +116,7 @@ function eliminarCaja(id_caja){
   });
   
 }
-function cancelarVenta(id_venta){
+function cancelarVenta(id_venta,codigo_venta){
 
 
   Swal.fire({
@@ -132,6 +132,7 @@ function cancelarVenta(id_venta){
       if (result.isConfirmed) {
           let datos = new FormData();
           datos.append("id_venta", id_venta);
+          datos.append("codigo_venta", codigo_venta);
           datos.append("modulo_venta", "cancelar_venta");
           fetch(url + "app/ajax/ventaAjax.php", {
             method: "POST",

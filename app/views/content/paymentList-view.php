@@ -18,7 +18,7 @@
                     <input class="input is-rounded" placeholder="¿Qué estas buscando?" type="text" id="busqueda" onkeyup="listarPagos()">
                 </p>
                 <p class="control">
-                    <button class="button is-info" type="button" onclick="listarPagos()">Buscar</button>
+                    <button class="button is-info" type="button" onclick="listarPagos()">Actualizar</button>
                 </p>
             </div>
         </div>

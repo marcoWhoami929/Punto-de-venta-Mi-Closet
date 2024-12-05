@@ -588,8 +588,20 @@ class saleController extends mainModel
 
 
 		/*== Formateando variables ==*/
-		$pagado = number_format($total_pagado, MONEDA_DECIMALES, '.', '');
-		$total = number_format($_SESSION['total'], MONEDA_DECIMALES, '.', '');
+
+		$total_final = number_format($_SESSION['total'], MONEDA_DECIMALES, '.', '');
+		if ($total_pagado >= $total_final) {
+
+			$pago = ($total_pagado - $total_cambio);
+			$pagado = number_format($pago, MONEDA_DECIMALES, '.', '');
+		} else if ($total_pagado < $total_final) {
+
+			$pagado = number_format($total_pagado, MONEDA_DECIMALES, '.', '');
+		}
+
+
+
+
 		$subtotal = number_format($_SESSION['subtotal'], MONEDA_DECIMALES, '.', '');
 		$descuento = number_format($_SESSION['descuento'], MONEDA_DECIMALES, '.', '');
 		$porc_descuento = number_format($_SESSION['porc_descuento'], MONEDA_DECIMALES, '.', '');
@@ -597,11 +609,10 @@ class saleController extends mainModel
 		$fecha_venta = date("Y-m-d");
 		$hora_venta = date("h:i a");
 
-		$total_final = $total;
-		$total_final = number_format($total_final, MONEDA_DECIMALES, '.', '');
 
 
 		/*== Calculando el cambio ==*/
+		/*
 		if ($pagado < $total_final) {
 			$alerta = [
 				"tipo" => "simple",
@@ -612,7 +623,7 @@ class saleController extends mainModel
 			return json_encode($alerta);
 			exit();
 		}
-
+		*/
 		$cambio = $pagado - $total_final;
 		$cambio = number_format($cambio, MONEDA_DECIMALES, '.', '');
 
@@ -689,6 +700,13 @@ class saleController extends mainModel
 		$correlativo = $this->ejecutarConsulta("SELECT id_venta FROM venta");
 		$correlativo = ($correlativo->rowCount()) + 1;
 		$codigo_venta = $this->generarCodigoAleatorio('SALE', 22, $correlativo);
+		if ($forma_pago == "5") {
+			$estatus_pago = 0;
+			$pendiente = $total_final;
+		} else {
+			$estatus_pago = 1;
+			$pendiente = ($total_final - $pagado);
+		}
 
 		/*== Preparando datos para enviarlos al modelo ==*/
 		$datos_venta_reg = [
@@ -748,10 +766,11 @@ class saleController extends mainModel
 				"campo_valor" => $pagado
 			],
 			[
-				"campo_nombre" => "cambio",
-				"campo_marcador" => ":Cambio",
-				"campo_valor" => $cambio
+				"campo_nombre" => "pendiente",
+				"campo_marcador" => ":Pendiente",
+				"campo_valor" => $pendiente
 			],
+
 			[
 				"campo_nombre" => "id_usuario",
 				"campo_marcador" => ":Usuario",
@@ -775,7 +794,7 @@ class saleController extends mainModel
 			[
 				"campo_nombre" => "estatus_pago",
 				"campo_marcador" => ":EstatusPago",
-				"campo_valor" => '1'
+				"campo_valor" => $estatus_pago
 			]
 		];
 		$agregar_venta = $this->guardarDatos("venta", $datos_venta_reg);
@@ -810,116 +829,118 @@ class saleController extends mainModel
 				$prefijo = 'PAY';
 				$codigo_pago =  strtoupper($prefijo . "-" . substr(str_shuffle($caracteres_permitidos), 0, $longitud) . "-" . $correlativo);
 
+				if ($forma_pago == "5") {
+				} else {
+					$datos_pago_reg = [
+						[
+							"campo_nombre" => "codigo_pago",
+							"campo_marcador" => ":CodigoPago",
+							"campo_valor" => $codigo_pago
+						],
+						[
+							"campo_nombre" => "codigo_venta",
+							"campo_marcador" => ":CodigoVenta",
+							"campo_valor" => $codigo_venta
+						],
+						[
+							"campo_nombre" => "id_metodo_pago",
+							"campo_marcador" => ":MetodoPago",
+							"campo_valor" => $forma_pago
+						],
+						[
+							"campo_nombre" => "total_pago",
+							"campo_marcador" => ":TotalPago",
+							"campo_valor" => $total_pago
+						],
+						[
+							"campo_nombre" => "total_pagado",
+							"campo_marcador" => ":TotalPagado",
+							"campo_valor" => $total_pagado
+						],
+						[
+							"campo_nombre" => "total_cambio",
+							"campo_marcador" => ":TotalCambio",
+							"campo_valor" => $total_cambio
+						],
+						[
+							"campo_nombre" => "referencia",
+							"campo_marcador" => ":Referencia",
+							"campo_valor" => $referencia_venta
+						],
 
-				$datos_pago_reg = [
-					[
-						"campo_nombre" => "codigo_pago",
-						"campo_marcador" => ":CodigoPago",
-						"campo_valor" => $codigo_pago
-					],
-					[
-						"campo_nombre" => "codigo_venta",
-						"campo_marcador" => ":CodigoVenta",
-						"campo_valor" => $codigo_venta
-					],
-					[
-						"campo_nombre" => "id_metodo_pago",
-						"campo_marcador" => ":MetodoPago",
-						"campo_valor" => $forma_pago
-					],
-					[
-						"campo_nombre" => "total_pago",
-						"campo_marcador" => ":TotalPago",
-						"campo_valor" => $total_pago
-					],
-					[
-						"campo_nombre" => "total_pagado",
-						"campo_marcador" => ":TotalPagado",
-						"campo_valor" => $total_pagado
-					],
-					[
-						"campo_nombre" => "total_cambio",
-						"campo_marcador" => ":TotalCambio",
-						"campo_valor" => $total_cambio
-					],
-					[
-						"campo_nombre" => "referencia",
-						"campo_marcador" => ":Referencia",
-						"campo_valor" => $referencia_venta
-					],
+					];
 
-				];
+					/*== Agregando venta ==*/
+					$generar_pago = $this->guardarDatos("pago", $datos_pago_reg);
 
-				/*== Agregando venta ==*/
-				$generar_pago = $this->guardarDatos("pago", $datos_pago_reg);
+					$datos_caja = $check_caja->fetch();
+					switch ($forma_pago) {
+						case '1':
+							$campo_nombre = "efectivo";
+							$campo_marcador = ':Efectivo';
+							break;
+						case '2':
+							$campo_nombre = "transferencia";
+							$campo_marcador = ':Transferencia';
+							break;
+						case '3':
+							$campo_nombre = "tarjeta_credito";
+							$campo_marcador = ':TarjetaCredito';
+							break;
+						case '4':
+							$campo_nombre = "tarjeta_debito";
+							$campo_marcador = ':TarjetaDebito';
+							break;
+					}
 
-				$datos_caja = $check_caja->fetch();
-				switch ($forma_pago) {
-					case '1':
-						$campo_nombre = "efectivo";
-						$campo_marcador = ':Efectivo';
-						break;
-					case '2':
-						$campo_nombre = "transferencia";
-						$campo_marcador = ':Transferencia';
-						break;
-					case '3':
-						$campo_nombre = "tarjeta_credito";
-						$campo_marcador = ':TarjetaCredito';
-						break;
-					case '4':
-						$campo_nombre = "tarjeta_debito";
-						$campo_marcador = ':TarjetaDebito';
-						break;
+					$datos_caja_rs = [
+						[
+							"campo_nombre" => $campo_nombre,
+							"campo_marcador" => $campo_marcador,
+							"campo_valor" => $datos_caja[$campo_nombre] + $pagado
+						]
+					];
+
+					$condicion = [
+						"condicion_campo" => "codigo_sesion",
+						"condicion_marcador" => ":CodigoSesion",
+						"condicion_valor" => $_SESSION["sesion_caja"]
+					];
+
+					$saldo_caja = $this->actualizarDatos("sesiones_caja", $datos_caja_rs, $condicion);
+					/*== Preparando datos para enviarlos al modelo ==*/
+					$datos_movimiento_caja_reg = [
+						[
+							"campo_nombre" => "sesion_caja",
+							"campo_marcador" => ":SesionCaja",
+							"campo_valor" => $_SESSION["sesion_caja"]
+						],
+						[
+							"campo_nombre" => "id_caja",
+							"campo_marcador" => ":Caja",
+							"campo_valor" => $caja
+						],
+						[
+							"campo_nombre" => "tipo_movimiento",
+							"campo_marcador" => ":TipoMovimiento",
+							"campo_valor" => 'ingreso'
+						],
+						[
+							"campo_nombre" => "monto",
+							"campo_marcador" => ":Monto",
+							"campo_valor" => $pagado
+						],
+						[
+							"campo_nombre" => "descripcion",
+							"campo_marcador" => ":Descripcion",
+							"campo_valor" => $codigo_pago
+						]
+
+
+					];
+					$movimiento_caja = $this->guardarDatos("movimiento_caja", $datos_movimiento_caja_reg);
 				}
 
-				$datos_caja_rs = [
-					[
-						"campo_nombre" => $campo_nombre,
-						"campo_marcador" => $campo_marcador,
-						"campo_valor" => $datos_caja[$campo_nombre] + $total_final
-					]
-				];
-
-				$condicion = [
-					"condicion_campo" => "codigo_sesion",
-					"condicion_marcador" => ":CodigoSesion",
-					"condicion_valor" => $_SESSION["sesion_caja"]
-				];
-
-				$saldo_caja = $this->actualizarDatos("sesiones_caja", $datos_caja_rs, $condicion);
-
-				/*== Preparando datos para enviarlos al modelo ==*/
-				$datos_movimiento_caja_reg = [
-					[
-						"campo_nombre" => "sesion_caja",
-						"campo_marcador" => ":SesionCaja",
-						"campo_valor" => $_SESSION["sesion_caja"]
-					],
-					[
-						"campo_nombre" => "id_caja",
-						"campo_marcador" => ":Caja",
-						"campo_valor" => $caja
-					],
-					[
-						"campo_nombre" => "tipo_movimiento",
-						"campo_marcador" => ":TipoMovimiento",
-						"campo_valor" => 'ingreso'
-					],
-					[
-						"campo_nombre" => "monto",
-						"campo_marcador" => ":Monto",
-						"campo_valor" => $total_final
-					],
-					[
-						"campo_nombre" => "descripcion",
-						"campo_marcador" => ":Descripcion",
-						"campo_valor" => $codigo_pago
-					]
-
-
-				];
-				$movimiento_caja = $this->guardarDatos("movimiento_caja", $datos_movimiento_caja_reg);
 
 				/***
 				 * Registrar Productos Venta
@@ -1108,7 +1129,7 @@ class saleController extends mainModel
 			$sWhere .= " AND venta.codigo LIKE '%$busqueda%' OR venta.codigo_nota LIKE '%$busqueda%' OR usuario.nombre LIKE '%$busqueda%' OR cliente.nombre LIKE '%$busqueda%'";
 		}
 
-		$campos = "venta.pagado,venta.forma_pago,venta.tipo_entrega,venta.estatus_pago,venta.id_venta,venta.estatus,venta.subtotal,venta.descuento,venta.tipo_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.fecha_registro,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre as 'nombreVendedor',cliente.id_cliente,cliente.nombre as 'nombreCliente',cliente.apellidos";
+		$campos = "venta.pendiente,venta.pagado,venta.forma_pago,venta.tipo_entrega,venta.estatus_pago,venta.id_venta,venta.estatus,venta.subtotal,venta.descuento,venta.tipo_venta,venta.codigo,venta.fecha_venta,venta.hora_venta,venta.fecha_registro,venta.total,venta.id_usuario,venta.id_cliente,venta.id_caja,usuario.id_usuario,usuario.nombre as 'nombreVendedor',cliente.id_cliente,cliente.nombre as 'nombreCliente',cliente.apellidos";
 		$tabla = "";
 
 		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
@@ -1131,21 +1152,38 @@ class saleController extends mainModel
 			$contador = $inicio + 1;
 			$pag_inicio = $inicio + 1;
 			foreach ($datos as $rows) {
-
-				if ($rows['estatus_pago'] == 0) {
-					$estatus_pago = '<button class="button is-danger is-light" style="margin-right:10px;margin-top:5px" onclick="establecerFormaPago(' . $rows['forma_pago'] . ',' . $rows['total'] . ',\'' . $rows["codigo"] . '\',' . $rows['estatus'] . ')">Sin Pagar</button>';
-					$disabled = "";
+				if ($rows["estatus"] == 1) {
+					if ($rows["estatus_pago"] == 0) {
+						$estatus_pago = '<button class="button is-danger is-light" style="margin-right:10px;margin-top:5px" onclick="establecerFormaPago(\'' . $rows["forma_pago"] . '\',\'' . $rows["total"] . '\',\'' . $rows["codigo"] . '\',\'' . $rows["estatus"] . '\',\'' . $rows["pendiente"] . '\',\'' . $rows["pagado"] . '\')">Sin Pagar</button>';
+						$disabled = "";
+						$estatus_boton = 'display:none';
+					} else {
+						if ($rows["pendiente"] != '0.00') {
+							$estatus_pago = '<button class="button is-danger is-light" style="margin-right:10px;margin-top:5px" onclick="establecerFormaPago(\'' . $rows["forma_pago"] . '\',\'' . $rows["total"] . '\',\'' . $rows["codigo"] . '\',\'' . $rows["estatus"] . '\',\'' . $rows["pendiente"] . '\',\'' . $rows["pagado"] . '\')">Pago Parcial</button>';
+							$disabled = "display:none";
+							$estatus_boton = 'display:none';
+						} else {
+							$estatus_pago = '<button class="button is-success" style="margin-right:10px;margin-top:5px">Pagado</button>';
+							$disabled = "display:none";
+							$estatus_boton = '';
+						}
+					}
 				} else {
-					$estatus_pago = '<button class="button is-success" style="margin-right:10px;margin-top:5px">Pagado</button>';
+					$estatus_pago = '<button class="button is-danger" style="margin-right:10px;margin-top:5px">Cancelado</button>';
 					$disabled = "display:none";
+					$estatus_boton = 'display:none';
 				}
+
+
+
+
 				switch ($rows['estatus']) {
 					case '0':
 						$estatus = '<button class="button is-danger" >Cancelado</button>';
 
 						break;
 					case '1':
-						$estatus = '<button class="button is-info" style="background:#ef7216;margin-right:10px;margin-top:5px" onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'2\',' . $rows['estatus_pago'] . ')">Recibido</button>';
+						$estatus = '<button class="button is-info" style="background:#ef7216;margin-right:10px;margin-top:5px;' . $estatus_boton . '"onclick="actualizarEstatus(\'venta\',' . $rows['id_venta'] . ',\'2\',' . $rows['estatus_pago'] . ')">Recibido</button>';
 
 						break;
 					case '2':
@@ -1264,7 +1302,7 @@ class saleController extends mainModel
 													<div class="columns">
 														
 															<div class="column">
-																	<button type="button" class="button is-danger is-rounded is-medium" onclick="cancelarVenta(\'' . $rows['id_venta'] . '\')" style="' . $disabled . '" title="Cancelar venta Nro. ' . $rows['id_venta'] . '" >
+																	<button type="button" class="button is-danger is-rounded is-medium" onclick="cancelarVenta(\'' . $rows['id_venta'] . '\',\'' . $rows['codigo'] . '\')" style="' . $disabled . '" title="Cancelar venta Nro. ' . $rows['id_venta'] . '" >
 																		<i class="fas fa-times fa-fw"></i>
 																	</button>
 															
@@ -1510,6 +1548,7 @@ class saleController extends mainModel
 	{
 
 		$id = $this->limpiarCadena($_POST['id_venta']);
+		$codigo_venta = $this->limpiarCadena($_POST['codigo_venta']);
 
 		# Verificando venta #
 		$datos = $this->ejecutarConsulta("SELECT * FROM venta WHERE id_venta='$id' and estatus <=1");
@@ -1549,8 +1588,89 @@ class saleController extends mainModel
 			
 		$eliminarVenta = $this->eliminarRegistro("venta", "id_venta", $id);
 			*/
+		$productos = $this->ejecutarConsulta("SELECT * FROM venta_detalle WHERE codigo='$codigo_venta'");
+		$productos = $productos->fetchAll();
 
+		foreach ($productos as $key => $value) {
+			/****ACTUALIZAR INVENTARIO */
+			$stock_producto = $this->ejecutarConsulta("SELECT prod.*,inven.stock_total FROM producto as prod INNER JOIN inventario as inven ON prod.cid_producto = inven.id_producto WHERE prod.cid_producto='" . $value['id_producto'] . "'");
+			$stock_producto = $stock_producto->fetch();
 
+			/*== Respaldando datos de BD para poder restaurar en caso de errores ==*/
+			$stock = $stock_producto['stock_total'] + $value["cantidad"];
+
+			$inventario_rs = [
+				[
+					"campo_nombre" => "stock_total",
+					"campo_marcador" => ":StockTotal",
+					"campo_valor" => $stock
+				]
+			];
+
+			$condicion = [
+				"condicion_campo" => "id_producto",
+				"condicion_marcador" => ":IdProducto",
+				"condicion_valor" => $value['id_producto']
+			];
+
+			$inventario = $this->actualizarDatos("inventario", $inventario_rs, $condicion);
+
+			$movimiento_inventario_reg = [
+				[
+					"campo_nombre" => "id_producto",
+					"campo_marcador" => ":Producto",
+					"campo_valor" => $value['id_producto']
+				],
+				[
+					"campo_nombre" => "tipo_movimiento",
+					"campo_marcador" => ":TipoMovimiento",
+					"campo_valor" => 'entrada'
+				],
+				[
+					"campo_nombre" => "documento",
+					"campo_marcador" => ":Documento",
+					"campo_valor" => $codigo_venta
+				],
+				[
+					"campo_nombre" => "cantidad",
+					"campo_marcador" => ":Cantidad",
+					"campo_valor" =>  $value['cantidad']
+				],
+				[
+					"campo_nombre" => "descripcion",
+					"campo_marcador" => ":Descripcion",
+					"campo_valor" =>  'Devolucion Producto'
+				]
+			];
+
+			$movimiento_inventario = $this->guardarDatos("movimiento_inventario", $movimiento_inventario_reg);
+			/****ACTUALIZAR DATOS DE PRODUCTO */
+			$productos_venta = [
+				[
+					"campo_nombre" => "cantidad",
+					"campo_marcador" => ":Cantidad",
+					"campo_valor" => 0
+				],
+				[
+					"campo_nombre" => "subtotal",
+					"campo_marcador" => ":Subtotal",
+					"campo_valor" => 0
+				],
+				[
+					"campo_nombre" => "total",
+					"campo_marcador" => ":Total",
+					"campo_valor" => 0
+				]
+
+			];
+
+			$condicion = [
+				"condicion_campo" => "codigo",
+				"condicion_marcador" => ":Codigo",
+				"condicion_valor" => $codigo_venta
+			];
+			$actualizarEstatus = $this->actualizarDatos("venta_detalle", $productos_venta, $condicion);
+		}
 		$cancelarVenta = $this->cancelarRegistro("venta", "estatus", "id_venta", $id);
 
 		if ($cancelarVenta->rowCount() == 1) {
@@ -1678,6 +1798,16 @@ class saleController extends mainModel
 
 
 		$fecha_pago = date("Y-m-d H:i:s");
+
+		if ($total_pagado < $total_pago) {
+			$pago = $datos["pendiente"];
+			$pagado = $datos["pagado"] + $total_pagado;
+			$pendiente = $datos["pendiente"] - $total_pagado;
+		} else {
+			$pago = $total_pago;
+			$pagado = $total_pago - $total_cambio;
+			$pendiente = $total_pago - $pagado;
+		}
 		$datos_venta = [
 			[
 				"campo_nombre" => "forma_pago",
@@ -1693,12 +1823,12 @@ class saleController extends mainModel
 			[
 				"campo_nombre" => "pagado",
 				"campo_marcador" => ":Pagado",
-				"campo_valor" => $total_pagado,
+				"campo_valor" => $pagado,
 			],
 			[
-				"campo_nombre" => "cambio",
-				"campo_marcador" => ":Cambio",
-				"campo_valor" => $total_cambio,
+				"campo_nombre" => "pendiente",
+				"campo_marcador" => ":Pendiente",
+				"campo_valor" => $pendiente,
 			]
 		];
 
@@ -1737,12 +1867,12 @@ class saleController extends mainModel
 				[
 					"campo_nombre" => "total_pago",
 					"campo_marcador" => ":TotalPago",
-					"campo_valor" => $total_pago
+					"campo_valor" => $pago
 				],
 				[
 					"campo_nombre" => "total_pagado",
 					"campo_marcador" => ":TotalPagado",
-					"campo_valor" => $total_pagado
+					"campo_valor" => $pagado
 				],
 				[
 					"campo_nombre" => "total_cambio",
@@ -1759,6 +1889,75 @@ class saleController extends mainModel
 
 			/*== Agregando venta ==*/
 			$generar_pago = $this->guardarDatos("pago", $datos_pago_reg);
+
+			$check_caja = $this->ejecutarConsulta("SELECT * FROM sesiones_caja  WHERE codigo_sesion = '" . $_SESSION["sesion_caja"] . "' and estado = 'abierta'");
+
+			$datos_caja = $check_caja->fetch();
+			switch ($id_metodo_pago) {
+				case '1':
+					$campo_nombre = "efectivo";
+					$campo_marcador = ':Efectivo';
+					break;
+				case '2':
+					$campo_nombre = "transferencia";
+					$campo_marcador = ':Transferencia';
+					break;
+				case '3':
+					$campo_nombre = "tarjeta_credito";
+					$campo_marcador = ':TarjetaCredito';
+					break;
+				case '4':
+					$campo_nombre = "tarjeta_debito";
+					$campo_marcador = ':TarjetaDebito';
+					break;
+			}
+
+			$datos_caja_rs = [
+				[
+					"campo_nombre" => $campo_nombre,
+					"campo_marcador" => $campo_marcador,
+					"campo_valor" => $datos_caja[$campo_nombre] + $pagado
+				]
+			];
+
+			$condicion = [
+				"condicion_campo" => "codigo_sesion",
+				"condicion_marcador" => ":CodigoSesion",
+				"condicion_valor" => $_SESSION["sesion_caja"]
+			];
+
+			$saldo_caja = $this->actualizarDatos("sesiones_caja", $datos_caja_rs, $condicion);
+			/*== Preparando datos para enviarlos al modelo ==*/
+			$datos_movimiento_caja_reg = [
+				[
+					"campo_nombre" => "sesion_caja",
+					"campo_marcador" => ":SesionCaja",
+					"campo_valor" => $_SESSION["sesion_caja"]
+				],
+				[
+					"campo_nombre" => "id_caja",
+					"campo_marcador" => ":Caja",
+					"campo_valor" => $_SESSION["caja"]
+				],
+				[
+					"campo_nombre" => "tipo_movimiento",
+					"campo_marcador" => ":TipoMovimiento",
+					"campo_valor" => 'ingreso'
+				],
+				[
+					"campo_nombre" => "monto",
+					"campo_marcador" => ":Monto",
+					"campo_valor" => $pagado
+				],
+				[
+					"campo_nombre" => "descripcion",
+					"campo_marcador" => ":Descripcion",
+					"campo_valor" => $codigo_pago
+				]
+
+
+			];
+			$movimiento_caja = $this->guardarDatos("movimiento_caja", $datos_movimiento_caja_reg);
 
 			if ($generar_pago->rowCount() == 1) {
 

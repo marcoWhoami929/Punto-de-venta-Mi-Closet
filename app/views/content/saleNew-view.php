@@ -280,7 +280,7 @@
                                     <option value="2">Transferencia Electrónica</option>
                                     <option value="3">Tarjeta de Crédito</option>
                                     <option value="4">Tarjeta de Débito</option>
-
+                                    <option value="5">Crédito</option>
                                 </select>
                             </div>
                         </div>

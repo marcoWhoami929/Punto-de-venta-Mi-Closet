@@ -958,7 +958,7 @@ class cashierController extends mainModel
 	{
 		$codigo_venta = $this->limpiarCadena($_POST['codigo_venta']);
 
-		$datos = $this->ejecutarConsulta("SELECT pago.*,met.metodo FROM `pago` INNER JOIN `metodopago` as met ON pago.id_metodo_pago = met.id_metodo_pago WHERE pago.codigo_venta ='" . $codigo_venta . "'");
+		$datos = $this->ejecutarConsulta("SELECT venta.*,met.metodo FROM `venta` INNER JOIN `metodopago` as met ON venta.forma_pago = met.id_metodo_pago WHERE venta.codigo ='" . $codigo_venta . "'");
 
 		$datos = $datos->fetch();
 

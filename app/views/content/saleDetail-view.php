@@ -15,21 +15,41 @@
 
 	if ($datos->rowCount() == 1) {
 		$datos_venta = $datos->fetch();
-
-		if ($datos_venta["estatus_pago"] == 1) {
-			$buttonPago = '<p class="has-text-centered ">
-			<a href="#" class="button is-link is-rounded is-success is-large js-modal-trigger"  data-target="modal-detalle-pago" onclick="obtenerDetallePago(\'' . $code . '\')">
-				<i class="fas fa-check-circle"></i> &nbsp;Pago Realizado </a>
-		</p>';
+		if ($datos_venta["estatus"] == 1) {
+			if ($datos_venta["estatus_pago"] == 1) {
+				if ($datos_venta["pendiente"] == '0.00') {
+					$buttonPago = '<p class="has-text-centered ">
+				<a href="#" class="button is-link is-rounded is-success is-large js-modal-trigger"  data-target="modal-detalle-pago" onclick="obtenerDetallePago(\'' . $code . '\')">
+					<i class="fas fa-check-circle"></i> &nbsp;Pago Completo </a>
+			</p>';
+				} else {
+					$buttonPago = '<p class="has-text-centered ">
+				<a href="#" class="button is-link is-rounded is-warning is-large js-modal-trigger"  data-target="modal-detalle-pago" onclick="obtenerDetallePago(\'' . $code . '\')">
+					<i class="fas fa-check-circle"></i> &nbsp;Pago Parcial </a>
+			</p>';
+				}
+			} else {
+				$buttonPago = '<p class="has-text-centered ">
+				<a href="#" class="button is-link is-rounded is-danger is-large">
+					<i class="fas fa-exclamation-triangle"></i>&nbsp;Sin Pagar </a>
+			</p>';
+			}
 		} else {
 			$buttonPago = '<p class="has-text-centered ">
-			<a href="#" class="button is-link is-rounded is-danger is-large">
-				<i class="fas fa-exclamation-triangle"></i>&nbsp;Sin Pagar </a>
-		</p>';
+				<a href="#" class="button is-link is-rounded is-danger">
+					<i class="fas fa-check-circle"></i> &nbsp;Venta Cancelada </a>
+			</p>';
 		}
 
 
+
 		switch ($datos_venta["estatus"]) {
+			case '0':
+				$estatus1 = "is-active";
+				$estatus2 = "is-active";
+				$estatus3 = "is-active";
+				$estatus4 = "is-active";
+				break;
 			case '1':
 				$estatus1 = "is-active";
 				$estatus2 = "";
@@ -160,8 +180,8 @@
 				</div>
 
 				<div class="full-width sale-details text-condensedLight">
-					<div class="has-text-weight-bold">Cambio</div>
-					<span class="has-text-link"><?php echo MONEDA_SIMBOLO . number_format($datos_venta['cambio'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE; ?></span>
+					<div class="has-text-weight-bold">Pendiente</div>
+					<span class="has-text-link"><?php echo MONEDA_SIMBOLO . number_format($datos_venta['pendiente'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE; ?></span>
 				</div>
 
 			</div>
@@ -270,4 +290,90 @@
 		include "./app/views/inc/error_alert.php";
 	}
 	?>
+</div>
+<div class="modal fade is-large" id="modal-detalle-pago" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+	<div class="modal-background"></div>
+	<div class="modal-card ">
+		<header class="modal-card-head" style="background:#B99654">
+			<p class="modal-card-title is-uppercase" style="color:#ffffff"><i class="fas fa-cash-register"></i> &nbsp; Detalle Pago</p>
+			<button class="delete" aria-label="close"></button>
+		</header>
+		<section class="modal-card-body">
+			<div class="columns">
+				<div class="column">
+					<div class="field mt-2 mb-2">
+						<label class="label">Forma de Pago</label>
+						<div class="control has-text-centered">
+							<div class="select is-primary  is-rounded is-large">
+								<select id="forma_pago_venta">
+								</select>
+							</div>
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="columns  mb-6">
+				<div class="column">
+					<div class="field">
+						<label class="label">Total a Pagar:</label>
+						<div class="control has-icons-left">
+							<input class="input is-large" type="text" placeholder="0.00" style="font-size:50px;font-weight:bold" id="total_pagar_venta" disabled />
+							<span class="icon is-medium is-left " style="margin-top:20px">
+								<i class="fas fa-dollar-sign fa-3x"></i>
+							</span>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="columns  mb-6" id="div-payment-efectivo-1">
+				<div class="column">
+					<div class="field">
+						<label class="label">Pagado</label>
+						<div class="control has-icons-left">
+							<input class="input is-large" type="text" placeholder="0.00" style="font-size:40px;font-weight:bold" id="total_pagado_venta" value="0.00" disabled />
+							<span class="icon is-medium is-left " style="margin-top:20px">
+								<i class="fas fa-dollar-sign fa-3x"></i>
+							</span>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+			<div class="columns  mb-6" id="div-payment-efectivo-2">
+
+				<div class="column">
+					<div class="field">
+						<label class="label">Pendiente</label>
+						<div class="control has-icons-left">
+							<input class="input is-large" type="text" placeholder="0.00" style="font-size:40px;font-weight:bold" id="total_pendiente_venta" disabled value="0.00" />
+							<span class="icon is-medium is-left " style="margin-top:20px">
+								<i class="fas fa-dollar-sign fa-3x"></i>
+							</span>
+
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="columns  mb-6" style="display:none" id="div-payment-transferencia">
+				<div class="column">
+					<div class="field">
+						<label class="label">Referencia Pago</label>
+						<div class="control has-icons-left">
+							<input class="input is-large" type="text" placeholder="Capturar referencia de pago" style="font-size:20px;font-weight:bold" id="referencia_venta" disabled />
+							<span class="icon is-medium is-left">
+
+								<i class="fas fa-receipt"></i>
+							</span>
+
+						</div>
+					</div>
+				</div>
+
+			</div>
+		</section>
+	</div>
 </div>

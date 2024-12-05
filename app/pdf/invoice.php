@@ -177,8 +177,8 @@ if ($datos_venta->rowCount() == 1) {
 
 	$pdf->Cell(100, 7, iconv("UTF-8", "ISO-8859-1", ''), '', 0, 'C');
 	$pdf->Cell(15, 7, iconv("UTF-8", "ISO-8859-1", ''), '', 0, 'C');
-	$pdf->Cell(32, 7, iconv("UTF-8", "ISO-8859-1", 'CAMBIO'), '', 0, 'C');
-	$pdf->Cell(34, 7, iconv("UTF-8", "ISO-8859-1", MONEDA_SIMBOLO . number_format($datos_venta['cambio'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE), '', 0, 'C');
+	$pdf->Cell(32, 7, iconv("UTF-8", "ISO-8859-1", 'PENDIENTE'), '', 0, 'C');
+	$pdf->Cell(34, 7, iconv("UTF-8", "ISO-8859-1", MONEDA_SIMBOLO . number_format($datos_venta['pendiente'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE), '', 0, 'C');
 
 	$pdf->Ln(12);
 

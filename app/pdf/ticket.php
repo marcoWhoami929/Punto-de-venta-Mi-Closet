@@ -22,7 +22,11 @@ if ($datos_venta->rowCount() == 1) {
     /*---------- Seleccion de datos de la empresa ----------*/
     $datos_empresa = $ins_venta->seleccionarDatos("Normal", "empresa LIMIT 1", "*", 0);
     $datos_empresa = $datos_empresa->fetch();
-
+    if ($datos_venta["estatus"] == 0) {
+        $estatus = "CANCELADA";
+    } else {
+        $estatus = "VIGENTE";
+    }
 
     require "./code128.php";
 
@@ -32,6 +36,7 @@ if ($datos_venta->rowCount() == 1) {
 
     $pdf->SetFont('Arial', 'B', 10);
     $pdf->SetTextColor(0, 0, 0);
+    $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", strtoupper($estatus)), 0, 'C', false);
     $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", strtoupper($datos_empresa['empresa_nombre'])), 0, 'C', false);
     $pdf->SetFont('Arial', '', 9);
     $pdf->MultiCell(0, 5, iconv("UTF-8", "ISO-8859-1", $datos_empresa['empresa_direccion']), 0, 'C', false);
@@ -107,8 +112,8 @@ if ($datos_venta->rowCount() == 1) {
     $pdf->Ln(5);
 
     $pdf->Cell(18, 5, iconv("UTF-8", "ISO-8859-1", ""), 0, 0, 'C');
-    $pdf->Cell(22, 5, iconv("UTF-8", "ISO-8859-1", "CAMBIO"), 0, 0, 'C');
-    $pdf->Cell(32, 5, iconv("UTF-8", "ISO-8859-1", MONEDA_SIMBOLO . number_format($datos_venta['cambio'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE), 0, 0, 'C');
+    $pdf->Cell(22, 5, iconv("UTF-8", "ISO-8859-1", "PENDIENTE"), 0, 0, 'C');
+    $pdf->Cell(32, 5, iconv("UTF-8", "ISO-8859-1", MONEDA_SIMBOLO . number_format($datos_venta['pendiente'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE), 0, 0, 'C');
 
     $pdf->Ln(10);
 
