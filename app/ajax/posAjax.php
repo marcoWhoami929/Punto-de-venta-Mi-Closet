@@ -143,6 +143,58 @@ if (isset($_POST['modulo_pos'])) {
 
         echo $inventory->listarKardexInventarioControlador($datos);
     }
+    if ($_POST['modulo_pos'] == "listarDetalleKardex") {
+
+        $datos = array(
+            "busqueda" => $_POST["busqueda"],
+            "campoOrden" => $_POST["campoOrden"],
+            "orden" => $_POST["orden"],
+            "page" => $_POST["page"],
+            "per_page" => $_POST["per_page"],
+            "id_producto" => $_POST["id_producto"],
+            "tipo_movimiento" => $_POST["tipo_movimiento"],
+            "url" => $_POST["url"],
+        );
+
+        $inventory = new productController();
+
+        echo $inventory->listarDetalleKardexControlador($datos);
+    }
+    if ($_POST['modulo_pos'] == "listarDetalleSession") {
+
+        $datos = array(
+            "busqueda" => $_POST["busqueda"],
+            "campoOrden" => $_POST["campoOrden"],
+            "orden" => $_POST["orden"],
+            "page" => $_POST["page"],
+            "per_page" => $_POST["per_page"],
+            "sesion" => $_POST["sesion"],
+            "tipo_movimiento" => $_POST["tipo_movimiento"],
+            "metodo_pago" => $_POST["metodo_pago"],
+            "url" => $_POST["url"],
+        );
+
+        $session = new sessionsController();
+
+        echo $session->listarDetalleSessionControlador($datos);
+    }
+    if ($_POST['modulo_pos'] == "listarPagos") {
+
+        $datos = array(
+            "busqueda" => $_POST["busqueda"],
+            "campoOrden" => $_POST["campoOrden"],
+            "orden" => $_POST["orden"],
+            "page" => $_POST["page"],
+            "per_page" => $_POST["per_page"],
+            "tipo_movimiento" => $_POST["tipo_movimiento"],
+            "metodo_pago" => $_POST["metodo_pago"],
+            "url" => $_POST["url"],
+        );
+
+        $session = new sessionsController();
+
+        echo $session->listarPagosControlador($datos);
+    }
 } else {
     session_destroy();
     header("Location: " . APP_URL . "login/");

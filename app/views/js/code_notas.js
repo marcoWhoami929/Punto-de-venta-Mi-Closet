@@ -31,21 +31,38 @@ $(function () {
     case "kardex":
       listarKardex();
     break;
+    case "paymentList":
+      listarPagos();
+    break;
     case "saleNew":
       cargarListaCamaras();
       cargarCatalogoProductos(1);
       cargarCatalogoClientes(1);
       cargarCarritoVenta();
-     break;
+    break;
     case "notesNew":
       generarQrNotas();
       cargarListaCamaras();
       cargarCatalogoProductos(1);
       cargarCarritoNota();
-      break;
-   
+    break;
+    
  
   }
+  if (ruta[3] != undefined) {
+    switch (ruta[2]) {
+      case "kardexDetail":
+        id_producto = ruta[3];
+        listarDetalleKardex(id_producto);
+      break;
+      case "sessionsDetail":
+        sesion = ruta[3];
+        listarDetalleSession(sesion);
+      break;
+     
+    }
+  }
+  
 });
 function cargarAperturaCaja(){
   var sesion_caja = localStorage.session_caja;
@@ -359,6 +376,94 @@ function listarKardex() {
     },
     success: function (response) {
       $(".div-kardex").html(response);
+    },
+  });
+}
+
+function listarDetalleKardex(id_producto) {
+
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var url2 = $("#url").val();
+  var tipo_movimiento = $("#tipo_movimiento").val();
+  $.ajax({
+    url: url+"app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      url:url2,
+      id_producto:id_producto,
+      tipo_movimiento:tipo_movimiento,
+      modulo_pos: "listarDetalleKardex",
+    },
+    success: function (response) {
+      $(".div-movimientos-inventario").html(response);
+    },
+  });
+}
+function listarDetalleSession(sesion) {
+
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var url2 = $("#url").val();
+  var tipo_movimiento = $("#tipo_movimiento").val();
+  var metodo_pago = $("#metodo_pago").val();
+  $.ajax({
+    url: url+"app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      url:url2,
+      sesion:sesion,
+      tipo_movimiento:tipo_movimiento,
+      metodo_pago:metodo_pago,
+      modulo_pos: "listarDetalleSession",
+    },
+    success: function (response) {
+      $(".div-movimientos-session").html(response);
+    },
+  });
+}
+function listarPagos() {
+
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var url2 = $("#url").val();
+  var tipo_movimiento = $("#tipo_movimiento").val();
+  var metodo_pago = $("#metodo_pago").val();
+  $.ajax({
+    url: url+"app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      url:url2,
+      tipo_movimiento:tipo_movimiento,
+      metodo_pago:metodo_pago,
+      modulo_pos: "listarPagos",
+    },
+    success: function (response) {
+      $(".div-pagos").html(response);
     },
   });
 }

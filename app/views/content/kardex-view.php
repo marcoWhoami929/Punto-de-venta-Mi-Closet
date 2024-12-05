@@ -32,9 +32,10 @@
             <label>Mostrar</label><br>
             <div class="select">
                 <select id="per_page" onchange="listarKardex()">
-                    <option value="15">15</option>
+
                     <option value="50">50</option>
                     <option value="100">100</option>
+                    <option value="500">500</option>
 
                 </select>
             </div>

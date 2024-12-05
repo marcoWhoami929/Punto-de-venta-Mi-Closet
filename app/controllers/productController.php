@@ -457,6 +457,12 @@ class productController extends mainModel
 				} else {
 					$foto = '<img src="' . APP_URL . 'app/views/productos/default.png">';
 				}
+
+				if ($rows['stock_total'] == "0.000") {
+					$estatus = 'display:none';
+				} else {
+					$estatus = "";
+				}
 				$tabla .= '<div class="card  pb-4">
 							<header class="card-header" style="background:#B99654;color:#ffffff">
 							 <p class="card-header-title"><strong style="color:#ffffff">' . $rows['producto'] . '</strong></p>
@@ -536,7 +542,7 @@ class productController extends mainModel
 															</button>
 															</div>
 															<div class="column">
-																	<button class="button is-danger is-rounded is-small js-modal-trigger"  data-target="modal-salida-inventario" onclick="salidaInventario(\'' . $rows["cid_producto"] . '\')">
+																	<button class="button is-danger is-rounded is-small js-modal-trigger"  data-target="modal-salida-inventario" onclick="salidaInventario(\'' . $rows["cid_producto"] . '\')" style="' . $estatus . '">
 																<i class="fas fa-recycle fa-fw"></i> Desechar
 															</button>
 															</div>
@@ -1755,6 +1761,143 @@ class productController extends mainModel
 		### Paginacion ###
 		if ($total > 0 && $pagina <= $numeroPaginas) {
 			$tabla .= '<p class="has-text-right">Mostrando categorias <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+
+			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
+		}
+
+		return $tabla;
+	}
+	public function listarDetalleKardexControlador($datos)
+	{
+
+		$pagina = $this->limpiarCadena($datos["page"]);
+		$registros = $this->limpiarCadena($datos["per_page"]);
+		$campoOrden = $this->limpiarCadena($datos["campoOrden"]);
+		$orden = $this->limpiarCadena($datos["orden"]);
+		$id_producto = $this->limpiarCadena($datos["id_producto"]);
+
+		$url = $this->limpiarCadena($datos["url"]);
+		$url = APP_URL . $url . "/";
+
+		$sWhere = "mov.id_producto ='" . $id_producto . "'";
+
+		$busqueda = $this->limpiarCadena($datos["busqueda"]);
+		if ($datos["tipo_movimiento"] != "") {
+			$sWhere .= " and mov.tipo_movimiento = '" . $datos["tipo_movimiento"] . "'";
+		}
+		if (isset($busqueda) && $busqueda != "") {
+			$sWhere .= " AND mov.documento LIKE '%$busqueda%' OR mov.descripcion LIKE '%$busqueda%'";
+		}
+		$tabla = "";
+		$campos = "mov.*,prod.codigo,prod.nombre";
+		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+
+		$consulta_datos = "SELECT $campos FROM movimiento_inventario as mov INNER JOIN producto as prod ON mov.id_producto = prod.cid_producto WHERE $sWhere ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+		$consulta_total = "SELECT COUNT(id_movimiento_inventario) FROM movimiento_inventario as mov WHERE $sWhere ";
+
+		$datos = $this->ejecutarConsulta($consulta_datos);
+		$datos = $datos->fetchAll();
+
+		$total = $this->ejecutarConsulta($consulta_total);
+		$total = (int) $total->fetchColumn();
+
+		$numeroPaginas = ceil($total / $registros);
+
+
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+
+			$tabla .= '
+			<div class="table-container">
+			<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+				<thead style="background:#B99654;color:#ffffff;">
+					<tr>
+						<th style="color:#ffffff">#</th>
+						<th style="color:#ffffff">Producto</th>
+						<th style="color:#ffffff">Código</th>
+						<th style="color:#ffffff">Tipo</th>
+						<th style="color:#ffffff">Documento</th>
+						<th style="color:#ffffff">Cantidad</th>
+						<th style="color:#ffffff">Descripción</th>
+						<th style="color:#ffffff">Fecha</th>
+					</tr>
+				</thead>
+				<tbody>
+		';
+
+			$totalCantidad = 0;
+			foreach ($datos as $rows) {
+
+				if ($rows["tipo_movimiento"] == "entrada") {
+					$cantidad =  $rows['cantidad'];
+				} else {
+					$cantidad =  -$rows['cantidad'];
+				}
+
+				$tabla .= '
+						<tr >
+							<td>' . $contador . '</td>
+							<td><strong>' . $rows['nombre'] . '</strong></td>
+							<td><strong>' . $rows['codigo'] . '</strong></td>
+							<td>' . $rows['tipo_movimiento'] . '</td>
+							<td>' . $rows['documento'] . '</td>
+							<td>' . $cantidad . '</td>
+							<td>' . $rows['descripcion'] . '</td>
+							<td>' . $rows['fecha_movimiento'] . '</td>
+							
+						</tr>
+					';
+
+				$contador++;
+				$totalCantidad += $cantidad;
+			}
+			$tabla .= '
+						<tr >
+							<td></td>
+							<td></td>
+							<td></td>
+							<td></td>
+							<td><strong>Existencias:</strong></td>
+							<td><strong>' . $totalCantidad . '</td>
+							<td></td>
+							<td></td>
+							
+						</tr>
+					';
+			$pag_final = $contador - 1;
+		} else {
+			if ($total >= 1) {
+				$tabla .= '
+						<tr class="has-text-centered" >
+			                <td colspan="5">
+			                    <a href="' . $url . '1/" class="button is-link is-rounded is-small mt-4 mb-4">
+			                        Haga clic acá para recargar el listado
+			                    </a>
+			                </td>
+			            </tr>
+					';
+			} else {
+				$tabla .= '
+				<article class="message is-warning mt-4 mb-4">
+		 <div class="message-header">
+			<p></p>
+		 </div>
+		<div class="message-body has-text-centered">
+			<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+			No hay movimientos relacionados con el producto
+		</div>
+	</article>';
+			}
+		}
+
+		$tabla .= '</tbody></table></div>';
+
+		### Paginacion ###
+		if ($total > 0 && $pagina <= $numeroPaginas) {
+			$tabla .= '<p class="has-text-right">Mostrando productos <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
 
 			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
 		}
