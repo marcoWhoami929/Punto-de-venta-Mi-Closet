@@ -1152,7 +1152,7 @@ class saleController extends mainModel
 			$contador = $inicio + 1;
 			$pag_inicio = $inicio + 1;
 			foreach ($datos as $rows) {
-				if ($rows["estatus"] == 1) {
+				if ($rows["estatus"] != 0) {
 					if ($rows["estatus_pago"] == 0) {
 						$estatus_pago = '<button class="button is-danger is-light" style="margin-right:10px;margin-top:5px" onclick="establecerFormaPago(\'' . $rows["forma_pago"] . '\',\'' . $rows["total"] . '\',\'' . $rows["codigo"] . '\',\'' . $rows["estatus"] . '\',\'' . $rows["pendiente"] . '\',\'' . $rows["pagado"] . '\')">Sin Pagar</button>';
 						$disabled = "";

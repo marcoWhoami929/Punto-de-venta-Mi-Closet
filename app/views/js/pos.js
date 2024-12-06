@@ -283,3 +283,29 @@ function  obtenerDetalleDenominaciones(sesion){
     },
   })
 }
+function generarReporte(vista){
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var url = $("#url").val();
+
+
+  location.href =
+    "../app/reporteador.php?modulo_reporte="+vista+"" +
+    "&busqueda=" +
+    busqueda +
+    "&campoOrden=" +
+    campoOrden +
+    "&orden=" +
+    orden +
+    "&per_page=" +
+    per_page +
+    "&page=" +
+    page +
+    "&url=" +
+    url ;
+
+
+}

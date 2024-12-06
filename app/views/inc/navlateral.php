@@ -334,6 +334,16 @@ if ($_SESSION['perfil'] == 'Administrador') {
 								</div>
 							</a>
 						</li>
+						<li class="full-width">
+							<a href="<?php echo APP_URL; ?>progressList/" class="full-width">
+								<div class="navLateral-body-cl">
+									<i class="fas fa-spinner fa-fw"></i>
+								</div>
+								<div class="navLateral-body-cr">
+									Estatus Ventas
+								</div>
+							</a>
+						</li>
 
 					</ul>
 				</li>

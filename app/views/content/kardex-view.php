@@ -5,7 +5,7 @@
 <div class="container is-fluid pb-2 pt-2">
 
     <div class="columns">
-        <div class="column is-half">
+        <div class="column is-one-third">
             <label></label><br>
             <div class="field is-grouped">
                 <input type="hidden" id="pagina" value="<?= $url[1] ?>">
@@ -14,7 +14,7 @@
                     <input class="input is-rounded" type="text" id="busqueda" placeholder="¿Qué producto estas buscando?" maxlength="30" onkeyup="listarKardex()">
                 </p>
                 <p class="control">
-                    <button class="button is-info" type="button" onclick="listarKardex()">Actualizar</button>
+                    <button class="button is-info" type="button" onclick="generarReporte('kardex')"><i class="fas fa-file-excel"></i></button>
                 </p>
             </div>
         </div>

@@ -1,10 +1,9 @@
 <?php
 
+
 use app\models\mainModel;
 
 $mainModel = new mainModel();
-
-
 
 ?>
 <div class="container is-fluid mb-6">
@@ -97,16 +96,35 @@ $mainModel = new mainModel();
         </p>
 
     </form>
-    <div class="column">
-        <div id="reader" width="600px"></div>
-        <div class="mt-2 w-full">
-            <div class="select">
-                <select class="form-select" id="listaCamaras" onchange="camaraSeleccionada(this)">
+    <div class="columns">
+        <div class="column">
+            <div id="reader" width="600px"></div>
+            <div class="mt-2 w-full">
+                <div class="select">
+                    <select class="form-select" id="listaCamaras" onchange="camaraSeleccionada(this)">
 
-                </select>
+                    </select>
+                </div>
+
+                <button class="button is-link " onclick="detenerCamara()">Detener camara</button>
             </div>
+        </div>
+        <div class="column">
+            <form method="post" id="export_excel">
 
-            <button class="button is-link " onclick="detenerCamara()">Detener camara</button>
+                <div class="file is-info has-name">
+                    <label class="file-label">
+                        <input class="file-input" type="file" name="excel_file" id="excel_file" />
+                        <span class="file-cta">
+                            <span class="file-icon">
+                                <i class="fas fa-upload"></i>
+                            </span>
+                            <span class="file-label">Subir Archivo </span>
+                        </span>
+                        <span class="file-name"></span>
+                    </label>
+                </div>
+            </form>
         </div>
     </div>
     <?php
@@ -159,3 +177,35 @@ $mainModel = new mainModel();
         </section>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+        $('#excel_file').change(function() {
+            $('#export_excel').submit();
+        });
+        $('#export_excel').on('submit', function(event) {
+            event.preventDefault();
+
+            let datos = new FormData();
+
+            datos.append("excel", this);
+            datos.append("modulo_producto", "cargar_productos_nota");
+
+            $.ajax({
+                url: url + "app/ajax/importProductosNota.php",
+                method: "POST",
+                data: new FormData(this),
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    if (data == "exito") {
+                        cargarCatalogoProductos(1);
+                        cargarCarritoNota();
+                    } else {
+
+                    }
+
+                }
+            });
+        });
+    });
+</script>

@@ -210,7 +210,7 @@ class sessionsController extends mainModel
 			<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
             <thead >
 					<tr>
-						<td class="has-text-centered" style="color:#ffffff;background:#16a085" colspan="5">Movimiento</td>
+						<td class="has-text-centered" style="color:#ffffff;background:#16a085" colspan="4">Movimiento</td>
 						<td class="has-text-centered" style="color:#ffffff;background:#F14668" colspan="4">Pago</td>
                         <td class="has-text-centered" style="color:#ffffff;background:#B99654" colspan="4">Venta</td>
 						
@@ -221,7 +221,6 @@ class sessionsController extends mainModel
 						<th style="color:#ffffff">#</th>
 						<th style="color:#ffffff">Sesion</th>
 						<th style="color:#ffffff">Movimiento</th>
-						<th style="color:#ffffff">$ Total</th>
 						<th style="color:#ffffff">Fecha</th>
 						<th style="color:#ffffff">Codigo</th>
 						<th style="color:#ffffff">$ Total</th>
@@ -238,6 +237,9 @@ class sessionsController extends mainModel
 
             $totalPagos = 0;
             $totalMovimientos = 0;
+            $totalVenta = 0;
+            $totalPagado = 0;
+            $totalPendiente = 0;
             foreach ($datos as $rows) {
                 if ($rows["tipo_movimiento"] == "ingreso") {
                     $total_monto = $rows['monto'];
@@ -251,7 +253,7 @@ class sessionsController extends mainModel
 							<td>' . $contador . '</td>
 							<td><strong>' . $rows['sesion_caja'] . '</strong></td>
 							<td>' . $rows['tipo_movimiento'] . '</td>
-							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['monto'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+							
 							<td>' . $rows['fecha_movimiento'] . '</td>
 							<td><strong>' . $rows["codigo_pago"] . '</td>
 							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['total_pagado_pay'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
@@ -265,20 +267,25 @@ class sessionsController extends mainModel
 						</tr>
 					';
                 $totalPagos += $rows['total_pagado_pay'];
-                $totalMovimientos += $total_monto;
+
+                $totalVenta += $rows['total_venta'];
+                $totalPagado += $rows['total_pagado'];
+                $totalPendiente += $rows['total_pendiente'];
                 $contador++;
             }
 
 
             $tabla .= '	<tr>
-						<td class="has-text-right" style="color:#B99654" colspan="3"></td>
-                        <td class="has-text-left" style="color:#B99654" colspan="2">' . MONEDA_SIMBOLO . " " . number_format($totalMovimientos, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
-                     
-						<td class="has-text-right" style="color:#B99654" colspan="2">' . MONEDA_SIMBOLO . " " . number_format($totalPagos, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
-                        <td class="has-text-right" style="color:#B99654" colspan="6"></td>
+						
+
+                        <td class="has-text-right" style="color:#B99654" colspan="5"></td>
+                          <td class="has-text-right" style="color:#B99654" colspan="1">' . MONEDA_SIMBOLO . " " . number_format($totalPagos, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+                        <td class="has-text-right" style="color:#B99654" colspan="3"></td>
+                          <td class="has-text-right" style="color:#B99654" colspan="1">' . MONEDA_SIMBOLO . " " . number_format($totalVenta, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+                        <td class="has-text-right" style="color:#B99654" colspan="1">' . MONEDA_SIMBOLO . " " . number_format($totalPagado, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+                        <td class="has-text-right" style="color:#B99654" colspan="1">' . MONEDA_SIMBOLO . " " . number_format($totalPendiente, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
 						
 					</tr>';
-
             $pag_final = $contador - 1;
         } else {
             if ($total >= 1) {

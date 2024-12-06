@@ -18,7 +18,7 @@
                     <input class="input is-rounded" placeholder="¿Qué estas buscando?" type="text" id="busqueda" onkeyup="listarDetalleKardex('<?= $url[1] ?>')">
                 </p>
                 <p class="control">
-                    <button class="button is-info" type="button" onclick="listarDetalleKardex('<?= $url[1] ?>')">Buscar</button>
+                    <button class="button is-info" type="button" onclick="listarDetalleKardex('<?= $url[1] ?>')">Actualizar</button>
                 </p>
             </div>
         </div>
