@@ -6,7 +6,7 @@
 <div class="container is-fluid pb-2 pt-2">
 	<button class="button is-danger is-light js-modal-trigger" data-target="modal-pago-venta" id="btn-modal-pago" style="display:none">Sin Pagar</button>
 	<div class="columns ">
-		<div class="column is-half">
+		<div class="column is-two-fifths">
 			<label></label><br>
 			<div class="field is-grouped">
 				<input type="hidden" id="pagina" value="<?= $url[1] ?>">
@@ -65,11 +65,6 @@
 				</select>
 			</div>
 		</div>
-
-	</div>
-	<div class="columns">
-
-
 		<div class="column">
 			<label>Filtro Tipo Entrega</label><br>
 			<div class="select">
@@ -81,6 +76,12 @@
 				</select>
 			</div>
 		</div>
+
+	</div>
+	<div class="columns">
+
+
+
 		<div class="column">
 			<label>Ordenar por</label><br>
 			<div class="select">
@@ -302,3 +303,24 @@
 <?php
 include "./app/views/inc/print_invoice_script.php";
 ?>
+<style>
+	/***RIBBON CSS */
+	.ribbon {
+		--f: 15px;
+		/* control the folded part */
+		height: 50px;
+		position: absolute;
+		top: 0;
+		color: #fff;
+		padding: .6em 1.8em;
+		background: var(--c, #45ADA8);
+		border-bottom: var(--f) solid #0007;
+		clip-path: polygon(100% calc(100% - var(--f)), 100% 100%, calc(100% - var(--f)) calc(100% - var(--f)), var(--f) calc(100% - var(--f)), 0 100%, 0 calc(100% - var(--f)), 999px calc(100% - var(--f) - 999px), calc(100% - 999px) calc(100% - var(--f) - 999px))
+	}
+
+	.right {
+		right: 0;
+		transform: translate(calc((1 - cos(45deg))*100%), -100%) rotate(45deg);
+		transform-origin: 0% 100%;
+	}
+</style>

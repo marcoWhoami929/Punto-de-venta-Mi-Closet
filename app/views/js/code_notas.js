@@ -28,6 +28,9 @@ $(function () {
     case "saleList":
       listarVentas();
     break;
+    case "notesList":
+      listarNotas();
+    break;
     case "kardex":
       listarKardex();
     break;
@@ -45,6 +48,9 @@ $(function () {
       cargarListaCamaras();
       cargarCatalogoProductos(1);
       cargarCarritoNota();
+    break;
+    case "statusSales":
+      listarEstatusVentas();
     break;
     
  
@@ -464,6 +470,60 @@ function listarPagos() {
     },
     success: function (response) {
       $(".div-pagos").html(response);
+    },
+  });
+}
+function listarNotas() {
+
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var url = $("#url").val();
+
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      url:url,
+      modulo_pos: "listarNotas",
+    },
+    success: function (response) {
+      $(".div-notas").html(response);
+    },
+  });
+}
+function listarEstatusVentas() {
+
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var url = $("#url").val();
+
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      url:url,
+      modulo_pos: "listarEstatusVentas",
+    },
+    success: function (response) {
+      $(".div-estatus-ventas").html(response);
     },
   });
 }

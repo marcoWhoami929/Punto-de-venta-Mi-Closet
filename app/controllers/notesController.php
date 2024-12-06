@@ -353,7 +353,186 @@ class notesController extends mainModel
         return json_encode($alerta);
     }
     /*----------  Controlador listar notas  ----------*/
-    public function listarNotasControlador($pagina, $registros, $url, $busqueda)
+    public function listarNotasControlador($datos)
+    {
+
+        $pagina = $this->limpiarCadena($datos["page"]);
+        $registros = $this->limpiarCadena($datos["per_page"]);
+        $campoOrden = $this->limpiarCadena($datos["campoOrden"]);
+        $orden = $this->limpiarCadena($datos["orden"]);
+
+        $url = $this->limpiarCadena($datos["url"]);
+        $url = APP_URL . $url . "/";
+
+        $busqueda = $this->limpiarCadena($datos["busqueda"]);
+        $sWhere = "nota.id_nota !='0'";
+
+        if (isset($busqueda) && $busqueda != "") {
+            $sWhere .= " AND nota.codigo LIKE '%$busqueda%' OR nota.titulo_nota LIKE '%$busqueda%'";
+        }
+
+        $campos = "*";
+        $tabla = "";
+
+        $pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+        $inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+
+        $consulta_datos = "SELECT $campos FROM notas as nota WHERE $sWhere  ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+        $consulta_total = "SELECT COUNT(id_nota) FROM notas as nota WHERE $sWhere";
+
+
+        $datos = $this->ejecutarConsulta($consulta_datos);
+        $datos = $datos->fetchAll();
+
+        $total = $this->ejecutarConsulta($consulta_total);
+        $total = (int) $total->fetchColumn();
+
+        $numeroPaginas = ceil($total / $registros);
+
+        if ($total >= 1 && $pagina <= $numeroPaginas) {
+            $contador = $inicio + 1;
+            $pag_inicio = $inicio + 1;
+            foreach ($datos as $rows) {
+
+                switch ($rows['estatus']) {
+                    case '0':
+                        $estado = '<button class="button is-danger">Cancelada</button>';
+                        break;
+                    case '1':
+                        $estado = '<button class="button is-success">Activa</button>';
+                        break;
+                }
+
+                if (is_file("../ajax/codes/" . $rows['codigo'] . ".png")) {
+                    $foto = '<img src="' . APP_URL . 'app/ajax/codes/' . $rows['codigo'] . '.png">';
+                } else {
+                    $foto = '<img src="' . APP_URL . 'app/views/productos/default.png">';
+                }
+                $tabla .= '<div class="card  pb-4">
+							<header class="card-header" style="background:#B99654;color:#ffffff">
+							
+								 <p class="card-header-title"><strong style="color:#ffffff">' . $rows['codigo'] . '</strong></p>
+								
+								
+								 <p class="card-header-title"><strong style="color:#ffffff">' . $rows['fecha_publicacion'] . '</strong></p>
+								
+										' . $estado . '
+								
+							
+							</header>
+							<div class="card-content">
+								<div class="content">
+									<div class="columns">
+                                    	<div class="column">
+											<figure class="media-left">
+												<p class="image is-96x96">
+													' . $foto . '
+												</p>
+												</figure>
+										</div>
+                                    
+										<div class="column">
+												<div class="columns">
+												<label><strong>Titulo Nota:</strong></label>
+												</div>
+												<div class="columns">
+												' . $rows['titulo_nota']  . '
+												 </div>
+										</div>
+										<div class="column">
+												<div class="columns">
+												<label><strong>Fecha Expiracion:</strong></label>
+												</div>
+												<div class="columns">
+												' . strtoupper($rows['fecha_expiracion']) . '
+												</div>
+										</div>
+										<div class="column">
+												<div class="columns">
+												<label><strong>% Descuento:</strong></label>
+												</div>
+												<div class="columns">
+												' . strtoupper($rows['porc_descuento']) . '
+												</div>
+										</div>
+										
+									</div>
+									
+									
+								</div>
+							</div>
+							<footer class="card-footer">
+									<div class="columns">
+										<div class="column is-full">
+											<div class=" card-footer-item">
+													<div class="columns">
+														<div class="column">
+																<button type="button" class="button is-link is-outlined is-rounded is-medium btn-sale-options" onclick="copiarNota(\'' . $rows['qr'] . '\')" title="Copiar url nota" >
+                                                                    <i class="fas fa-copy fa-fw"></i>
+                                                                </button>
+														</div>
+														<div class="column">
+															  <a href="' . APP_URL . 'noteDetail/' . $rows['codigo'] . '/" class="button is-link is-rounded is-medium" title="Informacion de nota Nro. ' . $rows['id_nota'] . '" >
+                                                                    <i class="fas fa-shopping-bag fa-fw"></i>
+                                                                </a>
+														</div>
+															<div class="column">
+																 <button type="button" class="button is-danger is-rounded is-medium" title="Eliminar nota Nro. ' . $rows['id_nota'] . '" onclick="eliminarNota(\'' . $rows['id_nota'] . '\',\'' . $rows['fecha_publicacion'] . '\')">
+                                                                    <i class="far fa-trash-alt fa-fw"></i>
+                                                                </button>
+															</div>
+													</div>
+
+											</div>
+										</div>
+										
+									</div>
+
+							</footer>
+							</div>
+								<hr>';
+                $contador++;
+            }
+            $pag_final = $contador - 1;
+        } else {
+            if ($total >= 1) {
+                $tabla .= '
+						<tr class="has-text-centered" >
+			                <td colspan="5">
+			                    <a href="' . $url . '1/" class="button is-link is-rounded is-small mt-4 mb-4">
+			                        Haga clic acá para recargar el listado
+			                    </a>
+			                </td>
+			            </tr>
+					';
+            } else {
+                $tabla .= '
+							<article class="message is-warning mt-4 mb-4">
+				 <div class="message-header">
+					<p></p>
+				 </div>
+				<div class="message-body has-text-centered">
+					<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+					No hay resultados de la busqueda.
+				</div>
+			</article>
+					';
+            }
+        }
+
+
+
+        ### Paginacion ###
+        if ($total > 0 && $pagina <= $numeroPaginas) {
+            $tabla .= '<p class="has-text-right">Mostrando notas <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+
+            $tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
+        }
+
+        return $tabla;
+    }
+    public function listarNotasxControlador($pagina, $registros, $url, $busqueda)
     {
 
         $pagina = $this->limpiarCadena($pagina);

@@ -195,6 +195,36 @@ if (isset($_POST['modulo_pos'])) {
 
         echo $session->listarPagosControlador($datos);
     }
+    if ($_POST['modulo_pos'] == "listarNotas") {
+
+        $datos = array(
+            "busqueda" => $_POST["busqueda"],
+            "campoOrden" => $_POST["campoOrden"],
+            "orden" => $_POST["orden"],
+            "page" => $_POST["page"],
+            "per_page" => $_POST["per_page"],
+            "url" => $_POST["url"],
+        );
+
+        $notes = new notesController();
+
+        echo $notes->listarNotasControlador($datos);
+    }
+    if ($_POST['modulo_pos'] == "listarEstatusVentas") {
+
+        $datos = array(
+            "busqueda" => $_POST["busqueda"],
+            "campoOrden" => $_POST["campoOrden"],
+            "orden" => $_POST["orden"],
+            "page" => $_POST["page"],
+            "per_page" => $_POST["per_page"],
+            "url" => $_POST["url"],
+        );
+
+        $estatus = new saleController();
+
+        echo $estatus->listarEstatusVentasControlador($datos);
+    }
 } else {
     session_destroy();
     header("Location: " . APP_URL . "login/");

@@ -335,7 +335,7 @@ if ($_SESSION['perfil'] == 'Administrador') {
 							</a>
 						</li>
 						<li class="full-width">
-							<a href="<?php echo APP_URL; ?>progressList/" class="full-width">
+							<a href="<?php echo APP_URL; ?>statusSales/" class="full-width">
 								<div class="navLateral-body-cl">
 									<i class="fas fa-spinner fa-fw"></i>
 								</div>

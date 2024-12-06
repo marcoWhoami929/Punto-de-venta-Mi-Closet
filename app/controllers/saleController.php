@@ -1118,7 +1118,7 @@ class saleController extends mainModel
 		}
 
 		if ($datos["estatus_pago"] != "") {
-			$sWhere .= " and venta.estatus_pago = '" . $datos["estatus_pago"] . "'";
+			$sWhere .= " and venta.estatus_pago = '" . $datos["estatus_pago"] . "' and  venta.estatus != 0";
 		}
 
 		if ($datos["tipo_entrega"] != "") {
@@ -1154,26 +1154,51 @@ class saleController extends mainModel
 			foreach ($datos as $rows) {
 				if ($rows["estatus"] != 0) {
 					if ($rows["estatus_pago"] == 0) {
-						$estatus_pago = '<button class="button is-danger is-light" style="margin-right:10px;margin-top:5px" onclick="establecerFormaPago(\'' . $rows["forma_pago"] . '\',\'' . $rows["total"] . '\',\'' . $rows["codigo"] . '\',\'' . $rows["estatus"] . '\',\'' . $rows["pendiente"] . '\',\'' . $rows["pagado"] . '\')">Sin Pagar</button>';
+						$estatus_pago = '<button class="button is-danger is-light" style="margin-right:80px;margin-top:5px" onclick="establecerFormaPago(\'' . $rows["forma_pago"] . '\',\'' . $rows["total"] . '\',\'' . $rows["codigo"] . '\',\'' . $rows["estatus"] . '\',\'' . $rows["pendiente"] . '\',\'' . $rows["pagado"] . '\')">Sin Pagar</button>';
 						$disabled = "";
 						$estatus_boton = 'display:none';
 					} else {
 						if ($rows["pendiente"] != '0.00') {
-							$estatus_pago = '<button class="button is-danger is-light" style="margin-right:10px;margin-top:5px" onclick="establecerFormaPago(\'' . $rows["forma_pago"] . '\',\'' . $rows["total"] . '\',\'' . $rows["codigo"] . '\',\'' . $rows["estatus"] . '\',\'' . $rows["pendiente"] . '\',\'' . $rows["pagado"] . '\')">Pago Parcial</button>';
+							$estatus_pago = '<button class="button is-danger is-light" style="margin-right:80px;margin-top:5px" onclick="establecerFormaPago(\'' . $rows["forma_pago"] . '\',\'' . $rows["total"] . '\',\'' . $rows["codigo"] . '\',\'' . $rows["estatus"] . '\',\'' . $rows["pendiente"] . '\',\'' . $rows["pagado"] . '\')">Pago Parcial</button>';
 							$disabled = "display:none";
 							$estatus_boton = 'display:none';
 						} else {
-							$estatus_pago = '<button class="button is-success" style="margin-right:10px;margin-top:5px">Pagado</button>';
+							$estatus_pago = '';
 							$disabled = "display:none";
 							$estatus_boton = '';
 						}
 					}
 				} else {
-					$estatus_pago = '<button class="button is-danger" style="margin-right:10px;margin-top:5px">Cancelado</button>';
+					$estatus_pago = '';
 					$disabled = "display:none";
 					$estatus_boton = 'display:none';
 				}
 
+				if ($rows["estatus"] != 0) {
+					if ($rows["estatus_pago"] == 0) {
+						$displaySinPagar = "";
+						$displayPagado = "display:none";
+						$displayCancelado = "display:none";
+						$displayParcial = "display:none";
+					} else {
+						if ($rows["pendiente"] != '0.00') {
+							$displaySinPagar = "display:none";
+							$displayPagado = "display:none";
+							$displayCancelado = "display:none";
+							$displayParcial = "";
+						} else {
+							$displaySinPagar = "display:none";
+							$displayPagado = "";
+							$displayCancelado = "display:none";
+							$displayParcial = "display:none";
+						}
+					}
+				} else {
+					$displaySinPagar = "display:none";
+					$displayPagado = "display:none";
+					$displayCancelado = "";
+					$displayParcial = "display:none";
+				}
 
 
 
@@ -1200,6 +1225,7 @@ class saleController extends mainModel
 						break;
 				}
 
+
 				$tabla .= '<div class="card  pb-4">
 							<header class="card-header" style="background:#B99654;color:#ffffff">
 							
@@ -1209,6 +1235,11 @@ class saleController extends mainModel
 								 <p class="card-header-title"><strong style="color:#ffffff">' . $rows['fecha_registro'] . '</strong></p>
 								
 										' . $estatus_pago . '
+
+									<div class="ribbon right" style="--c: #CC333F;--f: 10px;' . $displaySinPagar . '">Sin Pagar</div>
+                    				<div class="ribbon right" style="--c: #27ae60;--f: 10px;' . $displayPagado . '">Pagada</div>
+									<div class="ribbon right" style="--c: #CC333F;--f: 10px;' . $displayCancelado . '">Cancelada</div>
+									<div class="ribbon right" style="--c: #FFDD57;--f: 10px;' . $displayParcial . '">Pago Parcial</div>
 								
 							
 							</header>
@@ -2191,5 +2222,197 @@ class saleController extends mainModel
 <?php
 
 
+	}
+	public function listarEstatusVentasControlador($datos)
+	{
+
+		$pagina = $this->limpiarCadena($datos["page"]);
+		$registros = $this->limpiarCadena($datos["per_page"]);
+		$campoOrden = $this->limpiarCadena($datos["campoOrden"]);
+		$orden = $this->limpiarCadena($datos["orden"]);
+
+		$url = $this->limpiarCadena($datos["url"]);
+		$url = APP_URL . $url . "/";
+
+		$busqueda = $this->limpiarCadena($datos["busqueda"]);
+		$sWhere = "vent.id_venta !='0'";
+
+		if (isset($busqueda) && $busqueda != "") {
+			$sWhere .= " AND vent.codigo LIKE '%$busqueda%' OR vent.codigo_nota LIKE '%$busqueda%'";
+		}
+
+		$campos = "*";
+		$tabla = "";
+
+		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+
+		$consulta_datos = "SELECT $campos FROM venta as vent WHERE $sWhere  ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+		$consulta_total = "SELECT COUNT(id_venta) FROM venta as vent WHERE $sWhere";
+
+
+		$datos = $this->ejecutarConsulta($consulta_datos);
+		$datos = $datos->fetchAll();
+
+		$total = $this->ejecutarConsulta($consulta_total);
+		$total = (int) $total->fetchColumn();
+
+		$numeroPaginas = ceil($total / $registros);
+
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+			foreach ($datos as $rows) {
+				switch ($rows["estatus"]) {
+					case '0':
+						$estatus1 = "";
+						$estatus2 = "";
+						$estatus3 = "";
+						$estatus4 = "";
+						break;
+					case '1':
+						$estatus1 = "completed";
+						$estatus2 = "";
+						$estatus3 = "";
+						$estatus4 = "";
+						//$color = 'style="background:#00D1B2"';
+						break;
+					case '2':
+						$estatus1 = "completed";
+						$estatus2 = "completed";
+						$estatus3 = "";
+						$estatus4 = "";
+						//$color = 'style="background:#00D1B2"';
+						break;
+					case '3':
+						$estatus1 = "completed";
+						$estatus2 = "completed";
+						$estatus3 = "completed";
+						$estatus4 = "";
+						//$color = 'style="background:#23D160"';
+						break;
+					case '4':
+						$estatus1 = "completed";
+						$estatus2 = "completed";
+						$estatus3 = "completed";
+						$estatus4 = "completed";
+						//$color = 'style="background:#FFDD57"';
+						break;
+				}
+
+				if ($rows["estatus"] != 0) {
+					if ($rows["estatus_pago"] == 0) {
+						$displaySinPagar = "";
+						$displayPagado = "display:none";
+						$displayCancelado = "display:none";
+						$displayParcial = "display:none";
+					} else {
+						if ($rows["pendiente"] != '0.00') {
+							$displaySinPagar = "display:none";
+							$displayPagado = "display:none";
+							$displayCancelado = "display:none";
+							$displayParcial = "";
+						} else {
+							$displaySinPagar = "display:none";
+							$displayPagado = "";
+							$displayCancelado = "display:none";
+							$displayParcial = "display:none";
+						}
+					}
+				} else {
+					$displaySinPagar = "display:none";
+					$displayPagado = "display:none";
+					$displayCancelado = "";
+					$displayParcial = "display:none";
+				}
+
+
+				$tabla .= '<div class="card  pb-4">
+				<header class="card-header" style="background:#B99654;color:#ffffff">
+				
+					 <p class="card-header-title"><strong style="color:#ffffff">' . $rows['codigo'] . '</strong></p>
+					
+					<div class="ribbon right" style="--c: #CC333F;--f: 10px;' . $displaySinPagar . '">Sin Pagar</div>
+                    <div class="ribbon right" style="--c: #27ae60;--f: 10px;' . $displayPagado . '">Pagada</div>
+					<div class="ribbon right" style="--c: #CC333F;--f: 10px;' . $displayCancelado . '">Cancelada</div>
+					<div class="ribbon right" style="--c: #FFDD57;--f: 10px;' . $displayParcial . '">Pago Parcial</div>
+					
+				
+				</header>
+				<div class="card-content">
+					<div class="content">
+						<div class="steps d-flex flex-wrap flex-sm-nowrap justify-content-between padding-top-2x padding-bottom-1x">
+                            <div class="step ' .  $estatus1 . '">
+                                <div class="step-icon-wrap">
+                                    <div class="step-icon" style="background:#00D1B2"><i class="fas fa-shopping-cart"></i></div>
+                                </div>
+                                <h4 class="step-title">Recibido</h4>
+                            </div>
+                            <div class="step ' .  $estatus2 . '">
+                                <div class="step-icon-wrap">
+                                    <div class="step-icon" style="background:#209CEE"><i class="fas fa-people-carry"></i></div>
+                                </div>
+                                <h4 class="step-title">En Preparación</h4>
+                            </div>
+                            <div class="step ' . $estatus3  . '">
+                                <div class="step-icon-wrap">
+                                    <div class="step-icon" style="background:#23D160"><i class="fas fa-truck-loading"></i></div>
+                                </div>
+                                <h4 class="step-title">Enviado</h4>
+                            </div>
+                            <div class="step ' .  $estatus4 . '">
+                                <div class="step-icon-wrap">
+                                    <div class="step-icon" style="background:#FFDD57"><i class="fas fa-check-circle"></i></div>
+                                </div>
+                                <h4 class="step-title">Entregado</h4>
+                            </div>
+
+                        </div>
+						
+					</div>
+				</div>
+				
+				</div>
+					<hr>';
+				$contador++;
+			}
+			$pag_final = $contador - 1;
+		} else {
+			if ($total >= 1) {
+				$tabla .= '
+						<tr class="has-text-centered" >
+			                <td colspan="5">
+			                    <a href="' . $url . '1/" class="button is-link is-rounded is-small mt-4 mb-4">
+			                        Haga clic acá para recargar el listado
+			                    </a>
+			                </td>
+			            </tr>
+					';
+			} else {
+				$tabla .= '
+							<article class="message is-warning mt-4 mb-4">
+				 <div class="message-header">
+					<p></p>
+				 </div>
+				<div class="message-body has-text-centered">
+					<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+					No hay resultados de la busqueda.
+				</div>
+			</article>
+					';
+			}
+		}
+
+
+
+		### Paginacion ###
+		if ($total > 0 && $pagina <= $numeroPaginas) {
+			$tabla .= '<p class="has-text-right">Mostrando notas <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+
+			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
+		}
+
+		return $tabla;
 	}
 }
