@@ -290,8 +290,7 @@ function generarReporte(vista){
   var per_page = $("#per_page").val();
   var page = $("#pagina").val();
   var url = $("#url").val();
-
-
+ 
   location.href =
     "../app/reporteador.php?modulo_reporte="+vista+"" +
     "&busqueda=" +

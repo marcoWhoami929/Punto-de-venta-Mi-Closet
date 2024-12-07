@@ -14,7 +14,7 @@
                     <input class="input is-rounded" type="text" id="busqueda" placeholder="¿Qué nota estás buscando?" onkeyup="listarNotas()">
                 </p>
                 <p class="control">
-                    <button class="button is-info" type="button" onclick="listarNotas()">Actualizar</button>
+                    <button class="button is-info" type="button" onclick="generarReporte('notas')"><i class="fas fa-file-excel"></i></button>
                 </p>
             </div>
         </div>

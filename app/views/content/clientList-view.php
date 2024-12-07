@@ -14,7 +14,7 @@
 					<input class="input is-rounded" type="text" id="busqueda" placeholder="¿Qué cliente estás buscando?" onkeyup="listarClientes()">
 				</p>
 				<p class="control">
-					<button class="button is-info" type="button" onclick="listarClientes()">Actualizar</button>
+					<button class="button is-info" type="button" onclick="generarReporte('clientes')"><i class="fas fa-file-excel"></i></button>
 				</p>
 			</div>
 		</div>
