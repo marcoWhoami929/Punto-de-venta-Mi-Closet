@@ -1287,6 +1287,14 @@ class saleController extends mainModel
 												 </div>
 										</div>
 										<div class="column">
+												<div class="columns">
+												<label><strong>Pendiente:</strong></label>
+												</div>
+												<div class="columns">
+												' . MONEDA_SIMBOLO . " " . number_format($rows['pendiente'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '
+												 </div>
+										</div>
+										<div class="column">
 											<div class="columns">
 												<label><strong>Estatus Venta:</strong></label>
 												</div>
@@ -2409,6 +2417,200 @@ class saleController extends mainModel
 		### Paginacion ###
 		if ($total > 0 && $pagina <= $numeroPaginas) {
 			$tabla .= '<p class="has-text-right">Mostrando notas <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
+
+			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
+		}
+
+		return $tabla;
+	}
+	public function listarHistorialClienteControlador($datos)
+	{
+
+		$pagina = $this->limpiarCadena($datos["page"]);
+		$registros = $this->limpiarCadena($datos["per_page"]);
+		$campoOrden = $this->limpiarCadena($datos["campoOrden"]);
+		$orden = $this->limpiarCadena($datos["orden"]);
+		$id_cliente = $this->limpiarCadena($datos["id_cliente"]);
+
+		$url = $this->limpiarCadena($datos["url"]);
+		$url = APP_URL . $url . "/";
+
+		$sWhere = "vent.id_cliente = '" . $id_cliente . "'";
+
+		$busqueda = $this->limpiarCadena($datos["busqueda"]);
+		if (isset($busqueda) && $busqueda != "") {
+			$sWhere .= " AND vent.codigo LIKE '%$busqueda%' OR vent.codigo_nota LIKE '%$busqueda%'";
+		}
+		$tabla = "";
+		$campos = "vent.*,met.metodo as 'metodo_pago'";
+		$pagina = (isset($pagina) && $pagina > 0) ? (int) $pagina : 1;
+		$inicio = ($pagina > 0) ? (($pagina * $registros) - $registros) : 0;
+
+		$consulta_datos = "SELECT $campos FROM venta as vent  INNER JOIN metodopago as met ON vent.forma_pago = met.id_metodo_pago WHERE $sWhere  ORDER BY $campoOrden $orden LIMIT $inicio,$registros";
+
+		$consulta_total = "SELECT COUNT(vent.id_venta) FROM venta as vent  INNER JOIN metodopago as met ON vent.forma_pago = met.id_metodo_pago WHERE $sWhere ";
+
+		$datos = $this->ejecutarConsulta($consulta_datos);
+		$datos = $datos->fetchAll();
+
+		$total = $this->ejecutarConsulta($consulta_total);
+		$total = (int) $total->fetchColumn();
+
+		$numeroPaginas = ceil($total / $registros);
+
+
+		if ($total >= 1 && $pagina <= $numeroPaginas) {
+			$contador = $inicio + 1;
+			$pag_inicio = $inicio + 1;
+
+			$tabla .= '
+			<div class="table-container">
+			<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
+				<thead style="background:#B99654;color:#ffffff;">
+					<tr>
+						<th style="color:#ffffff">#</th>
+						<th style="color:#ffffff">Tipo Venta</th>
+						<th style="color:#ffffff">Tipo Entrega</th>
+						<th style="color:#ffffff">Codigo Venta</th>
+						<th style="color:#ffffff">Codigo Nota</th>
+						<th style="color:#ffffff">Metodo Pago</th>
+						<th style="color:#ffffff">Fecha Venta</th>
+						<th style="color:#ffffff">Subtotal</th>
+						<th style="color:#ffffff">% Descuento</th>
+						<th style="color:#ffffff">Descuento</th>
+						<th style="color:#ffffff">Total</th>
+						<th style="color:#ffffff">Pagado</th>
+						<th style="color:#ffffff">Pendiente</th>
+						<th style="color:#ffffff">Estatus Venta</th>
+						<th style="color:#ffffff">Estatus Pago</th>
+					</tr>
+				</thead>
+				<tbody>
+		';
+			$totalSubtotal = 0;
+			$totalDescuento = 0;
+			$total = 0;
+			$totalPagado = 0;
+			$totalPendiente = 0;
+			foreach ($datos as $rows) {
+
+				if ($rows["estatus"] != 0) {
+					if ($rows["estatus_pago"] == 0) {
+						$estatus_pago = '<button class="button is-danger is-light" style="margin-right:80px;margin-top:5px">Sin Pagar</button>';
+					} else {
+						if ($rows["pendiente"] != '0.00') {
+							$estatus_pago = '<button class="button is-danger is-light" style="margin-right:80px;margin-top:5px">Pago Parcial</button>';
+						} else {
+							$estatus_pago = '<button class="button is-success" style="margin-right:80px;margin-top:5px">Pagada</button>';
+						}
+					}
+				} else {
+					$estatus_pago = '<button class="button is-danger" style="margin-right:80px;margin-top:5px">Cancelada</button>';
+				}
+
+
+
+
+				switch ($rows['estatus']) {
+					case '0':
+						$estatus = '<button class="button is-danger" >Cancelado</button>';
+
+						break;
+					case '1':
+						$estatus = '<button class="button is-info" style="background:#ef7216;margin-right:10px;margin-top:5px;">Recibido</button>';
+
+						break;
+					case '2':
+						$estatus = '<button class="button is-warning" style="margin-right:10px;margin-top:5px">En Preparación</button>';
+
+						break;
+					case '3':
+						$estatus = '<button class="button is-primary" style="margin-right:10px;margin-top:5px">Enviado</button>';
+
+						break;
+					case '4':
+						$estatus = '<button class="button is-success" style="margin-right:10px;margin-top:5px">Entregado</button>';
+
+						break;
+				}
+
+
+				$tabla .= '
+						<tr>
+							<td>' . $contador . '</td>
+							<td>' . $rows['tipo_venta'] . '</td>
+							<td>' . $rows['tipo_entrega'] . '</td>
+							<td><strong> <a href="' . APP_URL . 'saleDetail/' . $rows['codigo'] . '/" class=" is-link is-rounded is-medium" title="Detalle Venta' . $rows['codigo'] . '" >' . $rows['codigo'] . '</a></strong></td>
+							<td><strong>' . $rows['codigo_nota'] . '</strong></td>
+							<td>' . $rows['metodo_pago'] . '</td>
+							<td>' . $rows['fecha_venta'] . " " . $rows["hora_venta"] . '</td>
+							<td>' . MONEDA_SIMBOLO . number_format($rows['subtotal'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
+							<td>' . $rows['porc_descuento'] . '</td>
+							<td>' . MONEDA_SIMBOLO . number_format($rows['descuento'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
+							<td>' . MONEDA_SIMBOLO . number_format($rows['total'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
+							<td>' . MONEDA_SIMBOLO . number_format($rows['pagado'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
+							<td>' . MONEDA_SIMBOLO . number_format($rows['pendiente'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</td>
+							<td>
+								' . $estatus . '
+							</td>
+								<td>
+							
+								' . $estatus_pago . '
+							</td>
+							
+						</tr>
+					';
+				$totalSubtotal += $rows['subtotal'];
+				$totalDescuento += $rows["descuento"];
+				$total += $rows["total"];
+				$totalPagado += $rows["pagado"];
+				$totalPendiente += $rows["pendiente"];
+				$contador++;
+			}
+			$tabla .= '
+						<tr>
+							<td colspan="7"></td>
+							<td><strong>' . MONEDA_SIMBOLO . number_format($totalSubtotal, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</strong></td>
+							<td></td>
+							<td><strong>' . MONEDA_SIMBOLO . number_format($totalDescuento, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</strong></td>
+							<td><strong>' . MONEDA_SIMBOLO . number_format($total, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</strong></td>
+							<td><strong>' . MONEDA_SIMBOLO . number_format($totalPagado, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</strong></td>
+							<td><strong>' . MONEDA_SIMBOLO . number_format($totalPendiente, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . ' ' . MONEDA_NOMBRE . '</strong></td>
+							<td colspan="2"></td>
+							
+						</tr>
+					';
+			$pag_final = $contador - 1;
+		} else {
+			if ($total >= 1) {
+				$tabla .= '
+						<tr class="has-text-centered" >
+			                <td colspan="5">
+			                    <a href="' . $url . '1/" class="button is-link is-rounded is-small mt-4 mb-4">
+			                        Haga clic acá para recargar el listado
+			                    </a>
+			                </td>
+			            </tr>
+					';
+			} else {
+				$tabla .= '
+				<article class="message is-warning mt-4 mb-4">
+		 <div class="message-header">
+			<p></p>
+		 </div>
+		<div class="message-body has-text-centered">
+			<i class="fas fa-exclamation-triangle fa-5x"></i><br>
+			No hay compras realizadas.
+		</div>
+	</article>';
+			}
+		}
+
+		$tabla .= '</tbody></table></div>';
+
+		### Paginacion ###
+		if ($total > 0 && $pagina <= $numeroPaginas) {
+			$tabla .= '<p class="has-text-right">Mostrando ventas <strong>' . $pag_inicio . '</strong> al <strong>' . $pag_final . '</strong> de un <strong>total de ' . $total . '</strong></p>';
 
 			$tabla .= $this->paginadorTablas($pagina, $numeroPaginas, $url, 7);
 		}

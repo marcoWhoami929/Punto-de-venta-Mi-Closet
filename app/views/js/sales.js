@@ -329,7 +329,7 @@ function eleccionFormaPago(forma_pago) {
   
   if (forma_pago === "1") {
     document.getElementById("div-payment-efectivo-1").style.display = "";
-    document.getElementById("div-payment-efectivo-2").style.display = "";
+    document.getElementById("div-payment-efectivo-2").style.display = "none";
     document.getElementById("div-payment-transferencia").style.display = "none";
   }else if(forma_pago === "5"){
     document.getElementById("div-payment-efectivo-1").style.display = "none";

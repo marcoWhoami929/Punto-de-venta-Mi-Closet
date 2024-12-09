@@ -241,9 +241,8 @@ class clientController extends mainModel
 							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['Pagado'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
 							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['Pendiente'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
 							 <td>
-			                    <a href="' . APP_URL . 'clientUpdate/' . $rows['id_cliente'] . '/" class="button is-info is-rounded is-small">
-			                    	<i class="fas fa-history fa-fw"></i>
-			                    </a>
+			                   
+								<a href="' . APP_URL . 'historyDetail/' . $rows['id_cliente'] . '/" class="button is-link is-rounded is-small" title="Historial Compras" ><i class="fas fa-history fa-fw"></i></a>
 			                </td>
 			                <td>
 			                    <a href="' . APP_URL . 'clientUpdate/' . $rows['id_cliente'] . '/" class="button is-success is-rounded is-small">

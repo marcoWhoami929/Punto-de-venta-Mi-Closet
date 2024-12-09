@@ -318,7 +318,7 @@
                 </div>
 
             </div>
-            <div class="columns  mb-6" id="div-payment-efectivo-2">
+            <div class="columns  mb-6" style="display:none" id="div-payment-efectivo-2">
 
                 <div class="column">
                     <div class="field">

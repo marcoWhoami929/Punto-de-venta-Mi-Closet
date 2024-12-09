@@ -15,7 +15,7 @@
 
 	if ($datos->rowCount() == 1) {
 		$datos_venta = $datos->fetch();
-		if ($datos_venta["estatus"] == 1) {
+		if ($datos_venta["estatus"] != 0) {
 			if ($datos_venta["estatus_pago"] == 1) {
 				if ($datos_venta["pendiente"] == '0.00') {
 					$buttonPago = '<p class="has-text-centered ">

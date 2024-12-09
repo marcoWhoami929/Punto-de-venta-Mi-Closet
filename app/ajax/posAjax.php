@@ -225,6 +225,22 @@ if (isset($_POST['modulo_pos'])) {
 
         echo $estatus->listarEstatusVentasControlador($datos);
     }
+    if ($_POST['modulo_pos'] == "listarHistorialCliente") {
+
+        $datos = array(
+            "busqueda" => $_POST["busqueda"],
+            "campoOrden" => $_POST["campoOrden"],
+            "orden" => $_POST["orden"],
+            "page" => $_POST["page"],
+            "per_page" => $_POST["per_page"],
+            "url" => $_POST["url"],
+            "id_cliente" => $_POST["id_cliente"],
+        );
+
+        $history = new saleController();
+
+        echo $history->listarHistorialClienteControlador($datos);
+    }
 } else {
     session_destroy();
     header("Location: " . APP_URL . "login/");

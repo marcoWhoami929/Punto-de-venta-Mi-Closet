@@ -65,6 +65,10 @@ $(function () {
         sesion = ruta[3];
         listarDetalleSession(sesion);
       break;
+      case "historyDetail":
+        id_cliente = ruta[3];
+        listarHistorialCliente(id_cliente);
+      break;
      
     }
   }
@@ -524,6 +528,33 @@ function listarEstatusVentas() {
     },
     success: function (response) {
       $(".div-estatus-ventas").html(response);
+    },
+  });
+}
+function listarHistorialCliente(id_cliente) {
+
+  var busqueda = $("#busqueda").val();
+  var campoOrden = $("#campoOrden").val();
+  var orden = $("#orden").val();
+  var per_page = $("#per_page").val();
+  var page = $("#pagina").val();
+  var url2 = $("#url").val();
+
+  $.ajax({
+    url: url+"app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      busqueda:busqueda,
+      campoOrden:campoOrden,
+      orden:orden,
+      per_page:per_page,
+      page:page,
+      url:url2,
+      id_cliente:id_cliente,
+      modulo_pos: "listarHistorialCliente",
+    },
+    success: function (response) {
+      $(".div-historial-cliente").html(response);
     },
   });
 }
