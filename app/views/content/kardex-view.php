@@ -19,6 +19,23 @@
             </div>
         </div>
         <div class="column">
+            <form method="post" id="form_load_inventario">
+                <label></label><br>
+                <div class="file is-info has-name">
+                    <label class="file-label">
+                        <input class="file-input" type="file" name="load_inventario" id="load_inventario" />
+                        <span class="file-cta">
+                            <span class="file-icon">
+                                <i class="fas fa-upload"></i>
+                            </span>
+                            <span class="file-label">Actualizar Inventario </span>
+                        </span>
+                        <span class="file-name"></span>
+                    </label>
+                </div>
+            </form>
+        </div>
+        <div class="column">
             <label>Filtro Stock</label><br>
             <div class="select">
                 <select id="stock" onchange="listarKardex()">
@@ -73,3 +90,36 @@
         </div>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+        $('#load_inventario').change(function() {
+            $('#form_load_inventario').submit();
+        });
+        $('#form_load_inventario').on('submit', function(event) {
+            event.preventDefault();
+
+            $.ajax({
+                url: url + "app/ajax/importInventario.php",
+                method: "POST",
+                data: new FormData(this),
+                contentType: false,
+                processData: false,
+                success: function(data) {
+                    if (data == "exito") {
+                        Swal.fire({
+                            icon: "success",
+                            title: "Actualizacion de inventario exitosa",
+                            text: "",
+                            confirmButtonText: "Entendido",
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                listarKardex();
+                            }
+                        });
+                    }
+
+                }
+            });
+        });
+    });
+</script>

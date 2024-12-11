@@ -112,8 +112,16 @@
 				processData: false,
 				success: function(data) {
 					if (data == "exito") {
-						listarProductos(1);
-
+						Swal.fire({
+							icon: "success",
+							title: "Alta de productos exitosa",
+							text: "",
+							confirmButtonText: "Entendido",
+						}).then((result) => {
+							if (result.isConfirmed) {
+								listarProductos(1);
+							}
+						});
 					}
 
 				}

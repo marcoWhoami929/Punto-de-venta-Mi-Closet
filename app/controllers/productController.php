@@ -2163,4 +2163,263 @@ class productController extends mainModel
 		$objWriter->save('php://output');
 		exit;
 	}
+	public function agregarProductosControlador($datos)
+	{
+
+		$cid_producto = $this->ejecutarConsulta("SELECT IF(MAX(cid_producto)+1 IS NULL,1,MAX(cid_producto)+1) as IdProducto FROM producto");
+		$cid_producto = $cid_producto->fetch();
+
+		$buscar_producto = $this->ejecutarConsulta("SELECT * FROM producto WHERE codigo = '" . $datos["codigo"] . "'");
+		if ($buscar_producto->rowCount() > 0) {
+		} else {
+
+			if ($datos["colores"] == "") {
+				$color = "";
+			} else {
+				$color = $datos["colores"];
+			}
+			if ($datos["tallas"] == "") {
+				$talla = "";
+			} else {
+				$talla = $datos["tallas"];
+			}
+			$producto_datos_reg = [
+
+				[
+					"campo_nombre" => "id_categoria",
+					"campo_marcador" => ":Categoria",
+					"campo_valor" => intval($datos["id_categoria"])
+				],
+				[
+					"campo_nombre" => "codigo",
+					"campo_marcador" => ":Codigo",
+					"campo_valor" => $datos["codigo"]
+				],
+				[
+					"campo_nombre" => "cid_producto",
+					"campo_marcador" => ":CidProducto",
+					"campo_valor" => $cid_producto['IdProducto']
+				],
+				[
+					"campo_nombre" => "nombre",
+					"campo_marcador" => ":Nombre",
+					"campo_valor" => $datos["nombre"]
+				],
+				[
+					"campo_nombre" => "out_stock",
+					"campo_marcador" => ":OutStock",
+					"campo_valor" => 0
+				],
+				[
+					"campo_nombre" => "tipo_unidad",
+					"campo_marcador" => ":Unidad",
+					"campo_valor" => $datos["unidad"]
+				],
+				[
+					"campo_nombre" => "precio_compra",
+					"campo_marcador" => ":PrecioCompra",
+					"campo_valor" => $datos["precio_compra"]
+				],
+				[
+					"campo_nombre" => "precio_venta",
+					"campo_marcador" => ":PrecioVenta",
+					"campo_valor" => $datos["precio_venta"]
+				],
+				[
+					"campo_nombre" => "marca",
+					"campo_marcador" => ":Marca",
+					"campo_valor" => ''
+				],
+				[
+					"campo_nombre" => "modelo",
+					"campo_marcador" => ":Modelo",
+					"campo_valor" => ''
+				],
+				[
+					"campo_nombre" => "colores",
+					"campo_marcador" => ":Colores",
+					"campo_valor" => $color
+				],
+				[
+					"campo_nombre" => "tallas",
+					"campo_marcador" => ":Tallas",
+					"campo_valor" => $talla
+				],
+				[
+					"campo_nombre" => "estado",
+					"campo_marcador" => ":Estado",
+					"campo_valor" => "1"
+				],
+				[
+					"campo_nombre" => "foto",
+					"campo_marcador" => ":Foto",
+					"campo_valor" => ''
+				]
+			];
+			$inventario_datos_reg = [
+
+				[
+					"campo_nombre" => "id_producto",
+					"campo_marcador" => ":IdProducto",
+					"campo_valor" => $cid_producto['IdProducto']
+				],
+				[
+					"campo_nombre" => "stock_total",
+					"campo_marcador" => ":StockTotal",
+					"campo_valor" => $datos["stock"]
+				],
+				[
+					"campo_nombre" => "stock_minimo",
+					"campo_marcador" => ":StockMinimo",
+					"campo_valor" => $datos["stock_minimo"]
+				],
+				[
+					"campo_nombre" => "stock_maximo",
+					"campo_marcador" => ":StockMaximo",
+					"campo_valor" => $datos["stock_maximo"]
+				]
+			];
+
+			$movimiento_datos_reg = [
+
+				[
+					"campo_nombre" => "id_producto",
+					"campo_marcador" => ":IdProducto",
+					"campo_valor" => $cid_producto['IdProducto']
+				],
+				[
+					"campo_nombre" => "tipo_movimiento",
+					"campo_marcador" => ":TipoMovimiento",
+					"campo_valor" => 'entrada'
+				],
+				[
+					"campo_nombre" => "cantidad",
+					"campo_marcador" => ":Cantidad",
+					"campo_valor" => $datos["stock"]
+				],
+				[
+					"campo_nombre" => "descripcion",
+					"campo_marcador" => ":Descripcion",
+					"campo_valor" => 'inventario inicial'
+				]
+			];
+			if ($datos["codigo"] != "" && $datos["stock"] != "" && $datos["stock_minimo"] != ""  && $datos["stock_maximo"] != "") {
+
+				$registrar_producto = $this->guardarDatos("producto", $producto_datos_reg);
+
+				$registrar_inventario = $this->guardarDatos("inventario", $inventario_datos_reg);
+				$registrar_movimiento = $this->guardarDatos("movimiento_inventario", $movimiento_datos_reg);
+				$bitacora_reg = [
+					[
+						"campo_nombre" => "accion",
+						"campo_marcador" => ":Accion",
+						"campo_valor" => 'Entrada de Inventario de ' . $datos["stock"] . ' unidades de ' . $datos["nombre"] . ''
+					],
+					[
+						"campo_nombre" => "id_usuario",
+						"campo_marcador" => ":IdUsuario",
+						"campo_valor" => $_SESSION["id"]
+					]
+				];
+
+				$registrar_bitacora = $this->guardarDatos("bitacora", $bitacora_reg);
+				return "ok";
+			} else {
+				return "error";
+			}
+		}
+	}
+	public function actualizarInventarioControlador($datos)
+	{
+
+		$producto = $this->ejecutarConsulta("SELECT prod.*,inven.stock_total FROM producto as prod INNER JOIN inventario as inven ON prod.cid_producto = inven.id_producto WHERE prod.codigo='" . $datos["codigo"] . "'");
+
+
+
+		if ($producto->rowCount() > 0) {
+			if ($datos["movimiento"] != "") {
+				$producto = $producto->fetch();
+				if ($datos["movimiento"] == "entrada") {
+					$movimiento = "entrada";
+					$descripcion = "Entrada de inventario";
+					$stock_total = $producto["stock_total"] + $datos["cantidad"];
+					$cantidad = $datos["cantidad"];
+				} else {
+					$movimiento = "salida";
+					$descripcion = "Salida de inventario";
+					if ($producto["stock_total"] < $datos["cantidad"]) {
+						$stock_total = $producto["stock_total"];
+						$cantidad = $producto["stock_total"];
+					} else {
+						$stock_total = $producto["stock_total"] - $datos["cantidad"];
+						$cantidad = $datos["cantidad"];
+					}
+				}
+
+				$inventario_datos_reg = [
+
+
+					[
+						"campo_nombre" => "stock_total",
+						"campo_marcador" => ":StockTotal",
+						"campo_valor" => $stock_total
+					]
+				];
+
+				$condicion = [
+					"condicion_campo" => "id_producto",
+					"condicion_marcador" => ":ID",
+					"condicion_valor" => $producto['cid_producto']
+				];
+
+				$actualizar_inventario = $this->actualizarDatos("inventario", $inventario_datos_reg, $condicion);
+				$movimiento_datos_reg = [
+
+					[
+						"campo_nombre" => "id_producto",
+						"campo_marcador" => ":IdProducto",
+						"campo_valor" => $producto['cid_producto']
+					],
+					[
+						"campo_nombre" => "tipo_movimiento",
+						"campo_marcador" => ":TipoMovimiento",
+						"campo_valor" => $movimiento
+					],
+					[
+						"campo_nombre" => "cantidad",
+						"campo_marcador" => ":Cantidad",
+						"campo_valor" => $cantidad
+					],
+					[
+						"campo_nombre" => "descripcion",
+						"campo_marcador" => ":Descripcion",
+						"campo_valor" => $descripcion
+					]
+				];
+
+
+				$movimiento_inventario = $this->guardarDatos("movimiento_inventario", $movimiento_datos_reg, $condicion);
+
+				$bitacora_reg = [
+					[
+						"campo_nombre" => "accion",
+						"campo_marcador" => ":Accion",
+						"campo_valor" => '' . ucfirst($movimiento) . ' de Inventario de ' . $cantidad . ' unidades de ' . $producto["nombre"] . ''
+					],
+					[
+						"campo_nombre" => "id_usuario",
+						"campo_marcador" => ":IdUsuario",
+						"campo_valor" => $_SESSION["id"]
+					]
+				];
+
+				$registrar_bitacora = $this->guardarDatos("bitacora", $bitacora_reg);
+				return "ok";
+			} else {
+				return "error";
+			}
+		} else {
+			return "error";
+		}
+	}
 }
