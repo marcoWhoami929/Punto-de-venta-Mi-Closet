@@ -86,6 +86,7 @@
 			<label>Ordenar por</label><br>
 			<div class="select">
 				<select id="campoOrden" onchange="listarVentas()">
+					<option value="id_venta">Id</option>
 					<option value="codigo">Codigo</option>
 					<option value="total">Total</option>
 					<option value="fecha_registro">Fecha Registro</option>
@@ -97,8 +98,9 @@
 			<label>Orden</label><br>
 			<div class="select">
 				<select id="orden" onchange="listarVentas()">
-					<option value="asc">Asc</option>
 					<option value="desc">Desc</option>
+					<option value="asc">Asc</option>
+
 
 				</select>
 			</div>

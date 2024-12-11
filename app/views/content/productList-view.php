@@ -5,7 +5,7 @@
 <div class="container is-fluid pb-2 pt-2">
 
 	<div class="columns">
-		<div class="column is-half">
+		<div class="column is-two-fifths">
 			<label></label><br>
 			<div class="field is-grouped">
 				<input type="hidden" id="pagina" value="<?= $url[1] ?>">
@@ -17,6 +17,23 @@
 					<button class="button is-info" type="button" onclick="generarReporte('productos')"><i class="fas fa-file-excel"></i></button>
 				</p>
 			</div>
+		</div>
+		<div class="column">
+			<form method="post" id="form_load_productos">
+				<label></label><br>
+				<div class="file is-info has-name">
+					<label class="file-label">
+						<input class="file-input" type="file" name="load_productos" id="load_productos" />
+						<span class="file-cta">
+							<span class="file-icon">
+								<i class="fas fa-upload"></i>
+							</span>
+							<span class="file-label">Subir Productos </span>
+						</span>
+						<span class="file-name"></span>
+					</label>
+				</div>
+			</form>
 		</div>
 		<div class="column">
 			<label>Filtro Estatus</label><br>
@@ -79,3 +96,28 @@
 </div>
 <button class="js-modal-trigger" data-target="modal-entrada-inventario" id="btn-modal-entrada" style="display:none"></button>
 <button class="js-modal-trigger" data-target="modal-salida-inventario" id="btn-modal-salida" style="display:none"></button>
+<script>
+	$(document).ready(function() {
+		$('#load_productos').change(function() {
+			$('#form_load_productos').submit();
+		});
+		$('#form_load_productos').on('submit', function(event) {
+			event.preventDefault();
+
+			$.ajax({
+				url: url + "app/ajax/importProductos.php",
+				method: "POST",
+				data: new FormData(this),
+				contentType: false,
+				processData: false,
+				success: function(data) {
+					if (data == "exito") {
+						listarProductos(1);
+
+					}
+
+				}
+			});
+		});
+	});
+</script>

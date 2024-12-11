@@ -110,16 +110,16 @@ $mainModel = new mainModel();
             </div>
         </div>
         <div class="column">
-            <form method="post" id="export_excel">
+            <form method="post" id="form_load_productos_nota">
 
                 <div class="file is-info has-name">
                     <label class="file-label">
-                        <input class="file-input" type="file" name="excel_file" id="excel_file" />
+                        <input class="file-input" type="file" name="load_productos_nota" id="load_productos_nota" />
                         <span class="file-cta">
                             <span class="file-icon">
                                 <i class="fas fa-upload"></i>
                             </span>
-                            <span class="file-label">Subir Archivo </span>
+                            <span class="file-label">Subir Productos </span>
                         </span>
                         <span class="file-name"></span>
                     </label>
@@ -179,16 +179,11 @@ $mainModel = new mainModel();
 </div>
 <script>
     $(document).ready(function() {
-        $('#excel_file').change(function() {
-            $('#export_excel').submit();
+        $('#load_productos_nota').change(function() {
+            $('#form_load_productos_nota').submit();
         });
-        $('#export_excel').on('submit', function(event) {
+        $('#form_load_productos_nota').on('submit', function(event) {
             event.preventDefault();
-
-            let datos = new FormData();
-
-            datos.append("excel", this);
-            datos.append("modulo_producto", "cargar_productos_nota");
 
             $.ajax({
                 url: url + "app/ajax/importProductosNota.php",
