@@ -980,4 +980,12 @@ class cashierController extends mainModel
 		$datos = $datos->fetch();
 		return json_encode($datos);
 	}
+	public function indicadoresCaja()
+	{
+		$sesion = $this->limpiarCadena($_SESSION['sesion_caja']);
+
+		$datos = $this->ejecutarConsulta("SELECT sesion.*,count(pay.codigo_venta) as 'num_ventas',(sesion.efectivo+sesion.transferencia+sesion.tarjeta_debito+sesion.tarjeta_credito) as 'total_ventas',sum(IF(mov.descripcion = 'ENTRADA',mov.monto,0)) as 'entrada_efectivo',sum(IF(mov.descripcion = 'SALIDA',mov.monto,0)) as 'salida_efectivo' FROM `sesiones_caja` as sesion LEFT OUTER JOIN movimiento_caja as mov ON sesion.codigo_sesion = mov.sesion_caja LEFT OUTER JOIN pago as pay ON mov.descripcion = pay.codigo_pago WHERE sesion.codigo_sesion = '" . $sesion . "'");
+		$datos = $datos->fetch();
+		return json_encode($datos);
+	}
 }

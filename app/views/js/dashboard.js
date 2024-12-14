@@ -1,5 +1,5 @@
 //--------------------------------------------------
-const ctx = document.getElementById("myChart");
+const ctx = document.getElementById("myChart2");
 new Chart(ctx, {
   type: "bar",
   data: {
@@ -21,14 +21,27 @@ new Chart(ctx, {
   },
 });
 //--------------------------------------------------
-const ctx2 = document.getElementById("myChart2");
+const ctx2 = document.getElementById("chart-ventas-mensuales");
 Chart.defaults.datasets.line.showLine = true;
 const data = {
-  labels: ["January", "February", "March", "April", "May", "June", "July"],
+  labels: ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre","Diciembre"],
   datasets: [
     {
-      label: "Looping tension",
-      data: [65, 59, 80, 81, 26, 55, 40],
+      label: "Ventas Mensuales",
+      data: [
+        $.ajax({
+          url: "../app/ajax/posAjax.php",
+          type: "POST",
+          data: {
+            
+            modulo_pos: "ventasMensuales",
+          },
+          success: function (response) {
+            var datos = JSON.parse(response);
+            console.log(datos);
+          }
+        })
+      ],
       fill: false,
       borderColor: "rgb(75, 192, 192)",
     },
@@ -56,17 +69,17 @@ const chart = new Chart(ctx2, {
   },
 });
 //--------------------------------------------------
-const ctx3 = document.getElementById("myChart3");
+const ctx3 = document.getElementById("chart-ventas-notas");
 new Chart(ctx3, {
   type: "doughnut",
   data: {
-    labels: ["Red", "Blue", "Yellow"],
+    labels: ["Ventas", "Notas"],
     datasets: [
       {
-        label: "My First Dataset",
-        data: [300, 50, 100],
+        label: "",
+        data: [300, 50,],
         backgroundColor: [
-          "rgb(255, 99, 132)",
+     
           "rgb(54, 162, 235)",
           "rgb(255, 205, 86)",
         ],

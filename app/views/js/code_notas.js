@@ -6,6 +6,9 @@ $(function () {
   switch (ruta[2]) {
     case "dashboard":
       cargarAperturaCaja();
+      cargarIndicadoresVentas();
+      cargarIndicadoresNotas();
+      cargarIndicadoresCaja();
     break;
     case "sessionsList":
       listarSesiones();
@@ -1125,4 +1128,84 @@ function obtenerDetallePago(codigo_venta){
     },
   })
   
+}
+function cargarIndicadoresVentas() {
+
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      
+      modulo_pos: "indicadoresVentas",
+    },
+    success: function (response) {
+      var datos = JSON.parse(response);
+      $("#ind-ventas-cantidad").html(datos.total_ventas);
+      $("#ind-ventas-totales").html("$ "+datos.ventas);
+      $("#ind-ventas-pagadas").html("$ "+datos.pagadas);
+      $("#ind-ventas-pendientes").html("$ "+datos.pendientes);
+    },
+  });
+}
+function cargarIndicadoresNotas() {
+
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      
+      modulo_pos: "indicadoresNotas",
+    },
+    success: function (response) {
+      var datos = JSON.parse(response);
+      $("#ind-notas-cantidad").html(datos.total_ventas);
+      $("#ind-notas-totales").html("$ "+datos.ventas);
+      $("#ind-notas-pagadas").html("$ "+datos.pagadas);
+      $("#ind-notas-pendientes").html("$ "+datos.pendientes);
+    },
+  });
+}
+function cargarIndicadoresCaja() {
+
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      
+      modulo_pos: "indicadoresCaja",
+    },
+    success: function (response) {
+      var datos = JSON.parse(response);
+      $("#ind-cashier-saldo").html("$ "+datos.saldo_inicial);
+      $("#ind-cashier-num-ventas").html(datos.num_ventas);
+      $("#ind-cashier-total-ventas").html("$ "+datos.total_ventas);
+      $("#ind-cashier-entrada").html("$ "+datos.entrada_efectivo);
+      $("#ind-cashier-salida").html("$ "+datos.salida_efectivo);
+      $("#ind-cashier-efectivo").html("$ "+datos.efectivo);
+      $("#ind-cashier-td").html("$ "+datos.tarjeta_debito);
+      $("#ind-cashier-tc").html("$ "+datos.tarjeta_credito);
+      $("#ind-cashier-transfer").html("$ "+datos.transferencia);
+    
+      
+    },
+  });
+}
+function ventasMensuales() {
+
+
+  $.ajax({
+    url: "../app/ajax/posAjax.php",
+    type: "POST",
+    data: {
+      
+      modulo_pos: "ventasMensuales",
+    },
+    success: function (response) {
+      var datos = JSON.parse(response);
+      console.log(datos);
+    },
+  });
 }

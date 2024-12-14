@@ -241,6 +241,34 @@ if (isset($_POST['modulo_pos'])) {
 
         echo $history->listarHistorialClienteControlador($datos);
     }
+    if ($_POST['modulo_pos'] == "indicadoresVentas") {
+
+
+        $sales = new saleController();
+
+        echo $sales->indicadoresVentas();
+    }
+    if ($_POST['modulo_pos'] == "indicadoresNotas") {
+
+
+        $sales = new saleController();
+
+        echo $sales->indicadoresNotas();
+    }
+    if ($_POST['modulo_pos'] == "indicadoresCaja") {
+
+
+        $cashier = new cashierController();
+
+        echo $cashier->indicadoresCaja();
+    }
+    if ($_POST['modulo_pos'] == "ventasMensuales") {
+
+
+        $sales = new saleController();
+
+        echo $sales->ventasMensuales();
+    }
 } else {
     session_destroy();
     header("Location: " . APP_URL . "login/");

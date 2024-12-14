@@ -2617,4 +2617,25 @@ class saleController extends mainModel
 
 		return $tabla;
 	}
+	public function indicadoresVentas()
+	{
+
+		$datos = $this->ejecutarConsulta("SELECT count(id_venta) as total_ventas,sum(total) as ventas, sum(pendiente) as pendientes,sum(pagado) as pagadas FROM venta WHERE estatus  != 0");
+		$datos = $datos->fetch();
+		return json_encode($datos);
+	}
+	public function indicadoresNotas()
+	{
+
+		$datos = $this->ejecutarConsulta("SELECT count(id_venta) as total_ventas,sum(total) as ventas, sum(pendiente) as pendientes,sum(pagado) as pagadas FROM venta WHERE estatus  != 0 and codigo_nota != ''");
+		$datos = $datos->fetch();
+		return json_encode($datos);
+	}
+	public function ventasMensuales()
+	{
+
+		$datos = $this->ejecutarConsulta("SELECT IF(MONTH(fecha_venta) = '1',IF(SUM(total) IS NULL,0,SUM(total)),0) as 'enero',IF(MONTH(fecha_venta) = '2',IF(SUM(total) IS NULL,0,SUM(total)),0) as 'febrero' , IF(MONTH(fecha_venta) = '3',IF(SUM(total) IS NULL,0,SUM(total)),0) as 'marzo' ,IF(MONTH(fecha_venta) = '4',IF(SUM(total) IS NULL,0,SUM(total)),0) as 'abril' ,IF(MONTH(fecha_venta) = '5',IF(SUM(total) IS NULL,0,SUM(total)),0) as 'mayo' ,IF(MONTH(fecha_venta) = '6',IF(SUM(total) IS NULL,0,SUM(total)),0) as 'junio' ,IF(MONTH(fecha_venta) = '7',IF(SUM(total) IS NULL,0,SUM(total)),0) as 'julio' ,IF(MONTH(fecha_venta) = '8',IF(SUM(total) IS NULL,0,SUM(total)),0) as 'agosto' ,IF(MONTH(fecha_venta) = '9',IF(SUM(total) IS NULL,0,SUM(total)),0) as 'septiembre' ,IF(MONTH(fecha_venta) = '10',IF(SUM(total) IS NULL,0,SUM(total)),0) as 'octubre' ,IF(MONTH(fecha_venta) = '11',IF(SUM(total) IS NULL,0,SUM(total)),0) as 'noviembre' ,IF(MONTH(fecha_venta) = '12',IF(SUM(total) IS NULL,0,SUM(total)),0) as 'diciembre' FROM `venta` WHERE estatus != 0 ");
+		$datos = $datos->fetch();
+		return json_encode($datos);
+	}
 }
