@@ -1,9 +1,11 @@
 <?php
 
+
 namespace app\controllers;
 
 use app\models\mainModel;
 
+error_reporting(0);
 class sessionsController extends mainModel
 {
 
@@ -236,41 +238,44 @@ class sessionsController extends mainModel
 		';
 
             $totalPagos = 0;
-            $totalMovimientos = 0;
             $totalVenta = 0;
             $totalPagado = 0;
             $totalPendiente = 0;
-            foreach ($datos as $rows) {
-                if ($rows["tipo_movimiento"] == "ingreso") {
-                    $total_monto = $rows['monto'];
+            for ($i = 0; $i < count($datos); $i++) {
+                $anterior = $i - 1;
+                if ($datos[$anterior]['codigo'] == $datos[$i]['codigo']) {
+                    $total_venta = 0;
+                    $total_pagado = 0;
+                    $total_pendiente = 0;
                 } else {
-                    $total_monto = -$rows['monto'];
+                    $total_venta = $datos[$i]['total_venta'];
+                    $total_pagado = $datos[$i]['total_pagado'];
+                    $total_pendiente = $datos[$i]['total_pendiente'];
                 }
 
-
                 $tabla .= '
-						<tr >
-							<td>' . $contador . '</td>
-							<td><strong>' . $rows['sesion_caja'] . '</strong></td>
-							<td>' . $rows['tipo_movimiento'] . '</td>
-							
-							<td>' . $rows['fecha_movimiento'] . '</td>
-							<td><strong>' . $rows["codigo_pago"] . '</td>
-							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['total_pagado_pay'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
-							<td>' . $rows['fecha_pago'] . '</td>
-							<td>' . $rows['metodo'] . '</td>
-							<td><strong>' . $rows['codigo'] . '</strong></td>
-							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['total_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
-							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['total_pagado'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
-							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['total_pendiente'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
-							
-						</tr>
-					';
-                $totalPagos += $rows['total_pagado_pay'];
+                    <tr >
+                        <td>' . $contador . '</td>
+                        <td><strong>' . $datos[$i]['sesion_caja'] . '</strong></td>
+                        <td>' . $datos[$i]['tipo_movimiento'] . '</td>
+                        
+                        <td>' . $datos[$i]['fecha_movimiento'] . '</td>
+                        <td><strong>' . $datos[$i]["codigo_pago"] . '</td>
+                        <td>' . MONEDA_SIMBOLO . " " . number_format($datos[$i]['total_pagado_pay'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+                        <td>' . $datos[$i]['fecha_pago'] . '</td>
+                        <td>' . $datos[$i]['metodo'] . '</td>
+                        <td><strong>' . $datos[$i]['codigo'] . '</strong></td>
+                        <td>' . MONEDA_SIMBOLO . " " . number_format($total_venta, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+                        <td>' . MONEDA_SIMBOLO . " " . number_format($total_pagado, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+                        <td>' . MONEDA_SIMBOLO . " " . number_format($total_pendiente, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+                        
+                    </tr>
+                ';
+                $totalPagos += $datos[$i]['total_pagado_pay'];
 
-                $totalVenta += $rows['total_venta'];
-                $totalPagado += $rows['total_pagado'];
-                $totalPendiente += $rows['total_pendiente'];
+                $totalVenta += $total_venta;
+                $totalPagado += $total_pagado;
+                $totalPendiente += $total_pendiente;
                 $contador++;
             }
 
@@ -400,41 +405,44 @@ class sessionsController extends mainModel
 		';
 
             $totalPagos = 0;
-            $totalMovimientos = 0;
             $totalVenta = 0;
             $totalPagado = 0;
             $totalPendiente = 0;
-            foreach ($datos as $rows) {
-                if ($rows["tipo_movimiento"] == "ingreso") {
-                    $total_monto = $rows['monto'];
+            for ($i = 0; $i < count($datos); $i++) {
+                $anterior = $i - 1;
+                if ($datos[$anterior]['codigo'] == $datos[$i]['codigo']) {
+                    $total_venta = 0;
+                    $total_pagado = 0;
+                    $total_pendiente = 0;
                 } else {
-                    $total_monto = -$rows['monto'];
+                    $total_venta = $datos[$i]['total_venta'];
+                    $total_pagado = $datos[$i]['total_pagado'];
+                    $total_pendiente = $datos[$i]['total_pendiente'];
                 }
-
 
                 $tabla .= '
 						<tr >
 							<td>' . $contador . '</td>
-							<td><strong>' . $rows['sesion_caja'] . '</strong></td>
-							<td>' . $rows['tipo_movimiento'] . '</td>
+							<td><strong>' . $datos[$i]['sesion_caja'] . '</strong></td>
+							<td>' . $datos[$i]['tipo_movimiento'] . '</td>
 							
-							<td>' . $rows['fecha_movimiento'] . '</td>
-							<td><strong>' . $rows["codigo_pago"] . '</td>
-							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['total_pagado_pay'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
-							<td>' . $rows['fecha_pago'] . '</td>
-							<td>' . $rows['metodo'] . '</td>
-							<td><strong>' . $rows['codigo'] . '</strong></td>
-							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['total_venta'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
-							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['total_pagado'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
-							<td>' . MONEDA_SIMBOLO . " " . number_format($rows['total_pendiente'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+							<td>' . $datos[$i]['fecha_movimiento'] . '</td>
+							<td><strong>' . $datos[$i]["codigo_pago"] . '</td>
+							<td>' . MONEDA_SIMBOLO . " " . number_format($datos[$i]['total_pagado_pay'], MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+							<td>' . $datos[$i]['fecha_pago'] . '</td>
+							<td>' . $datos[$i]['metodo'] . '</td>
+							<td><strong>' . $datos[$i]['codigo'] . '</strong></td>
+							<td>' . MONEDA_SIMBOLO . " " . number_format($total_venta, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+							<td>' . MONEDA_SIMBOLO . " " . number_format($total_pagado, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
+							<td>' . MONEDA_SIMBOLO . " " . number_format($total_pendiente, MONEDA_DECIMALES, MONEDA_SEPARADOR_DECIMAL, MONEDA_SEPARADOR_MILLAR) . " " . MONEDA_NOMBRE . '</td>
 							
 						</tr>
 					';
-                $totalPagos += $rows['total_pagado_pay'];
+                $totalPagos += $datos[$i]['total_pagado_pay'];
 
-                $totalVenta += $rows['total_venta'];
-                $totalPagado += $rows['total_pagado'];
-                $totalPendiente += $rows['total_pendiente'];
+                $totalVenta += $total_venta;
+                $totalPagado += $total_pagado;
+                $totalPendiente += $total_pendiente;
                 $contador++;
             }
 

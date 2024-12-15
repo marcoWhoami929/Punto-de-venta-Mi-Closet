@@ -1842,10 +1842,14 @@ class saleController extends mainModel
 			$pago = $datos["pendiente"];
 			$pagado = $datos["pagado"] + $total_pagado;
 			$pendiente = $datos["pendiente"] - $total_pagado;
+			$pay_pago =  $total_pago;
+			$pay_pagado = $total_pagado;
 		} else {
 			$pago = $total_pago;
 			$pagado = $total_pago - $total_cambio;
 			$pendiente = $total_pago - $pagado;
+			$pay_pago =  $total_pago;
+			$pay_pagado = $total_pagado;
 		}
 		$datos_venta = [
 			[
@@ -1906,12 +1910,12 @@ class saleController extends mainModel
 				[
 					"campo_nombre" => "total_pago",
 					"campo_marcador" => ":TotalPago",
-					"campo_valor" => $pago
+					"campo_valor" => $pay_pago
 				],
 				[
 					"campo_nombre" => "total_pagado",
 					"campo_marcador" => ":TotalPagado",
-					"campo_valor" => $pagado
+					"campo_valor" => $pay_pagado
 				],
 				[
 					"campo_nombre" => "total_cambio",
