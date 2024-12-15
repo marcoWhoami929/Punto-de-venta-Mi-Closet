@@ -1145,6 +1145,8 @@ function cargarIndicadoresVentas() {
       $("#ind-ventas-totales").html("$ "+datos.ventas);
       $("#ind-ventas-pagadas").html("$ "+datos.pagadas);
       $("#ind-ventas-pendientes").html("$ "+datos.pendientes);
+      localStorage.setItem("ventas-diciembre",datos.ventas);
+      localStorage.setItem("ventas-totales",datos.ventas);
     },
   });
 }
@@ -1164,6 +1166,7 @@ function cargarIndicadoresNotas() {
       $("#ind-notas-totales").html("$ "+datos.ventas);
       $("#ind-notas-pagadas").html("$ "+datos.pagadas);
       $("#ind-notas-pendientes").html("$ "+datos.pendientes);
+      localStorage.setItem("ventas-notas",datos.ventas);
     },
   });
 }
@@ -1188,24 +1191,9 @@ function cargarIndicadoresCaja() {
       $("#ind-cashier-td").html("$ "+datos.tarjeta_debito);
       $("#ind-cashier-tc").html("$ "+datos.tarjeta_credito);
       $("#ind-cashier-transfer").html("$ "+datos.transferencia);
+   
     
       
-    },
-  });
-}
-function ventasMensuales() {
-
-
-  $.ajax({
-    url: "../app/ajax/posAjax.php",
-    type: "POST",
-    data: {
-      
-      modulo_pos: "ventasMensuales",
-    },
-    success: function (response) {
-      var datos = JSON.parse(response);
-      console.log(datos);
     },
   });
 }

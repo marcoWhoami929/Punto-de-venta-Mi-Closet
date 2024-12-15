@@ -360,21 +360,6 @@ if ($_SESSION["perfil"] == "Administrador") {
 
 		</div>
 	</div>
-	<div class="container pb-2 pt-6">
-		<div class="columns is-multiline">
-			<div class="column is-two-quarter-desktop is-half-tablet" style="width: 30%;">
-				<div class="card">
-					<canvas id="chart-ventas-notas"></canvas>
-				</div>
-			</div>
-			<div class="column is-two-quarter-desktop is-half-tablet">
-				<div class="card">
-					<canvas id="myChart4"></canvas>
-				</div>
-			</div>
-
-		</div>
-	</div>
 
 	<div class="container is-fluid pb-6">
 
