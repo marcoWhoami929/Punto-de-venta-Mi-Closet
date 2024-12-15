@@ -7,7 +7,7 @@ require_once "../autoload.php";
 use app\models\mainModel;
 
 /** Include PHPExcel */
-require_once 'phpExcel/Classes/PHPExcel.php';
+require_once 'phpexcel/Classes/PHPExcel.php';
 
 
 class reportesGenerales extends mainModel
