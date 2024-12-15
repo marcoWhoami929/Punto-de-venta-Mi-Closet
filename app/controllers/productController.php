@@ -452,7 +452,7 @@ class productController extends mainModel
 			$pag_inicio = $inicio + 1;
 			foreach ($datos as $rows) {
 
-				if (is_file("./app/views/productos/" . $rows['foto'])) {
+				if (is_file("../views/productos/" . $rows['foto'])) {
 					$foto = '<img src="' . APP_URL . 'app/views/productos/' . $rows['foto'] . '">';
 				} else {
 					$foto = '<img src="' . APP_URL . 'app/views/productos/default.png">';
